@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" preserveAspectRatio="xMidYMid slice" role="img" aria-label="default article cover">
+  <defs>
+    <linearGradient id="cover-bg" x1="86" y1="34" x2="1106" y2="662" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff7e4"/>
+      <stop offset=".46" stop-color="#d8ebe2"/>
+      <stop offset="1" stop-color="#214f4b"/>
+    </linearGradient>
+    <radialGradient id="warm" cx="0" cy="0" r="1" gradientTransform="translate(902 156) rotate(125) scale(340 260)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f3bd64" stop-opacity=".85"/>
+      <stop offset="1" stop-color="#f3bd64" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="680" fill="url(#cover-bg)"/>
+  <rect width="1200" height="680" fill="url(#warm)"/>
+  <path d="M111 514c132-202 284-309 457-320 160-10 286 61 378 214-165-37-299-10-402 82-104 92-248 100-433 24Z" fill="#173b38" opacity=".86"/>
+  <path d="M0 575c174-65 332-75 474-29 148 48 279 42 393-18 121-64 232-75 333-32v184H0Z" fill="#fffaf0" opacity=".78"/>
+  <path d="M160 146h330v18H160zM160 192h238v18H160zM160 238h286v18H160z" fill="#174c48" opacity=".78"/>
+  <circle cx="930" cy="180" r="66" fill="#f3bd64" opacity=".9"/>
+</svg>

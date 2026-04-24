@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="yo666666yo avatar">
+  <defs>
+    <linearGradient id="bg" x1="26" y1="20" x2="218" y2="222" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff7e4"/>
+      <stop offset=".48" stop-color="#cfe8db"/>
+      <stop offset="1" stop-color="#2f6f6d"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="70" y1="52" x2="152" y2="154" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f7cf7a"/>
+      <stop offset="1" stop-color="#d9963d"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" rx="58" fill="url(#bg)"/>
+  <circle cx="78" cy="72" r="28" fill="url(#sun)" opacity=".94"/>
+  <path d="M58 166c22-58 50-89 85-96 26-5 45 8 54 30-36 1-63 15-79 42-13 22-31 34-60 24Z" fill="#174c48"/>
+  <path d="M48 183c38-18 70-20 97-7 19 9 34 11 52 4-23 28-54 40-91 34-25-4-44-14-58-31Z" fill="#fffaf0" opacity=".78"/>
+  <path d="M91 111c20 13 36 30 47 51" fill="none" stroke="#f8f4ea" stroke-width="7" stroke-linecap="round"/>
+  <text x="120" y="206" text-anchor="middle" fill="#174c48" font-family="Georgia, serif" font-size="28" font-weight="700">yo</text>
+</svg>
