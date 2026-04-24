@@ -1,7 +1,8 @@
 ---
 title: Hello World - 博客开张
+description: 这篇开篇文章记录博客的定位、写作方向，并验证公式、代码块、引用等基础写作能力。
 categories:
-  - research
+  - 研究
 tags:
   - 杂谈
   - 博客
@@ -9,9 +10,10 @@ tags:
 mathjax: true
 abbrlink: 76ef95e9
 date: 2026-04-24 18:00:00
+updated: 2026-04-24 18:00:00
 ---
 
-欢迎来到 **yo666666yo 的博客**。这里会记录 AI / 研究 进展，以及日常随笔。
+欢迎来到 **yo666666yo 的博客**。这里会记录 AI / 研究进展，以及日常随笔。
 
 <!-- more -->
 

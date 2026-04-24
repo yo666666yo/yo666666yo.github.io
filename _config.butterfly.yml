@@ -39,7 +39,7 @@ katex:
 comments:
   use: Giscus
   text: true
-  lazyload: false
+  lazyload: true
   region: default
 
 # Fill repo_id and category_id from https://giscus.app after creating the repo
@@ -62,10 +62,18 @@ rss: /atom.xml
 
 # ============= Assets =============
 # Put your own images under source/img/ and they'll resolve to /img/xxx
-favicon: /img/favicon.png
+favicon: /img/favicon.svg
 avatar:
-  img: https://cdn.jsdelivr.net/gh/volantis-x/cdn-wallpaper@master/avatar/adorable-girl.png
+  img: /img/avatar.svg
   effect: false
+
+# Banner and page background use local SVG assets to avoid fragile external cover images.
+default_top_img: /img/hero.svg
+index_img: /img/hero.svg
+archive_img: /img/hero.svg
+tag_img: /img/hero.svg
+category_img: /img/hero.svg
+background: "linear-gradient(135deg, #f8f4ea 0%, #eef7f3 42%, #e8f0f7 100%)"
 
 # Sidebar (aside)
 aside:
@@ -80,7 +88,7 @@ aside:
     category: true
   card_author:
     enable: true
-    description: 记录 AI/研究进展 + 生活点滴
+    description: AI 研究笔记 / 生活观察 / 长期记录
     button:
       enable: true
       icon: fab fa-github
@@ -88,7 +96,7 @@ aside:
       link: https://github.com/yo666666yo
   card_announcement:
     enable: true
-    content: 欢迎来到我的博客 🌸 研究向笔记与日常随笔并存之处
+    content: 这里记录 AI 研究、论文阅读和日常观察。慢写，持续更新。
   card_recent_post:
     enable: true
     limit: 5
@@ -106,15 +114,29 @@ aside:
     order: -1
     limit: 8
 
-# ============= Image viewer =============
-fancybox: true
+# ============= Image loading / viewer =============
+lazyload:
+  enable: true
+  native: false
+  field: site
+
+lightbox:
+
+# ============= Home page excerpts =============
+index_post_content:
+  method: 2
+  length: 180
+
+# ============= Share buttons =============
+share:
+  use:
 
 # ============= Reading progress bar =============
 reading_progress:
   enable: true
   start_at: 0
   position: top
-  color: "#6495ED"
+  color: "#2f6f6d"
   height: 3px
 
 # ============= Anchor =============
@@ -131,7 +153,7 @@ cover:
   aside_enable: true
   archives_enable: true
   default_cover:
-    - https://cdn.jsdelivr.net/gh/jerryc127/CDN@3.3.0/cover/default_cover.jpg
+    - /img/default-cover.svg
 
 # ============= Footer =============
 footer:
@@ -147,6 +169,7 @@ footer:
 inject:
   head:
     - <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    - <link rel="stylesheet" href="/css/custom.css">
   bottom:
 
 # ============= PWA (off by default; enable later if you want offline support) =============
@@ -155,6 +178,6 @@ pwa:
 
 # ============= Analytics / noneed now =============
 busuanzi:
-  site_uv: true
-  site_pv: true
-  page_pv: true
+  site_uv: false
+  site_pv: false
+  page_pv: false

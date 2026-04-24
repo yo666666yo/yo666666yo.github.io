@@ -1,8 +1,10 @@
 ---
 title: 关于
 date: 2026-04-24 18:00:00
+updated: 2026-04-24 18:00:00
 type: about
 comments: false
+description: 关于 yo666666yo、博客内容方向、订阅方式与站点技术栈。
 ---
 
 ## 你好 👋

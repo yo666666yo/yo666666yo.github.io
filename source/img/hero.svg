@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="site hero background">
+  <defs>
+    <linearGradient id="hero-bg" x1="126" y1="56" x2="1503" y2="862" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#173b38"/>
+      <stop offset=".48" stop-color="#2f6f6d"/>
+      <stop offset="1" stop-color="#f0b65d"/>
+    </linearGradient>
+    <radialGradient id="light-a" cx="0" cy="0" r="1" gradientTransform="translate(315 215) rotate(43) scale(520 360)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff7e4" stop-opacity=".72"/>
+      <stop offset="1" stop-color="#fff7e4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="light-b" cx="0" cy="0" r="1" gradientTransform="translate(1224 192) rotate(132) scale(420 300)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f7cf7a" stop-opacity=".72"/>
+      <stop offset="1" stop-color="#f7cf7a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#hero-bg)"/>
+  <rect width="1600" height="900" fill="url(#light-a)"/>
+  <rect width="1600" height="900" fill="url(#light-b)"/>
+  <path d="M-70 766c218-177 436-236 655-178 210 56 392 43 545-38 161-85 343-99 546-43v393H-70Z" fill="#102422" opacity=".58"/>
+  <path d="M112 608c178-250 365-381 560-393 165-10 303 77 413 260-144-21-267 7-369 84-133 100-335 117-604 49Z" fill="#0d2422" opacity=".50"/>
+  <path d="M1317 90c40 52 42 109 6 171-63-37-86-88-68-153 20-9 41-15 62-18Z" fill="#fff7e4" opacity=".35"/>
+  <path d="M220 156h404v20H220zM220 209h282v20H220zM220 262h348v20H220z" fill="#fffaf0" opacity=".56"/>
+</svg>

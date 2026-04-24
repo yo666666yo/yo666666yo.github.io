@@ -1,7 +1,15 @@
 version: 2
 updates:
-- package-ecosystem: npm
-  directory: "/"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 20
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: friday
+      time: "10:00"
+      timezone: Asia/Shanghai
+    groups:
+      hexo-stack:
+        patterns:
+          - "hexo*"
+          - "@traptitech/*"
+    open-pull-requests-limit: 5

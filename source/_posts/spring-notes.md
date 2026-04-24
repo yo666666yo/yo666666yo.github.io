@@ -1,12 +1,14 @@
 ---
 title: 春日随笔 - 一段关于专注的记忆
+description: 一段关于专注、阅读 Deep Work 和日常节奏的小记录。
 categories:
-  - life
+  - 生活
 tags:
   - 随笔
   - 生活
 abbrlink: e59f32d9
 date: 2026-04-24 20:00:00
+updated: 2026-04-24 20:00:00
 ---
 
 四月的光很软，落在阳台的绿萝叶子上，像融化的奶油。

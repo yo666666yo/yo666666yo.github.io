@@ -5,8 +5,8 @@
 # Site
 title: yo666666yo 的博客
 subtitle: AI 研究笔记与生活随笔
-description: AI/研究笔记 与 生活随笔 的混合记录
-keywords: AI,research,machine learning,blog,yo666666yo
+description: 记录 AI 研究、机器学习、LLM、论文阅读与日常观察的个人博客。
+keywords: AI,LLM,机器学习,深度学习,论文阅读,生活随笔,blog,yo666666yo
 author: yo666666yo
 language: zh-CN
 timezone: Asia/Shanghai
@@ -17,8 +17,8 @@ url: https://yo666666yo.github.io
 permalink: posts/:abbrlink/
 permalink_defaults:
 pretty_urls:
-  trailing_index: true # Set to false to remove trailing 'index.html' from permalinks
-  trailing_html: true # Set to false to remove trailing '.html' from permalinks
+  trailing_index: false # Keep canonical URLs clean, e.g. /posts/xxx/
+  trailing_html: false # Keep canonical URLs clean, e.g. /about/
 
 # abbrlink - stable short URLs even for Chinese titles
 abbrlink:
@@ -47,7 +47,7 @@ filename_case: 0
 render_drafts: false
 post_asset_folder: false
 relative_link: false
-future: true
+future: false
 syntax_highlighter: prismjs
 highlight:
   line_number: true
@@ -70,13 +70,15 @@ index_generator:
   order_by: -date
 
 # Category & Tag
-default_category: uncategorized
+default_category: 未分类
 category_map:
+  研究: research
+  生活: life
 tag_map:
 
 # Metadata elements
 ## https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta
-meta_generator: true
+meta_generator: false
 
 # Date / Time format
 ## Hexo uses Moment.js to parse and display date
@@ -85,7 +87,7 @@ meta_generator: true
 date_format: YYYY-MM-DD
 time_format: HH:mm:ss
 ## updated_option supports 'mtime', 'date', 'empty'
-updated_option: 'mtime'
+updated_option: 'date'
 
 # Pagination
 ## Set per_page to 0 to disable pagination
@@ -95,6 +97,7 @@ pagination_dir: page
 # Include / Exclude file(s)
 ## include:/exclude: options only apply to the 'source/' folder
 include:
+  - .nojekyll
 exclude:
 ignore:
 
@@ -106,7 +109,7 @@ theme: butterfly
 # Local search (hexo-generator-search)
 search:
   path: search.xml
-  field: post
+  field: all
   content: true
 
 # RSS feed (hexo-generator-feed)
