@@ -1,0 +1,160 @@
+# Butterfly theme config overrides
+# This file is automatically merged on top of node_modules/hexo-theme-butterfly/_config.yml
+# Only put the keys you want to override. Full reference:
+# https://butterfly.js.org/posts/21cfbf15/
+
+# ============= Navigation =============
+menu:
+  首页: / || fas fa-home
+  研究||fas fa-flask:
+    AI笔记: /categories/research/ || fas fa-brain
+  生活||fas fa-mug-hot:
+    随笔: /categories/life/ || fas fa-pen
+  归档: /archives/ || fas fa-archive
+  标签: /tags/ || fas fa-tags
+  分类: /categories/ || fas fa-folder-open
+  关于: /about/ || fas fa-heart
+
+# ============= Code highlighting =============
+highlight_theme: mac light
+highlight_copy: true
+highlight_lang: true
+highlight_shrink: false
+highlight_height_limit: 400
+
+# ============= Local search =============
+local_search:
+  enable: true
+  preload: false
+  CDN:
+
+# ============= Math (KaTeX via markdown-it-katex) =============
+# Butterfly's `katex` block loads KaTeX CSS/JS on pages with `mathjax: true` front-matter.
+katex:
+  enable: true
+  per_page: false
+  hide_scrollbar: true
+
+# ============= Comments (Giscus) =============
+comments:
+  use: Giscus
+  text: true
+  lazyload: false
+  region: default
+
+# Fill repo_id and category_id from https://giscus.app after creating the repo
+giscus:
+  repo: yo666666yo/yo666666yo.github.io
+  repo_id: R_kgDO_REPLACE_ME_
+  category: Announcements
+  category_id: DIC_kwDO_REPLACE_ME_
+  mapping: pathname
+  strict: 0
+  reactions_enabled: 1
+  emit_metadata: 0
+  input_position: top
+  theme: preferred_color_scheme
+  lang: zh-CN
+  loading: lazy
+
+# ============= RSS =============
+rss: /atom.xml
+
+# ============= Assets =============
+# Put your own images under source/img/ and they'll resolve to /img/xxx
+favicon: /img/favicon.png
+avatar:
+  img: https://cdn.jsdelivr.net/gh/volantis-x/cdn-wallpaper@master/avatar/adorable-girl.png
+  effect: false
+
+# Sidebar (aside)
+aside:
+  enable: true
+  hide: false
+  button: true
+  mobile: true
+  position: right
+  display:
+    archive: true
+    tag: true
+    category: true
+  card_author:
+    enable: true
+    description: 记录 AI/研究进展 + 生活点滴
+    button:
+      enable: true
+      icon: fab fa-github
+      text: Follow Me
+      link: https://github.com/yo666666yo
+  card_announcement:
+    enable: true
+    content: 欢迎来到我的博客 🌸 研究向笔记与日常随笔并存之处
+  card_recent_post:
+    enable: true
+    limit: 5
+  card_categories:
+    enable: true
+    limit: 8
+    expand: none
+  card_tags:
+    enable: true
+    limit: 40
+  card_archives:
+    enable: true
+    type: monthly
+    format: MMMM YYYY
+    order: -1
+    limit: 8
+
+# ============= Image viewer =============
+fancybox: true
+
+# ============= Reading progress bar =============
+reading_progress:
+  enable: true
+  start_at: 0
+  position: top
+  color: "#6495ED"
+  height: 3px
+
+# ============= Anchor =============
+anchor:
+  button:
+    enable: false
+    always_show: false
+    icon: "#"
+  auto_update: true
+
+# ============= Cover =============
+cover:
+  index_enable: true
+  aside_enable: true
+  archives_enable: true
+  default_cover:
+    - https://cdn.jsdelivr.net/gh/jerryc127/CDN@3.3.0/cover/default_cover.jpg
+
+# ============= Footer =============
+footer:
+  owner:
+    enable: true
+    since: 2026
+  custom_text:
+  copyright: true
+
+# ============= Inject custom head/bottom content =============
+# Load KaTeX CSS from CDN so math renders correctly (Butterfly's built-in katex block
+# doesn't wire up the maintained @traptitech/markdown-it-katex output automatically).
+inject:
+  head:
+    - <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+  bottom:
+
+# ============= PWA (off by default; enable later if you want offline support) =============
+pwa:
+  enable: false
+
+# ============= Analytics / noneed now =============
+busuanzi:
+  site_uv: true
+  site_pv: true
+  page_pv: true
