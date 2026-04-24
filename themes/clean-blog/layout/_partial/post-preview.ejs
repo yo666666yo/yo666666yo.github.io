@@ -1,0 +1,37 @@
+<%
+  const postPath = url_for(post.path);
+  const authorName = post.author || config.author;
+  const excerptLen = (theme.index && theme.index.excerpt_length) || 180;
+
+  // Produce a plaintext blurb: prefer excerpt, fall back to content with tags stripped.
+  let blurb = '';
+  if (post.excerpt) {
+    blurb = post.excerpt.replace(/<[^>]+>/g, '').trim();
+  } else if (post.description) {
+    blurb = post.description.toString().trim();
+  } else if (post.content) {
+    blurb = post.content.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+  }
+  if (blurb.length > excerptLen) blurb = blurb.slice(0, excerptLen).trimEnd() + '…';
+%>
+<div class="post-preview">
+  <a href="<%- postPath %>">
+    <h2 class="post-title"><%= post.title %></h2>
+    <% if (post.subtitle || post.description) { %>
+      <h3 class="post-subtitle"><%= post.subtitle || post.description %></h3>
+    <% } else if (blurb) { %>
+      <h3 class="post-subtitle"><%= blurb %></h3>
+    <% } %>
+  </a>
+  <p class="post-meta">
+    <%= __('post.posted_by') %>
+    <a href="<%- url_for('/about/') %>"><%= authorName %></a>
+    <%= __('post.posted_on') %>
+    <time datetime="<%= date_xml(post.date) %>"><%= date(post.date, config.date_format) %></time>
+    <% if (post.categories && post.categories.length) { %>
+      <span class="post-meta-sep">·</span>
+      <% post.categories.each(function (cat) { %><a class="post-meta-cat" href="<%- url_for(cat.path) %>"><%= cat.name %></a><% }); %>
+    <% } %>
+  </p>
+</div>
+<hr class="post-divider" />

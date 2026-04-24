@@ -1,0 +1,4 @@
+<script defer src="<%- url_for('/js/clean-blog.js') %>"></script>
+<% (theme.inject && theme.inject.bottom || []).forEach(function (line) { %>
+<%- line %>
+<% }); %>

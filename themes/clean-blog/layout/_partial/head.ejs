@@ -1,0 +1,57 @@
+<%
+  const siteTitle = config.title;
+  const pageTitle = page.title;
+  const fullTitle = pageTitle && !is_home() ? (pageTitle + ' · ' + siteTitle) : siteTitle;
+  const pageDesc = page.description || page.excerpt || config.description || '';
+  const pageUrl = config.url.replace(/\/$/, '') + '/' + (page.path || '');
+  const keywordsValue = (() => {
+    const kw = page.keywords || config.keywords;
+    if (!kw) return '';
+    return Array.isArray(kw) ? kw.join(',') : kw;
+  })();
+  const favicon = theme.favicon || '/img/favicon.svg';
+  const needMath = (() => {
+    if (theme.features && theme.features.math === true) return true;
+    if (theme.features && theme.features.math === false) return false;
+    return !!page.mathjax;
+  })();
+  const fontsSerif = (theme.fonts && theme.fonts.serif) || 'Lora:ital,wght@0,400;0,700;1,400';
+  const fontsSans = (theme.fonts && theme.fonts.sans) || 'Open Sans:wght@400;700;800';
+  const fontsFamily = encodeURI('family=' + fontsSerif) + '&' + encodeURI('family=' + fontsSans);
+%>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<title><%= fullTitle %></title>
+<% if (pageDesc) { %><meta name="description" content="<%= pageDesc %>" /><% } %>
+<% if (keywordsValue) { %><meta name="keywords" content="<%= keywordsValue %>" /><% } %>
+<% if (config.author) { %><meta name="author" content="<%= config.author %>" /><% } %>
+<link rel="canonical" href="<%- pageUrl %>" />
+
+<!-- Open Graph / Twitter -->
+<meta property="og:site_name" content="<%= siteTitle %>" />
+<meta property="og:title" content="<%= pageTitle || siteTitle %>" />
+<meta property="og:type" content="<%= is_post() ? 'article' : 'website' %>" />
+<meta property="og:url" content="<%- pageUrl %>" />
+<% if (pageDesc) { %><meta property="og:description" content="<%= pageDesc %>" /><% } %>
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="<%- url_for(favicon) %>" type="image/svg+xml" />
+<% if (theme.rss) { %>
+<link rel="alternate" type="application/atom+xml" title="<%= siteTitle %>" href="<%- url_for(theme.rss) %>" />
+<% } %>
+
+<!-- Google Fonts (Lora + Open Sans) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?<%- fontsFamily %>&display=swap" />
+
+<% if (needMath) { %>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous" />
+<% } %>
+
+<link rel="stylesheet" href="<%- url_for('/css/clean-blog.css') %>" />
+
+<% (theme.inject && theme.inject.head || []).forEach(function (line) { %>
+<%- line %>
+<% }); %>

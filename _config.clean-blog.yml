@@ -1,0 +1,69 @@
+# Clean Blog theme — site-specific overrides
+# This file is auto-merged on top of themes/clean-blog/_config.yml.
+# Keep only the keys that need to differ from the theme defaults.
+
+# ---------- Navigation ----------
+menu:
+  首页: /
+  研究: /categories/research/
+  生活: /categories/life/
+  周报: /categories/weekly/
+  归档: /archives/
+  分类: /categories/
+  标签: /tags/
+  关于: /about/
+
+# ---------- Masthead copy ----------
+site:
+  tagline: yo666666yo 的博客
+  subheading: AI 研究笔记、论文阅读，以及日常生活的小观察。
+
+# ---------- Masthead backgrounds ----------
+masthead:
+  default_bg: /img/home-bg.svg
+  post_bg: /img/post-bg.svg
+  about_bg: /img/about-bg.svg
+  archive_bg: /img/post-bg.svg
+
+# ---------- Author & social ----------
+author:
+  name: yo666666yo
+social:
+  github: https://github.com/yo666666yo
+
+# ---------- Features ----------
+features:
+  reading_progress: true
+  back_to_top: true
+  math: auto
+
+# ---------- Favicon ----------
+favicon: /img/favicon.svg
+
+# ---------- RSS ----------
+rss: /atom.xml
+
+# ---------- Giscus comments ----------
+giscus:
+  enable: true
+  repo: yo666666yo/yo666666yo.github.io
+  repo_id: R_kgDOSLiRUQ
+  category: Announcements
+  category_id: DIC_kwDOSLiRUc4C7m3u
+  mapping: pathname
+  strict: 0
+  reactions_enabled: 1
+  emit_metadata: 0
+  input_position: top
+  theme: light
+  lang: zh-CN
+
+# ---------- Footer ----------
+footer:
+  since: 2026
+  copyright: true
+  powered: true
+
+# ---------- Home page post preview ----------
+index:
+  excerpt_length: 200

@@ -1,0 +1,14 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col">
+      <% if (page.posts && page.posts.length) { %>
+        <% page.posts.each(function (post) { %>
+          <%- partial('_partial/post-preview', { post: post }) %>
+        <% }); %>
+        <%- partial('_partial/pagination') %>
+      <% } else { %>
+        <p class="empty-state"><%= __('index.empty') %></p>
+      <% } %>
+    </div>
+  </div>
+</div>

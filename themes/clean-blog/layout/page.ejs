@@ -1,0 +1,18 @@
+<%
+  const t = page.type;
+%>
+<% if (t === 'categories') { %>
+  <%- partial('categories') %>
+<% } else if (t === 'tags') { %>
+  <%- partial('tags') %>
+<% } else { %>
+<article class="article article-page mb-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col">
+        <div class="post-body"><%- page.content %></div>
+      </div>
+    </div>
+  </div>
+</article>
+<% } %>

@@ -1,0 +1,24 @@
+<%
+  const giscus = theme.giscus || {};
+  const enable = giscus.enable && giscus.repo && giscus.repo_id && giscus.category_id;
+  const allowComments = page.comments !== false;
+%>
+<% if (enable && allowComments && is_post()) { %>
+<section class="post-comments">
+  <script src="https://giscus.app/client.js"
+    data-repo="<%= giscus.repo %>"
+    data-repo-id="<%= giscus.repo_id %>"
+    data-category="<%= giscus.category %>"
+    data-category-id="<%= giscus.category_id %>"
+    data-mapping="<%= giscus.mapping || 'pathname' %>"
+    data-strict="<%= giscus.strict || '0' %>"
+    data-reactions-enabled="<%= giscus.reactions_enabled || '1' %>"
+    data-emit-metadata="<%= giscus.emit_metadata || '0' %>"
+    data-input-position="<%= giscus.input_position || 'top' %>"
+    data-theme="<%= giscus.theme || 'light' %>"
+    data-lang="<%= giscus.lang || 'en' %>"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async></script>
+</section>
+<% } %>

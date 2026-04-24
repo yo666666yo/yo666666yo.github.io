@@ -1,0 +1,14 @@
+<% if (page.prev || page.next) { %>
+<div class="pager">
+  <% if (page.next) { %>
+    <a class="btn btn-primary text-uppercase" href="<%- url_for(page.next_link) %>">
+      <%= __('pagination.next') %>
+    </a>
+  <% } %>
+  <% if (page.prev) { %>
+    <a class="btn btn-primary text-uppercase" href="<%- url_for(page.prev_link) %>">
+      <%= __('pagination.prev') %>
+    </a>
+  <% } %>
+</div>
+<% } %>

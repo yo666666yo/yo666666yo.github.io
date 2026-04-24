@@ -1,0 +1,79 @@
+# Clean Blog theme — defaults (overridden by /_config.clean-blog.yml)
+
+# ---------- Navigation ----------
+menu:
+  首页: /
+  研究: /categories/research/
+  生活: /categories/life/
+  周报: /categories/weekly/
+  归档: /archives/
+  关于: /about/
+
+# ---------- Masthead (hero) defaults ----------
+masthead:
+  # background image used when a page does not declare `cover` / `top_img`
+  default_bg: /img/home-bg.svg
+  post_bg: /img/post-bg.svg
+  about_bg: /img/about-bg.svg
+  archive_bg: /img/post-bg.svg
+
+# ---------- Site meta ----------
+site:
+  tagline: A Clean Blog Theme by Start Bootstrap
+  subheading: AI research notes, paper reading, and small observations from daily life.
+
+# ---------- Author & social ----------
+author:
+  name: yo666666yo
+  email:
+social:
+  github: https://github.com/yo666666yo
+
+# ---------- Typography ----------
+fonts:
+  # loaded via Google Fonts
+  serif: "Lora:ital,wght@0,400;0,500;0,700;1,400;1,700"
+  sans: "Open Sans:wght@400;600;700;800"
+
+# ---------- Feature toggles ----------
+features:
+  reading_progress: true
+  back_to_top: true
+  math: auto          # auto | true | false (auto = on when front-matter mathjax: true)
+  prism_theme: default
+
+# ---------- Favicon ----------
+favicon: /img/favicon.svg
+
+# ---------- RSS ----------
+rss: /atom.xml
+
+# ---------- Comments (Giscus) ----------
+giscus:
+  enable: false
+  repo:
+  repo_id:
+  category: Announcements
+  category_id:
+  mapping: pathname
+  strict: 0
+  reactions_enabled: 1
+  emit_metadata: 0
+  input_position: top
+  theme: light
+  lang: zh-CN
+
+# ---------- Footer ----------
+footer:
+  since: 2026
+  copyright: true
+  powered: true
+
+# ---------- Home page post preview ----------
+index:
+  excerpt_length: 180
+
+# ---------- Inject (extra head/bottom content) ----------
+inject:
+  head: []
+  bottom: []

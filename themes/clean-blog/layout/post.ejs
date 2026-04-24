@@ -1,0 +1,37 @@
+<article class="article article-post mb-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col">
+        <div class="post-body"><%- page.content %></div>
+
+        <% if (page.tags && page.tags.length) { %>
+        <div class="post-tags">
+          <span class="post-tags-label"><%= __('post.tags') %>:</span>
+          <% page.tags.each(function (t) { %>
+            <a class="post-tag" href="<%- url_for(t.path) %>">#<%= t.name %></a>
+          <% }); %>
+        </div>
+        <% } %>
+
+        <nav class="post-pager" aria-label="post navigation">
+          <% if (page.prev) { %>
+            <a class="post-pager-item post-pager-prev" href="<%- url_for(page.prev.path) %>">
+              <span class="post-pager-label"><%= __('post.prev') %></span>
+              <span class="post-pager-title"><%= page.prev.title %></span>
+            </a>
+          <% } else { %>
+            <span></span>
+          <% } %>
+          <% if (page.next) { %>
+            <a class="post-pager-item post-pager-next" href="<%- url_for(page.next.path) %>">
+              <span class="post-pager-label"><%= __('post.next') %></span>
+              <span class="post-pager-title"><%= page.next.title %></span>
+            </a>
+          <% } %>
+        </nav>
+
+        <%- partial('_partial/comments') %>
+      </div>
+    </div>
+  </div>
+</article>

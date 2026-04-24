@@ -1,0 +1,26 @@
+<%
+  const menu = theme.menu || {};
+  const menuEntries = Object.keys(menu);
+%>
+<nav id="mainNav" class="navbar navbar-light" aria-label="<%= __('nav.menu_aria') %>">
+  <div class="navbar-container">
+    <a class="navbar-brand" href="<%- url_for('/') %>"><%= config.title %></a>
+    <button class="navbar-toggler" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="<%= __('nav.toggle') %>">
+      <%= __('nav.toggle') %>
+      <span class="navbar-toggler-icon" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+    </button>
+    <div class="navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav">
+        <% menuEntries.forEach(function (label) { %>
+          <% const href = menu[label]; %>
+          <% const active = (page.path && href !== '/' && ('/' + page.path).startsWith(href)) || (href === '/' && is_home() && page.current === 1); %>
+          <li class="nav-item">
+            <a class="nav-link<%= active ? ' active' : '' %>" href="<%- url_for(href) %>"><%= label %></a>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  </div>
+</nav>

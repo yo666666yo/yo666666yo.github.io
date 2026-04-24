@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Clean Blog post masthead">
+  <defs>
+    <linearGradient id="post-bg" x1="0" y1="0" x2="1600" y2="900" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f1115"/>
+      <stop offset=".5" stop-color="#1e232b"/>
+      <stop offset="1" stop-color="#1a2a33"/>
+    </linearGradient>
+    <radialGradient id="post-glow" cx="0" cy="0" r="1" gradientTransform="translate(400 260) scale(640 440)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3f5768" stop-opacity=".6"/>
+      <stop offset="1" stop-color="#3f5768" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grain" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="4" height="4" fill="transparent"/>
+      <circle cx="1" cy="1" r=".4" fill="#fff" fill-opacity=".03"/>
+      <circle cx="3" cy="3" r=".4" fill="#fff" fill-opacity=".04"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="900" fill="url(#post-bg)"/>
+  <rect width="1600" height="900" fill="url(#post-glow)"/>
+  <rect width="1600" height="900" fill="url(#grain)"/>
+  <path d="M0 680 L240 620 L460 680 L700 600 L940 670 L1180 620 L1400 680 L1600 640 L1600 900 L0 900 Z" fill="#070a0d" opacity=".8"/>
+</svg>

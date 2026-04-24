@@ -1,0 +1,29 @@
+<%
+  const lang = page.lang || page.language || config.language || 'default';
+  const bodyClasses = [];
+  if (is_home()) bodyClasses.push('is-home');
+  if (is_post()) bodyClasses.push('is-post');
+  if (is_archive()) bodyClasses.push('is-archive');
+  if (is_category()) bodyClasses.push('is-category');
+  if (is_tag()) bodyClasses.push('is-tag');
+  if (page.type) bodyClasses.push('type-' + page.type);
+%>
+<!doctype html>
+<html lang="<%= lang %>">
+<head>
+  <%- partial('_partial/head') %>
+</head>
+<body id="page-top" class="<%= bodyClasses.join(' ') %>">
+  <%- partial('_partial/nav') %>
+  <%- partial('_partial/masthead') %>
+
+  <main id="main-content">
+    <%- body %>
+  </main>
+
+  <hr class="section-divider" />
+
+  <%- partial('_partial/footer') %>
+  <%- partial('_partial/scripts') %>
+</body>
+</html>

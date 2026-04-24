@@ -1,0 +1,44 @@
+<%
+  const footer = theme.footer || {};
+  const social = theme.social || {};
+  const socialEntries = Object.entries(social).filter(function (pair) { return pair[1]; });
+  const year = new Date().getFullYear();
+  const startYear = footer.since || year;
+  const copyYears = startYear === year ? ('' + year) : (startYear + '–' + year);
+  const authorName = config.author || '';
+%>
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <% if (socialEntries.length) { %>
+    <ul class="social-list">
+      <% socialEntries.forEach(function (pair) { %>
+        <% const key = pair[0]; const href = pair[1]; %>
+        <li class="social-list-item">
+          <a href="<%= href %>" rel="noopener me" target="_blank" aria-label="<%= key %>">
+            <span class="social-circle">
+              <span class="social-label"><%= key %></span>
+            </span>
+          </a>
+        </li>
+      <% }); %>
+      <% if (theme.rss) { %>
+      <li class="social-list-item">
+        <a href="<%- url_for(theme.rss) %>" rel="alternate" aria-label="rss">
+          <span class="social-circle"><span class="social-label">RSS</span></span>
+        </a>
+      </li>
+      <% } %>
+    </ul>
+    <% } %>
+
+    <div class="site-footer-copy">
+      <% if (footer.copyright !== false) { %>
+        <span>Copyright &copy; <%= authorName %> <%= copyYears %></span>
+      <% } %>
+      <% if (footer.powered !== false) { %>
+        <span class="site-footer-dot">·</span>
+        <span><a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> · <a href="/" >Clean Blog</a></span>
+      <% } %>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,43 @@
+<%
+  const archPosts = Array.isArray(page.posts) ? page.posts : (page.posts && typeof page.posts.toArray === 'function' ? page.posts.toArray() : []);
+  const archGroups = new Map();
+  archPosts.forEach(function (p) {
+    const m = p.date;
+    const nd = (m && typeof m.toDate === 'function') ? m.toDate() : (m instanceof Date ? m : new Date(m));
+    const yr = String(nd.getUTCFullYear());
+    if (!archGroups.has(yr)) archGroups.set(yr, []);
+    archGroups.get(yr).push(p);
+  });
+  const archYears = Array.from(archGroups.keys()).sort(function (a, b) { return Number(b) - Number(a); });
+%>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col">
+      <% if (!archYears.length) { %>
+        <p class="empty-state"><%= __('index.empty') %></p>
+      <% } else { %>
+      <div class="archive-list">
+        <% archYears.forEach(function (yk) { %>
+          <section class="archive-year">
+            <h2 class="archive-year-title"><%= __('archive.year', yk) %></h2>
+            <ul class="archive-posts">
+              <% archGroups.get(yk).forEach(function (p2) {
+                   const d = p2.date;
+                   const pd = (d && typeof d.toDate === 'function') ? d.toDate() : (d instanceof Date ? d : new Date(d));
+                   const md = String(pd.getUTCMonth()+1).padStart(2,'0') + '-' + String(pd.getUTCDate()).padStart(2,'0');
+                   const iso = pd.toISOString();
+              %>
+                <li class="archive-post">
+                  <time class="archive-post-date" datetime="<%= iso %>"><%= md %></time>
+                  <a class="archive-post-title" href="<%- url_for(p2.path) %>"><%= p2.title %></a>
+                </li>
+              <% }); %>
+            </ul>
+          </section>
+        <% }); %>
+      </div>
+      <%- partial('_partial/pagination') %>
+      <% } %>
+    </div>
+  </div>
+</div>

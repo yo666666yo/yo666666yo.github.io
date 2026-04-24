@@ -1,0 +1,51 @@
+menu:
+  home: Home
+  archives: Archives
+  categories: Categories
+  tags: Tags
+  about: About
+
+nav:
+  menu_aria: Primary menu
+  toggle: Menu
+
+index:
+  read_more: Read More →
+  empty: No posts yet.
+
+post:
+  posted_by: Posted by
+  posted_on: Posted on
+  updated_on: Updated on
+  word_count: Words
+  read_time: "%s min read"
+  prev: Previous
+  next: Next
+  back_to_home: Back to home
+  tags: Tags
+  categories: Categories
+  no_excerpt: (no excerpt)
+
+archive:
+  title: Archive
+  count_one: "%d post"
+  count_many: "%d posts"
+  year: "%s"
+
+categories:
+  title: Categories
+  empty: No categories yet.
+
+tags:
+  title: Tags
+  empty: No tags yet.
+
+pagination:
+  prev: ← Newer
+  next: Older →
+  page: "Page %d"
+
+footer:
+  powered_by: Powered by %s
+  theme_by: Theme %s
+  copyright: "© %s %s"
