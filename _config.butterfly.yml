@@ -10,6 +10,8 @@ menu:
     AI笔记: /categories/research/ || fas fa-brain
   生活||fas fa-mug-hot:
     随笔: /categories/life/ || fas fa-pen
+  专栏||fas fa-newspaper:
+    研究周报: /categories/weekly/ || fas fa-calendar-week
   归档: /archives/ || fas fa-archive
   标签: /tags/ || fas fa-tags
   分类: /categories/ || fas fa-folder-open

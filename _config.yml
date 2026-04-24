@@ -74,6 +74,7 @@ default_category: 未分类
 category_map:
   研究: research
   生活: life
+  周报: weekly
 tag_map:
 
 # Metadata elements
