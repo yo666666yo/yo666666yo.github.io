@@ -1,181 +1,197 @@
-<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>标签: MARL | yo666666yo 的博客</title><meta name="author" content="yo666666yo"><meta name="copyright" content="yo666666yo"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="记录 AI 研究、机器学习、LLM、论文阅读与日常观察的个人博客。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="yo666666yo 的博客">
-<meta property="og:url" content="https://yo666666yo.github.io/tags/MARL/">
-<meta property="og:site_name" content="yo666666yo 的博客">
-<meta property="og:description" content="记录 AI 研究、机器学习、LLM、论文阅读与日常观察的个人博客。">
-<meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://yo666666yo.github.io/img/avatar.svg">
-<meta property="article:author" content="yo666666yo">
-<meta property="article:tag" content="AI,LLM,机器学习,深度学习,论文阅读,生活随笔,blog,yo666666yo">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://yo666666yo.github.io/img/avatar.svg"><link rel="shortcut icon" href="/img/favicon.svg"><link rel="canonical" href="https://yo666666yo.github.io/tags/MARL/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
-    (() => {
-      
-    const saveToLocal = {
-      set: (key, value, ttl) => {
-        if (!ttl) return
-        const expiry = Date.now() + ttl * 86400000
-        localStorage.setItem(key, JSON.stringify({ value, expiry }))
-      },
-      get: key => {
-        const itemStr = localStorage.getItem(key)
-        if (!itemStr) return undefined
-        const { value, expiry } = JSON.parse(itemStr)
-        if (Date.now() > expiry) {
-          localStorage.removeItem(key)
-          return undefined
-        }
-        return value
-      }
-    }
 
-    window.btf = {
-      saveToLocal,
-      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
-        const script = document.createElement('script')
-        script.src = url
-        script.async = true
-        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
-        script.onload = script.onreadystatechange = () => {
-          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
-        }
-        script.onerror = reject
-        document.head.appendChild(script)
-      }),
-      getCSS: (url, id) => new Promise((resolve, reject) => {
-        const link = document.createElement('link')
-        link.rel = 'stylesheet'
-        link.href = url
-        if (id) link.id = id
-        link.onload = link.onreadystatechange = () => {
-          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
-        }
-        link.onerror = reject
-        document.head.appendChild(link)
-      }),
-      addGlobalFn: (key, fn, name = false, parent = window) => {
-        if (!false && key.startsWith('pjax')) return
-        const globalFn = parent.globalFn || {}
-        globalFn[key] = globalFn[key] || {}
-        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
-        parent.globalFn = globalFn
-      }
-    }
+<!doctype html>
+<html lang="zh-CN">
+<head>
   
-      
-      const activateDarkMode = () => {
-        document.documentElement.setAttribute('data-theme', 'dark')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
-        }
-      }
-      const activateLightMode = () => {
-        document.documentElement.setAttribute('data-theme', 'light')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
-        }
-      }
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<title>yo666666yo 的博客</title>
+<meta name="description" content="记录 AI 研究、机器学习、LLM、论文阅读与日常观察的个人博客。" />
+<meta name="keywords" content="AI,LLM,机器学习,深度学习,论文阅读,生活随笔,blog,yo666666yo" />
+<meta name="author" content="yo666666yo" />
+<link rel="canonical" href="https://yo666666yo.github.io/tags/MARL/index.html" />
 
-      btf.activateDarkMode = activateDarkMode
-      btf.activateLightMode = activateLightMode
+<!-- Open Graph / Twitter -->
+<meta property="og:site_name" content="yo666666yo 的博客" />
+<meta property="og:title" content="yo666666yo 的博客" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://yo666666yo.github.io/tags/MARL/index.html" />
+<meta property="og:description" content="记录 AI 研究、机器学习、LLM、论文阅读与日常观察的个人博客。" />
+<meta name="twitter:card" content="summary_large_image" />
 
-      const theme = saveToLocal.get('theme')
-    
-          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
+
+<link rel="alternate" type="application/atom+xml" title="yo666666yo 的博客" href="/atom.xml" />
+
+
+<!-- Google Fonts (Lora + Open Sans) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Open%20Sans:wght@400;600;700;800&display=swap" />
+
+
+
+<link rel="stylesheet" href="/css/clean-blog.css" />
+
+
+
+</head>
+<body id="page-top" class="is-tag">
+  
+<nav id="mainNav" class="navbar navbar-light" aria-label="主菜单">
+  <div class="navbar-container">
+    <a class="navbar-brand" href="/">yo666666yo 的博客</a>
+    <button class="navbar-toggler" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="菜单">
+      菜单
+      <span class="navbar-toggler-icon" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+    </button>
+    <div class="navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav">
         
-      
-      const asideStatus = saveToLocal.get('aside-status')
-      if (asideStatus !== undefined) {
-        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
-      }
-    
-      
-    const detectApple = () => {
-      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
-        document.documentElement.classList.add('apple')
-      }
-    }
-    detectApple()
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/research/">研究</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/life/">生活</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/weekly/">周报</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">分类</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link active" href="/tags/">标签</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
   
-    })()
-  </script><script>const GLOBAL_CONFIG = {
-  root: '/',
-  algolia: undefined,
-  localSearch: undefined,
-  translate: undefined,
-  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
-  copy: {
-    success: '复制成功',
-    error: '复制失败',
-    noSupport: '浏览器不支持'
-  },
-  relativeDate: {
-    homepage: false,
-    post: false
-  },
-  runtime: '',
-  dateSuffix: {
-    just: '刚刚',
-    min: '分钟前',
-    hour: '小时前',
-    day: '天前',
-    month: '个月前'
-  },
-  copyright: undefined,
-  lightbox: 'null',
-  Snackbar: undefined,
-  infinitegrid: {
-    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
-    buttonText: '加载更多'
-  },
-  isPhotoFigcaption: false,
-  islazyloadPlugin: true,
-  isAnchor: true,
-  percent: {
-    toc: true,
-    rightside: false,
-  },
-  autoDarkmode: false
-}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
-  title: '标签: MARL',
-  isHighlightShrink: false,
-  isToc: false,
-  pageType: 'tag'
-}</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous"><link rel="stylesheet" href="/css/custom.css"><link rel="alternate" href="/atom.xml" title="yo666666yo 的博客" type="application/atom+xml">
-</head><body><div class="bg-animation" id="web_bg" style="background: linear-gradient(135deg, #f8f4ea 0%, #eef7f3 42%, #e8f0f7 100%);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/avatar.svg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">23</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-flask"></i><span> 研究</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/research/"><i class="fa-fw fas fa-brain"></i><span> AI笔记</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-mug-hot"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/life/"><i class="fa-fw fas fa-pen"></i><span> 随笔</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-newspaper"></i><span> 专栏</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/weekly/"><i class="fa-fw fas fa-calendar-week"></i><span> 研究周报</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-home-page" id="page-header" style="background-image: url(/img/hero.svg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">yo666666yo 的博客</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-flask"></i><span> 研究</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/research/"><i class="fa-fw fas fa-brain"></i><span> AI笔记</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-mug-hot"></i><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/life/"><i class="fa-fw fas fa-pen"></i><span> 随笔</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-newspaper"></i><span> 专栏</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/weekly/"><i class="fa-fw fas fa-calendar-week"></i><span> 研究周报</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="page-site-info"><h1 id="site-title">MARL</h1></div></header><main class="layout" id="content-inner"><div id="tag"><div class="article-sort-title">标签 - MARL</div><div class="article-sort"><div class="article-sort-item year">2026</div><div class="article-sort-item"><a class="article-sort-item-img" href="/posts/2caf4e5e/" title="研究周报 · 2026.03.22–03.28 · PSR 实验 Block1-3 与方向复盘"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/default-cover.svg" alt="研究周报 · 2026.03.22–03.28 · PSR 实验 Block1-3 与方向复盘" onerror="this.onerror=null;this.src='/img/404.jpg'"></a><div class="article-sort-item-info"><div class="article-sort-item-time"><i class="far fa-calendar-alt"></i><time class="post-meta-date-created" datetime="2026-03-28T08:56:00.000Z" title="发表于 2026-03-28 16:56:00">2026-03-28</time></div><a class="article-sort-item-title" href="/posts/2caf4e5e/" title="研究周报 · 2026.03.22–03.28 · PSR 实验 Block1-3 与方向复盘">研究周报 · 2026.03.22–03.28 · PSR 实验 Block1-3 与方向复盘</a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/avatar.svg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">yo666666yo</div><div class="author-info-description">AI 研究笔记 / 生活观察 / 长期记录</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">23</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/yo666666yo"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">这里记录 AI 研究、论文阅读和日常观察。慢写，持续更新。</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/e59f32d9/" title="春日随笔 - 一段关于专注的记忆"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/default-cover.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="春日随笔 - 一段关于专注的记忆"/></a><div class="content"><a class="title" href="/posts/e59f32d9/" title="春日随笔 - 一段关于专注的记忆">春日随笔 - 一段关于专注的记忆</a><time datetime="2026-04-24T12:00:00.000Z" title="发表于 2026-04-24 20:00:00">2026-04-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/76ef95e9/" title="Hello World - 博客开张"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/default-cover.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World - 博客开张"/></a><div class="content"><a class="title" href="/posts/76ef95e9/" title="Hello World - 博客开张">Hello World - 博客开张</a><time datetime="2026-04-24T10:00:00.000Z" title="发表于 2026-04-24 18:00:00">2026-04-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/c05e1abd/" title="研究周报 · 2026.04.12–04.18 · Credit Assignment Survey、SHARP 精读与 Q&amp;A"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/default-cover.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="研究周报 · 2026.04.12–04.18 · Credit Assignment Survey、SHARP 精读与 Q&amp;A"/></a><div class="content"><a class="title" href="/posts/c05e1abd/" title="研究周报 · 2026.04.12–04.18 · Credit Assignment Survey、SHARP 精读与 Q&amp;A">研究周报 · 2026.04.12–04.18 · Credit Assignment Survey、SHARP 精读与 Q&amp;A</a><time datetime="2026-04-18T14:00:00.000Z" title="发表于 2026-04-18 22:00:00">2026-04-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/13f375aa/" title="研究周报 · 2026.04.06–04.12 · 基础概念补齐与 LLM-MAS 论文精读"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/default-cover.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="研究周报 · 2026.04.06–04.12 · 基础概念补齐与 LLM-MAS 论文精读"/></a><div class="content"><a class="title" href="/posts/13f375aa/" title="研究周报 · 2026.04.06–04.12 · 基础概念补齐与 LLM-MAS 论文精读">研究周报 · 2026.04.06–04.12 · 基础概念补齐与 LLM-MAS 论文精读</a><time datetime="2026-04-11T18:42:00.000Z" title="发表于 2026-04-12 02:42:00">2026-04-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/2caf4e5e/" title="研究周报 · 2026.03.22–03.28 · PSR 实验 Block1-3 与方向复盘"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/default-cover.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="研究周报 · 2026.03.22–03.28 · PSR 实验 Block1-3 与方向复盘"/></a><div class="content"><a class="title" href="/posts/2caf4e5e/" title="研究周报 · 2026.03.22–03.28 · PSR 实验 Block1-3 与方向复盘">研究周报 · 2026.03.22–03.28 · PSR 实验 Block1-3 与方向复盘</a><time datetime="2026-03-28T08:56:00.000Z" title="发表于 2026-03-28 16:56:00">2026-03-28</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline">
-            <i class="fas fa-folder-open"></i>
-            <span>分类</span>
-            
-          </div>
-          <ul class="card-category-list" id="aside-cat-list">
-            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/weekly/"><span class="card-category-list-name">周报</span><span class="card-category-list-count">4</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/life/"><span class="card-category-list-name">生活</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/research/"><span class="card-category-list-name">研究</span><span class="card-category-list-count">1</span></a></li>
-          </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>标签</span></div><div class="card-tag-cloud"><a href="/tags/Objective-Mismatch/" style="font-size: 1.1em; color: #999">Objective Mismatch</a> <a href="/tags/%E5%8D%9A%E5%AE%A2/" style="font-size: 1.1em; color: #999">博客</a> <a href="/tags/MHGPO/" style="font-size: 1.1em; color: #999">MHGPO</a> <a href="/tags/ProbeCommitEnv/" style="font-size: 1.1em; color: #999">ProbeCommitEnv</a> <a href="/tags/PSR/" style="font-size: 1.1em; color: #999">PSR</a> <a href="/tags/%E5%91%A8%E6%8A%A5/" style="font-size: 1.5em; color: #99a9bf">周报</a> <a href="/tags/credit-assignment/" style="font-size: 1.3em; color: #99a1ac">credit assignment</a> <a href="/tags/PPO/" style="font-size: 1.3em; color: #99a1ac">PPO</a> <a href="/tags/World-Model/" style="font-size: 1.1em; color: #999">World Model</a> <a href="/tags/policy-gradient/" style="font-size: 1.1em; color: #999">policy gradient</a> <a href="/tags/Agentic-RL/" style="font-size: 1.1em; color: #999">Agentic RL</a> <a href="/tags/%E7%94%9F%E6%B4%BB/" style="font-size: 1.1em; color: #999">生活</a> <a href="/tags/LangMARL/" style="font-size: 1.1em; color: #999">LangMARL</a> <a href="/tags/GRPO/" style="font-size: 1.3em; color: #99a1ac">GRPO</a> <a href="/tags/LLM-MAS/" style="font-size: 1.1em; color: #999">LLM-MAS</a> <a href="/tags/GAE/" style="font-size: 1.1em; color: #999">GAE</a> <a href="/tags/Model-Based-RL/" style="font-size: 1.1em; color: #999">Model-Based RL</a> <a href="/tags/Hexo/" style="font-size: 1.1em; color: #999">Hexo</a> <a href="/tags/representation-learning/" style="font-size: 1.1em; color: #999">representation learning</a> <a href="/tags/MARL/" style="font-size: 1.1em; color: #999">MARL</a> <a href="/tags/%E6%9D%82%E8%B0%88/" style="font-size: 1.1em; color: #999">杂谈</a> <a href="/tags/SHARP/" style="font-size: 1.1em; color: #999">SHARP</a> <a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 1.1em; color: #999">随笔</a></div></div><div class="card-widget card-archives">
-    <div class="item-headline">
-      <i class="fas fa-archive"></i>
-      <span>归档</span>
+<header class="masthead masthead-page" style="background-image: url('/img/post-bg.svg')">
+  <div class="masthead-overlay" aria-hidden="true"></div>
+  <div class="masthead-container">
+    <div class="masthead-inner">
+      
+        <div class="page-heading">
+          <h1>MARL</h1>
+          
+        </div>
       
     </div>
+  </div>
+</header>
+
+
+  <main id="main-content">
+    
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col">
+      
+      <div class="archive-list">
+        
+          <section class="archive-year">
+            <h2 class="archive-year-title">2026 年</h2>
+            <ul class="archive-posts">
+              
+                <li class="archive-post">
+                  <time class="archive-post-date" datetime="2026-03-28T08:56:00.000Z">03-28</time>
+                  <a class="archive-post-title" href="/posts/2caf4e5e/">研究周报 · 2026.03.22–03.28 · PSR 实验 Block1-3 与方向复盘</a>
+                </li>
+              
+            </ul>
+          </section>
+        
+      </div>
+      
+
+      
+    </div>
+  </div>
+</div>
+
+
+  </main>
+
+  <hr class="section-divider" />
+
   
-    <ul class="card-archive-list">
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    
+    <ul class="social-list">
       
-        <li class="card-archive-list-item">
-          <a class="card-archive-list-link" href="/archives/2026/04/">
-            <span class="card-archive-list-date">
-              四月 2026
+        
+        <li class="social-list-item">
+          <a href="https://github.com/yo666666yo" rel="noopener me external nofollow noreferrer" target="_blank" aria-label="github">
+            <span class="social-circle">
+              <span class="social-label">github</span>
             </span>
-            <span class="card-archive-list-count">4</span>
           </a>
         </li>
       
-        <li class="card-archive-list-item">
-          <a class="card-archive-list-link" href="/archives/2026/03/">
-            <span class="card-archive-list-date">
-              三月 2026
-            </span>
-            <span class="card-archive-list-count">2</span>
-          </a>
-        </li>
+      
+      <li class="social-list-item">
+        <a href="/atom.xml" rel="alternate" aria-label="rss">
+          <span class="social-circle"><span class="social-label">RSS</span></span>
+        </a>
+      </li>
       
     </ul>
-  </div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>网站信息</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">文章数目 :</div><div class="item-count">6</div></div><div class="webinfo-item"><div class="item-name">最后更新时间 :</div><div class="item-count" id="last-push-date" data-lastPushDate="2026-04-24T17:17:08.104Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By yo666666yo</span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div></div></body></html>
+    
+
+    <div class="site-footer-copy">
+      
+        <span>Copyright &copy; yo666666yo 2026</span>
+      
+      
+        <span class="site-footer-dot">·</span>
+        <span><a href="https://hexo.io/" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> · <a href="/" >Clean Blog</a></span>
+      
+    </div>
+  </div>
+</footer>
+
+  <script defer src="/js/clean-blog.js"></script>
+
+
+</body>
+</html>

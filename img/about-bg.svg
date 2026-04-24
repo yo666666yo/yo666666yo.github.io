@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Clean Blog about masthead">
+  <defs>
+    <linearGradient id="about-bg" x1="0" y1="0" x2="1600" y2="900" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#231d18"/>
+      <stop offset=".55" stop-color="#3d3127"/>
+      <stop offset="1" stop-color="#6b4d35"/>
+    </linearGradient>
+    <radialGradient id="about-glow" cx="0" cy="0" r="1" gradientTransform="translate(1200 300) scale(560 360)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f7c98a" stop-opacity=".32"/>
+      <stop offset="1" stop-color="#f7c98a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#about-bg)"/>
+  <rect width="1600" height="900" fill="url(#about-glow)"/>
+  <path d="M0 760 L260 700 L540 760 L820 690 L1100 760 L1360 710 L1600 760 L1600 900 L0 900 Z" fill="#15100a" opacity=".80"/>
+</svg>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Clean Blog home masthead">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="900" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1a1d21"/>
+      <stop offset=".45" stop-color="#2e3440"/>
+      <stop offset=".75" stop-color="#5c4a3c"/>
+      <stop offset="1" stop-color="#b07848"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0" cy="0" r="1" gradientTransform="translate(1180 640) scale(460 320)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd891" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#ffd891" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cloud" cx="0" cy="0" r="1" gradientTransform="translate(360 240) scale(520 180)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f0e6d7" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#f0e6d7" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <rect width="1600" height="900" fill="url(#sun)"/>
+  <rect width="1600" height="900" fill="url(#cloud)"/>
+  <!-- distant ridge -->
+  <path d="M0 620 L180 580 L360 610 L520 560 L720 600 L880 560 L1080 610 L1260 580 L1440 620 L1600 590 L1600 900 L0 900 Z" fill="#1b2128" opacity=".80"/>
+  <!-- near hills -->
+  <path d="M0 720 L140 680 L320 720 L500 670 L700 720 L880 680 L1100 730 L1320 690 L1600 720 L1600 900 L0 900 Z" fill="#0f1318" opacity=".90"/>
+  <!-- foreground -->
+  <path d="M0 820 L200 790 L420 820 L640 790 L880 820 L1120 795 L1360 820 L1600 800 L1600 900 L0 900 Z" fill="#060809"/>
+</svg>
