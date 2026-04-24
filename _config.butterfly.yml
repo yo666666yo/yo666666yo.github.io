@@ -45,9 +45,9 @@ comments:
 # Fill repo_id and category_id from https://giscus.app after creating the repo
 giscus:
   repo: yo666666yo/yo666666yo.github.io
-  repo_id: R_kgDO_REPLACE_ME_
+  repo_id: R_kgDOSLiRUQ
   category: Announcements
-  category_id: DIC_kwDO_REPLACE_ME_
+  category_id: DIC_kwDOSLiRUc4C7m3u
   mapping: pathname
   strict: 0
   reactions_enabled: 1
