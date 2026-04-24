@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://yo666666yo.github.io/categories/</loc>
+    <loc>https://yo666666yo.github.io/tags/</loc>
     
     <lastmod>2026-04-24</lastmod>
     
@@ -11,7 +11,7 @@
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/</loc>
+    <loc>https://yo666666yo.github.io/categories/</loc>
     
     <lastmod>2026-04-24</lastmod>
     
@@ -107,20 +107,6 @@
   
   <url>
     <loc>https://yo666666yo.github.io/tags/Hexo/</loc>
-    <lastmod>2026-04-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/%E9%9A%8F%E7%AC%94/</loc>
-    <lastmod>2026-04-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/%E7%94%9F%E6%B4%BB/</loc>
     <lastmod>2026-04-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -252,6 +238,20 @@
     <priority>0.2</priority>
   </url>
   
+  <url>
+    <loc>https://yo666666yo.github.io/tags/%E9%9A%8F%E7%AC%94/</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/%E7%94%9F%E6%B4%BB/</loc>
+    <lastmod>2026-04-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
 
   
   <url>
@@ -262,14 +262,14 @@
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/categories/life/</loc>
+    <loc>https://yo666666yo.github.io/categories/weekly/</loc>
     <lastmod>2026-04-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/categories/weekly/</loc>
+    <loc>https://yo666666yo.github.io/categories/life/</loc>
     <lastmod>2026-04-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
