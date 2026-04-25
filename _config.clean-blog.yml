@@ -15,7 +15,7 @@ menu:
 
 # ---------- Masthead copy ----------
 site:
-  tagline: yo666666yo 的博客
+  tagline: Yoyo_Lee 的博客
   subheading: AI 研究笔记、论文阅读，以及日常生活的小观察。
 
 # ---------- Masthead backgrounds ----------
@@ -27,7 +27,7 @@ masthead:
 
 # ---------- Author & social ----------
 author:
-  name: yo666666yo
+  name: Yoyo_Lee
 social:
   github: https://github.com/yo666666yo
 
