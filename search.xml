@@ -78,13 +78,13 @@
             
             <tag> 周报 </tag>
             
-            <tag> credit assignment </tag>
-            
-            <tag> SHARP </tag>
-            
             <tag> GRPO </tag>
             
             <tag> PPO </tag>
+            
+            <tag> credit assignment </tag>
+            
+            <tag> SHARP </tag>
             
             <tag> GAE </tag>
             
@@ -115,8 +115,6 @@
             
             <tag> 周报 </tag>
             
-            <tag> credit assignment </tag>
-            
             <tag> GRPO </tag>
             
             <tag> PPO </tag>
@@ -126,6 +124,8 @@
             <tag> LangMARL </tag>
             
             <tag> MHGPO </tag>
+            
+            <tag> credit assignment </tag>
             
         </tags>
       
@@ -203,17 +203,6 @@
     
     
     <entry>
-      <title>分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>关于</title>
       <link href="/about/index.html"/>
       <url>/about/index.html</url>
@@ -228,6 +217,17 @@
       <title>标签</title>
       <link href="/tags/index.html"/>
       <url>/tags/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       

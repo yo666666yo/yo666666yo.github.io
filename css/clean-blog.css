@@ -282,7 +282,7 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
 }
 
 /* ============ Post preview (index) ============ */
-.home-container { max-width: 1180px; }
+.home-container { max-width: 1260px; }
 .home-layout {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr);
@@ -330,7 +330,7 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
 }
 
 @media (min-width: 992px) {
-  .home-layout { grid-template-columns: minmax(0, 760px) minmax(320px, 390px) !important; gap: 3.25rem; justify-content: center; }
+  .home-layout { grid-template-columns: minmax(0, 720px) minmax(380px, 470px) !important; gap: 3.5rem; justify-content: center; }
   .home-tags-card { position: sticky; top: 5.5rem; }
 }
 
@@ -757,32 +757,35 @@ figure.highlight figcaption a { color: inherit; text-decoration: underline; }
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 400px;
+  max-width: 460px;
   margin: .25rem auto 0;
-  aspect-ratio: 7 / 6;
+  aspect-ratio: 13 / 9;
 }
 .tag-cloud-svg {
   width: 100%;
   height: 100%;
   overflow: visible;
 }
-.tag-cloud-glow circle:first-child {
-  fill: rgba(0,133,161,.07);
+.tag-cloud-glow {
+  opacity: .42;
+}
+.tag-cloud-glow ellipse:first-child {
+  fill: rgba(0,133,161,.06);
   stroke: rgba(0,133,161,.16);
   stroke-width: 1;
   stroke-dasharray: 8 10;
 }
-.tag-cloud-glow circle:nth-child(2) { fill: rgba(245,182,107,.13); }
-.tag-cloud-glow circle:nth-child(3) { fill: rgba(127,184,255,.12); }
+.tag-cloud-glow ellipse:nth-child(2) { fill: rgba(245,182,107,.12); }
+.tag-cloud-glow ellipse:nth-child(3) { fill: rgba(127,184,255,.11); }
 .tag-cloud-svg-link { text-decoration: none; }
 .tag-cloud-svg text {
-  fill: hsl(var(--tag-hue, 190), 58%, 30%);
+  fill: var(--tag-color, #0085a1);
   fill-opacity: var(--tag-opacity, .84);
-  font-family: "Lora", "Source Han Serif SC", Georgia, serif;
+  font-family: "Open Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
   font-weight: 800;
   paint-order: stroke;
-  stroke: rgba(255,255,255,.82);
-  stroke-width: 4px;
+  stroke: rgba(255,255,255,.92);
+  stroke-width: 2.6px;
   stroke-linejoin: round;
   cursor: pointer;
   transition: fill .2s ease, fill-opacity .2s ease, filter .2s ease, transform .2s ease;
