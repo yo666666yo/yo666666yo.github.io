@@ -1,0 +1,32 @@
+<%
+  const tagList = site.tags ? site.tags.sort('length', -1).toArray() : [];
+  const maxLen = tagList.reduce(function (max, tag) { return Math.max(max, tag.length); }, 0);
+  const minLen = tagList.reduce(function (min, tag) { return Math.min(min, tag.length); }, maxLen || 0);
+  const range = Math.max(1, maxLen - minLen);
+  const tagVariant = typeof variant !== 'undefined' && variant ? String(variant).replace(/[^a-z0-9_-]/gi, '') : '';
+  const variantClass = tagVariant ? ' tag-cloud--' + tagVariant : '';
+%>
+<% if (!tagList.length) { %>
+  <p class="empty-state"><%= __('tags.empty') %></p>
+<% } else { %>
+  <ul class="tag-cloud<%= variantClass %>">
+    <% tagList.forEach(function (tag, index) { %>
+      <%
+        const weight = maxLen === minLen ? 0.5 : (tag.length - minLen) / range;
+        const scale = 0.9 + weight * 0.95;
+        const hue = 184 + ((index * 37) % 94);
+      %>
+      <li class="tag-cloud-item">
+        <a
+          href="<%- url_for(tag.path) %>"
+          style="--tag-scale: <%= scale.toFixed(2) %>; --tag-hue: <%= hue %>;"
+          title="<%= tag.name %> (<%= tag.length %>)"
+          aria-label="<%= tag.name %>，<%= tag.length %> 篇文章"
+        >
+          <span class="tag-cloud-name">#<%= tag.name %></span>
+          <span class="tag-cloud-count"><%= tag.length %></span>
+        </a>
+      </li>
+    <% }); %>
+  </ul>
+<% } %>

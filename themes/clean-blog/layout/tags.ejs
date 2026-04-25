@@ -1,24 +1,7 @@
-<%
-  const tags = site.tags.sort('length', -1).toArray();
-  const maxLen = tags.reduce(function (m, t) { return Math.max(m, t.length); }, 0) || 1;
-%>
 <div class="container">
   <div class="row justify-content-center">
     <div class="col">
-      <% if (!tags.length) { %>
-        <p class="empty-state"><%= __('tags.empty') %></p>
-      <% } else { %>
-      <ul class="tag-cloud">
-        <% tags.forEach(function (t) { %>
-          <% const scale = 0.82 + 0.6 * (t.length / maxLen); %>
-          <li class="tag-cloud-item">
-            <a href="<%- url_for(t.path) %>" style="font-size: <%= scale.toFixed(2) %>em">
-              #<%= t.name %> <span class="tag-cloud-count"><%= t.length %></span>
-            </a>
-          </li>
-        <% }); %>
-      </ul>
-      <% } %>
+      <%- partial('_partial/tag-cloud') %>
       <% if (page.content) { %><div class="post-body page-extra"><%- page.content %></div><% } %>
     </div>
   </div>

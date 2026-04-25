@@ -1,6 +1,6 @@
-<div class="container">
-  <div class="row justify-content-center">
-    <div class="col">
+<div class="container home-container">
+  <div class="home-layout">
+    <section class="home-posts" aria-label="Recent posts">
       <% if (page.posts && page.posts.length) { %>
         <% page.posts.each(function (post) { %>
           <%- partial('_partial/post-preview', { post: post }) %>
@@ -9,6 +9,15 @@
       <% } else { %>
         <p class="empty-state"><%= __('index.empty') %></p>
       <% } %>
-    </div>
+    </section>
+
+    <aside class="home-tags" aria-labelledby="home-tags-title">
+      <div class="home-tags-card">
+        <p class="home-tags-eyebrow">Tags</p>
+        <h2 id="home-tags-title" class="home-tags-title">标签云</h2>
+        <p class="home-tags-note">出现越频繁，词越醒目；点击即可进入对应标签。</p>
+        <%- partial('_partial/tag-cloud', { variant: 'home' }) %>
+      </div>
+    </aside>
   </div>
 </div>
