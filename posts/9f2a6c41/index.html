@@ -1,0 +1,357 @@
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<title>Agentic RL 经典 Baselines 综述 · Yoyo_Lee 的博客</title>
+<meta name="description" content="梳理单智能体 RL、多智能体 RL、reward-free 表征学习与 LLM-based Agentic RL 中常见 baseline，作为后续实验对照清单。" />
+<meta name="keywords" content="AI,LLM,机器学习,深度学习,论文阅读,生活随笔,blog,Yoyo_Lee" />
+<meta name="author" content="Yoyo_Lee" />
+<link rel="canonical" href="https://yo666666yo.github.io/posts/9f2a6c41/" />
+
+<!-- Open Graph / Twitter -->
+<meta property="og:site_name" content="Yoyo_Lee 的博客" />
+<meta property="og:title" content="Agentic RL 经典 Baselines 综述" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://yo666666yo.github.io/posts/9f2a6c41/" />
+<meta property="og:description" content="梳理单智能体 RL、多智能体 RL、reward-free 表征学习与 LLM-based Agentic RL 中常见 baseline，作为后续实验对照清单。" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
+
+<link rel="alternate" type="application/atom+xml" title="Yoyo_Lee 的博客" href="/atom.xml" />
+
+
+<!-- Google Fonts (Lora + Open Sans) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Open%20Sans:wght@400;600;700;800&display=swap" />
+
+
+
+<link rel="stylesheet" href="/css/clean-blog.css?v=20260425-6" />
+
+
+
+</head>
+<body id="page-top" class="is-post">
+  
+<nav id="mainNav" class="navbar navbar-light" aria-label="主菜单">
+  <div class="navbar-container">
+    <a class="navbar-brand" href="/">Yoyo_Lee 的博客</a>
+    <button class="navbar-toggler" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="菜单">
+      菜单
+      <span class="navbar-toggler-icon" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+    </button>
+    <div class="navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav">
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/research/">研究</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/life/">生活</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/weekly/">周报</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+<header class="masthead masthead-post" style="background-image: url('/img/post-bg.svg')">
+  <div class="masthead-overlay" aria-hidden="true"></div>
+  <div class="masthead-container">
+    <div class="masthead-inner">
+      
+        <div class="post-heading">
+          <h1>Agentic RL 经典 Baselines 综述</h1>
+          <h2 class="subheading">梳理单智能体 RL、多智能体 RL、reward-free 表征学习与 LLM-based Agentic RL 中常见 baseline，作为后续实验对照清单。</h2>
+          <span class="meta">
+            作者
+            <a href="/about/">Yoyo_Lee</a>
+            发表于
+            <time datetime="2026-03-31T08:11:13.000Z">2026-03-31</time>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+</header>
+
+
+  <main id="main-content">
+    <article class="article article-post mb-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col">
+        <div class="post-body"><p>这篇笔记整理单智能体 RL、多智能体 RL、reward-free 表征学习，以及 LLM-based Agentic RL 中常见 baseline，主要用于后续实验设计和论文对比时快速查表。</p>
+<span id="more"></span>
+<h2 id="1-单智能体-RL-基础算法">1. 单智能体 RL 基础算法</h2>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">┌─────────┬─────────────────┬──────────────────────────────────────────────────┐
+│  算法   │      类别       │                     核心思想                     │
+├─────────┼─────────────────┼──────────────────────────────────────────────────┤
+│ DQN     │ Value-based     │ 深度 Q 网络 + Experience Replay + Target Network │
+├─────────┼─────────────────┼──────────────────────────────────────────────────┤
+│ PPO     │ Policy Gradient │ Clipped surrogate objective，稳定策略优化        │
+├─────────┼─────────────────┼──────────────────────────────────────────────────┤
+│ SAC     │ Actor-Critic    │ 最大熵 RL，自动温度调节                          │
+├─────────┼─────────────────┼──────────────────────────────────────────────────┤
+│ TD3     │ Actor-Critic    │ Twin critics + delayed policy update，减少过估计 │
+├─────────┼─────────────────┼──────────────────────────────────────────────────┤
+│ A2C/A3C │ Actor-Critic    │ 异步/同步 advantage actor-critic                 │
+├─────────┼─────────────────┼──────────────────────────────────────────────────┤
+│ DDPG    │ Actor-Critic    │ 连续动作空间的 off-policy 方法                   │
+└─────────┴─────────────────┴──────────────────────────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="2-多智能体-RL-MARL-经典-Baselines">2. 多智能体 RL (MARL) 经典 Baselines</h2>
+<h3 id="2-1-集中训练分散执行-CTDE">2.1 集中训练分散执行 (CTDE)</h3>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">┌────────┬───────────────────────────────────────────┬──────────────────────────┐
+│  算法  │                 核心思想                  │         适用场景         │
+├────────┼───────────────────────────────────────────┼──────────────────────────┤
+│ QMIX   │ 单调混合网络分解联合 Q 值                 │ 合作任务（StarCraft 等） │
+├────────┼───────────────────────────────────────────┼──────────────────────────┤
+│ VDN    │ 简单加法分解 Q_tot = ΣQ_i                 │ 合作任务                 │
+├────────┼───────────────────────────────────────────┼──────────────────────────┤
+│ MAPPO  │ 多智能体 PPO + 集中 critic                │ 通用合作/竞争            │
+├────────┼───────────────────────────────────────────┼──────────────────────────┤
+│ MADDPG │ 每个 agent 一个 actor-critic，集中 critic │ 混合合作竞争             │
+├────────┼───────────────────────────────────────────┼──────────────────────────┤
+│ COMA   │ Counterfactual baseline 解决信用分配      │ 合作任务                 │
+├────────┼───────────────────────────────────────────┼──────────────────────────┤
+│ QTRAN  │ 线性约束分解，更一般化的值分解            │ 非单调 Q 值任务          │
+└────────┴───────────────────────────────────────────┴──────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="2-2-通信机制">2.2 通信机制</h3>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">┌─────────┬────────────────────────────┐
+│  算法   │          核心思想          │
+├─────────┼────────────────────────────┤
+│ CommNet │ 连续通信通道，均值聚合     │
+├─────────┼────────────────────────────┤
+│ TarMAC  │ Attention-based 选择性通信 │
+├─────────┼────────────────────────────┤
+│ IC3Net  │ 门控通信，学习何时通信     │
+├─────────┼────────────────────────────┤
+│ DIAL    │ 通过梯度反向传播学通信协议 │
+└─────────┴────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="2-3-对手-队友建模">2.3 对手/队友建模</h3>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">┌──────────────────────┬───────────────────────────────────────────┐
+│         算法         │                 核心思想                  │
+├──────────────────────┼───────────────────────────────────────────┤
+│ LOLA                 │ Learning with Opponent-Learning Awareness │
+├──────────────────────┼───────────────────────────────────────────┤
+│ ToM (Theory of Mind) │ 显式建模对手信念和意图                    │
+├──────────────────────┼───────────────────────────────────────────┤
+│ RIAL / DIAL          │ 可微通信 + 智能体间信号                   │
+└──────────────────────┴───────────────────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="3-Reward-Free-Baselines">3. Reward-Free Baselines</h2>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">┌──────────────────────┬────────────────────┬────────────────────────────┐
+│         方法         │      你的实现      │          核心思想          │
+├──────────────────────┼────────────────────┼────────────────────────────┤
+│ Autoencoder          │ AEPretrainer       │ 重构观测，无监督特征       │
+├──────────────────────┼────────────────────┼────────────────────────────┤
+│ Masked AE            │ MaskedAEPretrainer │ 随机遮蔽 + 重构 (类 MAE)   │
+├──────────────────────┼────────────────────┼────────────────────────────┤
+│ CPC                  │ CPCPretrainer      │ 对比预测编码，预测未来表征 │
+├──────────────────────┼────────────────────┼────────────────────────────┤
+│ Next-Step Prediction │ NextStepPretrainer │ 前向动态模型               │
+├──────────────────────┼────────────────────┼────────────────────────────┤
+│ TIMAR                │ TIMARPretrainer    │ 队友信息建模               │
+├──────────────────────┼────────────────────┼────────────────────────────┤
+│ MaskMA               │ MaskMAPretrainer   │ 掩码多智能体建模           │
+└──────────────────────┴────────────────────┴────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>其他重要的表征学习 baseline：</p>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">┌──────────────┬──────────────────────────────────────────────────────────┐
+│     方法     │                         核心思想                         │
+├──────────────┼──────────────────────────────────────────────────────────┤
+│ CURL         │ 对比学习 + 数据增强用于 RL 表征                          │
+├──────────────┼──────────────────────────────────────────────────────────┤
+│ DrQ / DrQ-v2 │ 图像增强的 data-efficient RL                             │
+├──────────────┼──────────────────────────────────────────────────────────┤
+│ SPR          │ Self-Predictive Representations                          │
+├──────────────┼──────────────────────────────────────────────────────────┤
+│ Proto-RL     │ Prototypical representations for reward-free exploration │
+├──────────────┼──────────────────────────────────────────────────────────┤
+│ ATC          │ Augmented Temporal Contrast                              │
+├──────────────┼──────────────────────────────────────────────────────────┤
+│ BYOL-Explore │ Bootstrap your own latent + 探索                         │
+└──────────────┴──────────────────────────────────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="4-Agentic-RL（LLM-based-Agent）新方向">4. Agentic RL（LLM-based Agent）新方向</h2>
+<p>如果 “Agentic RL” 指的是 LLM 驱动的智能体，还有这些 baselines：</p>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">┌───────────────────┬───────────────────────────────────────────────┐
+│       方法        │                   核心思想                    │
+├───────────────────┼───────────────────────────────────────────────┤
+│ ReAct             │ Reasoning + Acting 交替，思维链驱动工具调用   │
+├───────────────────┼───────────────────────────────────────────────┤
+│ Reflexion         │ 自我反思 + episodic memory 改进决策           │
+├───────────────────┼───────────────────────────────────────────────┤
+│ Voyager           │ LLM agent + 技能库 + 自动课程（Minecraft）    │
+├───────────────────┼───────────────────────────────────────────────┤
+│ DEPS              │ Describe, Explain, Plan, Select               │
+├───────────────────┼───────────────────────────────────────────────┤
+│ SayCan            │ LLM 提供语义知识 + affordance grounding       │
+├───────────────────┼───────────────────────────────────────────────┤
+│ Inner Monologue   │ 内部对话反馈闭环                              │
+├───────────────────┼───────────────────────────────────────────────┤
+│ AutoGPT / BabyAGI │ 自主任务分解 + 执行循环                       │
+├───────────────────┼───────────────────────────────────────────────┤
+│ RLHF / DPO        │ 从人类偏好中学习对齐策略                      │
+├───────────────────┼───────────────────────────────────────────────┤
+│ GRPO              │ Group Relative Policy Optimization (DeepSeek) │
+└───────────────────┴───────────────────────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-和你-PSR-框架最相关的对比方向">5. 和你 PSR 框架最相关的对比方向</h2>
+<p>结合你项目的定位 (reward-free pretraining + partner modeling + nuisance suppression)，最核心的对比 baselines 应该是：</p>
+<ol>
+<li>无预训练 (Scratch) — 纯在线学习的下界</li>
+<li>AE / Masked AE — 重构型方法（你已证明在 nuisance 高时退化）</li>
+<li>CPC / SPR — 对比/预测型表征方法</li>
+<li>TIMAR — 队友建模型方法（最直接的竞品）</li>
+<li>Random Encoder — 随机特征基线</li>
+<li>Oracle (u-only) — 直接访问 partner type 的上界</li>
+</ol>
+</div>
+
+        
+        <div class="post-tags">
+          <span class="post-tags-label">标签:</span>
+          
+            <a class="post-tag" href="/tags/Agentic-RL/">#Agentic RL</a>
+          
+            <a class="post-tag" href="/tags/MARL/">#MARL</a>
+          
+            <a class="post-tag" href="/tags/RL/">#RL</a>
+          
+            <a class="post-tag" href="/tags/Baselines/">#Baselines</a>
+          
+            <a class="post-tag" href="/tags/PPO/">#PPO</a>
+          
+            <a class="post-tag" href="/tags/GRPO/">#GRPO</a>
+          
+            <a class="post-tag" href="/tags/PSR/">#PSR</a>
+          
+        </div>
+        
+
+        <nav class="post-pager" aria-label="post navigation">
+          
+            <a class="post-pager-item post-pager-prev" href="/posts/3d8e5b20/">
+              <span class="post-pager-label">上一篇</span>
+              <span class="post-pager-title">Stronger-MAS 细读总结</span>
+            </a>
+          
+          
+            <a class="post-pager-item post-pager-next" href="/posts/2caf4e5e/">
+              <span class="post-pager-label">下一篇</span>
+              <span class="post-pager-title">研究周报 · 2026.03.22–03.28 · PSR 实验 Block1-3 与方向复盘</span>
+            </a>
+          
+        </nav>
+
+        
+
+<section class="post-comments">
+  <script src="https://giscus.app/client.js"
+    data-repo="yo666666yo/yo666666yo.github.io"
+    data-repo-id="R_kgDOSLiRUQ"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOSLiRUc4C7m3u"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="zh-CN"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async></script>
+</section>
+
+
+      </div>
+    </div>
+  </div>
+</article>
+
+  </main>
+
+  <hr class="section-divider" />
+
+  
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    
+    <ul class="social-list">
+      
+        
+        <li class="social-list-item">
+          <a href="https://github.com/yo666666yo" rel="noopener me external nofollow noreferrer" target="_blank" aria-label="github">
+            <span class="social-circle">
+              <span class="social-label">github</span>
+            </span>
+          </a>
+        </li>
+      
+      
+      <li class="social-list-item">
+        <a href="/atom.xml" rel="alternate" aria-label="rss">
+          <span class="social-circle"><span class="social-label">RSS</span></span>
+        </a>
+      </li>
+      
+    </ul>
+    
+
+    <div class="site-footer-copy">
+      
+        <span>Copyright &copy; Yoyo_Lee 2026</span>
+      
+      
+        <span class="site-footer-dot">·</span>
+        <span><a href="https://hexo.io/" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> · <a href="https://startbootstrap.com/theme/clean-blog" rel="noopener external nofollow noreferrer" target="_blank">Clean Blog</a></span>
+      
+    </div>
+  </div>
+</footer>
+
+  <script defer src="/js/clean-blog.js?v=20260425-6"></script>
+
+
+</body>
+</html>

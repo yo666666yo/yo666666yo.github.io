@@ -76,13 +76,13 @@
       
         <tags>
             
-            <tag> 周报 </tag>
+            <tag> PPO </tag>
             
             <tag> GRPO </tag>
             
-            <tag> PPO </tag>
-            
             <tag> credit assignment </tag>
+            
+            <tag> 周报 </tag>
             
             <tag> SHARP </tag>
             
@@ -113,19 +113,128 @@
       
         <tags>
             
-            <tag> 周报 </tag>
+            <tag> PPO </tag>
             
             <tag> GRPO </tag>
             
-            <tag> PPO </tag>
-            
             <tag> LLM-MAS </tag>
+            
+            <tag> credit assignment </tag>
+            
+            <tag> 周报 </tag>
             
             <tag> LangMARL </tag>
             
             <tag> MHGPO </tag>
             
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>多智能体 LLM RL 训练：当前 landscape</title>
+      <link href="/posts/b7c1a984/"/>
+      <url>/posts/b7c1a984/</url>
+      
+        <content type="html"><![CDATA[<p>这篇笔记梳理多智能体 LLM RL 训练的当前 landscape，对比 Stronger-MAS、Dr.MAS、MARFT、MAPoRL、MHGPO、CURE、GiGPO、MASPRM、SPO 等工作，并提炼 AT-GRPO 仍未解决的技术缺口。</p><span id="more"></span><h2 id="已有工作定位">已有工作定位</h2><pre class="line-numbers language-text" data-language="text"><code class="language-text">┌────────────────────────┬───────────────────────────────┬───────────────────────────────────────────┐│          论文          │          解决的问题           │                 核心方法                  │├────────────────────────┼───────────────────────────────┼───────────────────────────────────────────┤│ Stronger-MAS (ICLR'26) │ GRPO分组假设在MAS下失效       │ Agent+Turn-wise grouping + tree sampling  │├────────────────────────┼───────────────────────────────┼───────────────────────────────────────────┤│ Dr.MAS (2602.08847)    │ 全局normalization致梯度不稳定 │ Agent-wise advantage normalization        │├────────────────────────┼───────────────────────────────┼───────────────────────────────────────────┤│ MARFT (2504.16129)     │ 同步假设不适用于异步LLM agent │ Flex-MG formalism                         │├────────────────────────┼───────────────────────────────┼───────────────────────────────────────────┤│ MAPoRL (ACL'25)        │ 单agent RL缺乏协作信号        │ 协作verifier + discussion reward          │├────────────────────────┼───────────────────────────────┼───────────────────────────────────────────┤│ MHGPO (2506.02718)     │ 异构agent的group PO           │ 按agent type分组advantage                 │├────────────────────────┼───────────────────────────────┼───────────────────────────────────────────┤│ CURE (NeurIPS'25)      │ coder/tester的协同进化        │ 互给reward信号，无需ground truth          │├────────────────────────┼───────────────────────────────┼───────────────────────────────────────────┤│ GiGPO (NeurIPS'25)     │ 长horizon下GRPO credit稀疏    │ 两层hierarchical advantage（token+task）  │├────────────────────────┼───────────────────────────────┼───────────────────────────────────────────┤│ MASPRM (2510.24803)    │ 多agent的过程奖励             │ Agent-aware PRM，MCTS训练                 │├────────────────────────┼───────────────────────────────┼───────────────────────────────────────────┤│ SPO (ICLR'26)          │ GRPO的group退化               │ 消除分组，persistent value tracker        │├────────────────────────┼───────────────────────────────┼───────────────────────────────────────────┤│ DAPO (2503.14476)      │ 熵坍缩+token级credit          │ Decoupled clipping + token-level gradient │├────────────────────────┼───────────────────────────────┼───────────────────────────────────────────┤│ Turn-PPO (2512.17008)  │ 多轮对话的advantage估计       │ Turn-level MDP reformulation              │└────────────────────────┴───────────────────────────────┴───────────────────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><h2 id="AT-GRPO的具体未解决问题">AT-GRPO的具体未解决问题</h2><p>通过对比这些工作，AT-GRPO有三个明确的technical gap：</p><p>Gap 1: Tree sampling计算开销大，且exploration受限</p><ul><li>AT-GRPO每个(agent, turn)采K=4个branch → 总采样量 = K × N_agents × T_turns × E_envs</li><li>贪心选最高reward推进 → 可能陷入局部最优，exploration不足</li><li>相关但未解决：TreeRL（2506.11902）在单agent做了tree search + process reward；SPO完全消除了分组需求</li><li>Gap：没有工作在多agent设定下解决tree sampling的效率问题</li></ul><p>Gap 2: 无过程奖励（process reward），credit assignment粒度粗</p><ul><li>AT-GRPO只用turn-level的team+local reward混合（r = α·r_team + r_local, α=1固定）</li><li>没有step-wise的中间信号</li><li>相关但未解决：MASPRM做了multi-agent PRM，但假设hierarchical routing（非对称协作）；GiGPO做了hierarchical advantage但只在单agent</li><li>Gap：没有工作在对称/异构cooperative MAS中做agent-aware process reward + hierarchical advantage</li></ul><p>Gap 3: Team reward与local reward的平衡是静态的</p><ul><li>AT-GRPO的α=1完全未调优，论文也承认这是limitation</li><li>Dr.MAS解决了normalization问题，但没解决reward mixing问题</li><li>Gap：没有工作自适应地学习team vs local reward的权重</li></ul><hr><h2 id="三个可能的research方向（需要进一步验证）">三个可能的research方向（需要进一步验证）</h2><p>方向A：Multi-Agent Hierarchical Advantage（多agent层次化优势估计）</p><ul><li>将GiGPO的group-in-group思路推广到MAS：外层group=team trajectory，内层group=per-agent-turn</li><li>Motivation：AT-GRPO的flat grouping在长horizon下credit稀疏（和单agent GRPO的问题一样）</li><li>需要验证：GiGPO原文的实验是否在multi-turn agentic任务上有效</li></ul><p>方向B：Agent-aware Process Reward for Cooperative MAS</p><ul><li>将MASPRM的思路从hierarchical routing推广到cooperative异构agent</li><li>结合AT-GRPO的tree sampling作为MCTS的natural fit</li><li>Motivation：tree sampling本身就在产生树结构的trajectory，天然适合训PRM</li></ul><p>方向C：Group-Free Multi-Agent RL（消除分组依赖）</p><ul><li>将SPO的persistent value tracker推广到multi-agent：per-agent value tracker</li><li>完全避免tree sampling的开销</li><li>Motivation：AT-GRPO的核心困难（group size太小）可以从根本上绕过</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 研究 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Agentic RL </tag>
+            
+            <tag> MARL </tag>
+            
+            <tag> GRPO </tag>
+            
+            <tag> LLM-MAS </tag>
+            
+            <tag> AT-GRPO </tag>
+            
             <tag> credit assignment </tag>
+            
+            <tag> RLHF </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Stronger-MAS 细读总结</title>
+      <link href="/posts/3d8e5b20/"/>
+      <url>/posts/3d8e5b20/</url>
+      
+        <content type="html"><![CDATA[<p>这篇笔记细读 Stronger-MAS，重点关注 AT-GRPO 如何处理多智能体场景中 GRPO 分组假设失效的问题，以及它在训练系统、实验结论和局限上的启发。</p><span id="more"></span><h2 id="1-核心问题">1. 核心问题</h2><p>标准GRPO在多智能体场景下失效，原因是分组假设被违反：</p><ul><li>GRPO要求同一group内所有candidate共享相同的prompt</li><li>但在MAS中，不同agent有不同的role prompt，不同turn有不同的interaction history</li><li>直接用GRPO训MAS → advantage估计偏差 →<br>训练不稳定甚至性能下降（实验证实：Qwen3-8B在CodeContests上17.60→10.30，OlympiadBench 56.50→53.20）</li></ul><h2 id="2-AT-GRPO方法（三个核心设计）">2. AT-GRPO方法（三个核心设计）</h2><h3 id="A-Tree-structured-Sampling（树形采样）">A. Tree-structured Sampling（树形采样）</h3><ul><li>问题：如果用并行采样（K条完整轨迹），当t&gt;1时每个(agent, turn)组合只有1个样本，GRPO的variance reduction失效</li><li>解决：在每个turn的每个agent处，从当前状态分支出K个candidate action → 形成有效的size-K comparison group</li><li>用贪心选择（取reward最高的action）推进环境状态到下一step</li></ul><h3 id="B-Agent-and-Turn-wise-Grouping（按agent×turn分组）">B. Agent- and Turn-wise Grouping（按agent×turn分组）</h3><ul><li>Group key = hash(environment_id, agent_id, turn_id)</li><li>确保同一group内的所有candidate共享完全相同的observation（满足GRPO的identical-prompt假设）</li><li>是GiGPO（Group-in-Group PO）在多智能体设定下的自然推广</li></ul><h3 id="C-Agent-wise-Credit-Assignment（混合奖励）">C. Agent-wise Credit Assignment（混合奖励）</h3><ul><li>r_{t,i} = α · r_team + r_i^loc</li><li>team reward：全局任务成功信号</li><li>local reward：agent-specific的子任务评估（如coder的pass rate vs tester的测试质量）</li><li>α=1，未做精细调优</li></ul><h2 id="3-训练系统设计">3. 训练系统设计</h2><ul><li>每个policy有独立的GPU Resource Pool（RolloutWorker + UpdateWorker）</li><li>CPU Environment Pool执行环境交互（沙盒化）</li><li>Router根据agent-policy映射分发轨迹数据</li><li>支持两种模式：<ul><li>Role-sharing（M=1）：所有agent共享一个policy，数据pooled</li><li>Role-specialized（M=N）：每个role独立policy，独立更新</li></ul></li></ul><h2 id="4-关键实验结果">4. 关键实验结果</h2><pre class="line-numbers language-text" data-language="text"><code class="language-text">┌─────────────────────────────────────┬─────────────────────────────────────────────────────┐│                发现                 │                        证据                         │├─────────────────────────────────────┼─────────────────────────────────────────────────────┤│ AT-GRPO在长horizon任务提升巨大      │ Plan-Path: 5%→96%, Sokoban: 0%→96% (8B)             │├─────────────────────────────────────┼─────────────────────────────────────────────────────┤│ MAS+GRPO有时反而伤害性能            │ CodeContests 17.60→10.30, OlympiadBench 56.50→53.20 │├─────────────────────────────────────┼─────────────────────────────────────────────────────┤│ SA训练后组合 vs MAS联合训练差距巨大 │ Plan-Path: 16% vs 96%（Ablation Table 4）           │├─────────────────────────────────────┼─────────────────────────────────────────────────────┤│ 交换role-specialized policies后崩溃 │ 96%→6%，说明学到了互补的专业化                      │├─────────────────────────────────────┼─────────────────────────────────────────────────────┤│ 训练中turn数减少                    │ agent协作效率随训练提升                             │├─────────────────────────────────────┼─────────────────────────────────────────────────────┤│ Scalability                         │ 7-agent时AT-GRPO 47.7% vs GRPO 34.1%（后者饱和）    │└─────────────────────────────────────┴─────────────────────────────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><h2 id="5-Role-sharing-vs-Role-specialized的选择">5. Role-sharing vs Role-specialized的选择</h2><ul><li>高角色异质性（coding: coder vs tester）→ role-specialized更好（+3.05pts）</li><li>角色有overlap（math: reasoner vs tool-user）→ shared policy可能更好（OlympiadBench 39.6% vs 35.2%）</li><li>已饱和任务（game/plan）→ 无显著差异</li></ul><h2 id="6-与其他MARL框架对比">6. 与其他MARL框架对比</h2><pre class="line-numbers language-text" data-language="text"><code class="language-text">┌─────────────────────────┬────────────────────────────────────────────────────────┐│        对比对象         │                    Stronger-MAS优势                    │├─────────────────────────┼────────────────────────────────────────────────────────┤│ MAPORL（同质agent辩论） │ 异质角色更好，untrained MAS 84.4% > trained MAPORL 81% │├─────────────────────────┼────────────────────────────────────────────────────────┤│ MARFT（单轮偏好优化）   │ 多轮交互纠错 > 单步alignment                           │├─────────────────────────┼────────────────────────────────────────────────────────┤│ CURE（单轮code+test）   │ 迭代self-refinement cycle                              │└─────────────────────────┴────────────────────────────────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><h2 id="7-论文的Gap-局限">7. 论文的Gap/局限</h2><ol><li>奖励设计仍然是手工的：每个domain需要精心设计local reward（coder pass rate, tester quality等），没有自动化</li><li>仅测试了小模型（1.7B, 8B），大模型（70B+）的scaling behavior未知</li><li>tree sampling的计算开销：每个agent每个turn采K=4个candidate，成本随agent数和turn数线性增长</li><li>α=1未调优：team reward和local reward的平衡可能task-specific</li><li>只测了cooperative场景，competitive/mixed-motive未涉及</li><li>通信/信息传递未显式优化：agent间通过自然语言交互，没有优化&quot;该传什么信息&quot;</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 研究 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> MARL </tag>
+            
+            <tag> GRPO </tag>
+            
+            <tag> LLM-MAS </tag>
+            
+            <tag> AT-GRPO </tag>
+            
+            <tag> credit assignment </tag>
+            
+            <tag> Stronger-MAS </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Agentic RL 经典 Baselines 综述</title>
+      <link href="/posts/9f2a6c41/"/>
+      <url>/posts/9f2a6c41/</url>
+      
+        <content type="html"><![CDATA[<p>这篇笔记整理单智能体 RL、多智能体 RL、reward-free 表征学习，以及 LLM-based Agentic RL 中常见 baseline，主要用于后续实验设计和论文对比时快速查表。</p><span id="more"></span><h2 id="1-单智能体-RL-基础算法">1. 单智能体 RL 基础算法</h2><pre class="line-numbers language-text" data-language="text"><code class="language-text">┌─────────┬─────────────────┬──────────────────────────────────────────────────┐│  算法   │      类别       │                     核心思想                     │├─────────┼─────────────────┼──────────────────────────────────────────────────┤│ DQN     │ Value-based     │ 深度 Q 网络 + Experience Replay + Target Network │├─────────┼─────────────────┼──────────────────────────────────────────────────┤│ PPO     │ Policy Gradient │ Clipped surrogate objective，稳定策略优化        │├─────────┼─────────────────┼──────────────────────────────────────────────────┤│ SAC     │ Actor-Critic    │ 最大熵 RL，自动温度调节                          │├─────────┼─────────────────┼──────────────────────────────────────────────────┤│ TD3     │ Actor-Critic    │ Twin critics + delayed policy update，减少过估计 │├─────────┼─────────────────┼──────────────────────────────────────────────────┤│ A2C/A3C │ Actor-Critic    │ 异步/同步 advantage actor-critic                 │├─────────┼─────────────────┼──────────────────────────────────────────────────┤│ DDPG    │ Actor-Critic    │ 连续动作空间的 off-policy 方法                   │└─────────┴─────────────────┴──────────────────────────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><hr><h2 id="2-多智能体-RL-MARL-经典-Baselines">2. 多智能体 RL (MARL) 经典 Baselines</h2><h3 id="2-1-集中训练分散执行-CTDE">2.1 集中训练分散执行 (CTDE)</h3><pre class="line-numbers language-text" data-language="text"><code class="language-text">┌────────┬───────────────────────────────────────────┬──────────────────────────┐│  算法  │                 核心思想                  │         适用场景         │├────────┼───────────────────────────────────────────┼──────────────────────────┤│ QMIX   │ 单调混合网络分解联合 Q 值                 │ 合作任务（StarCraft 等） │├────────┼───────────────────────────────────────────┼──────────────────────────┤│ VDN    │ 简单加法分解 Q_tot = ΣQ_i                 │ 合作任务                 │├────────┼───────────────────────────────────────────┼──────────────────────────┤│ MAPPO  │ 多智能体 PPO + 集中 critic                │ 通用合作/竞争            │├────────┼───────────────────────────────────────────┼──────────────────────────┤│ MADDPG │ 每个 agent 一个 actor-critic，集中 critic │ 混合合作竞争             │├────────┼───────────────────────────────────────────┼──────────────────────────┤│ COMA   │ Counterfactual baseline 解决信用分配      │ 合作任务                 │├────────┼───────────────────────────────────────────┼──────────────────────────┤│ QTRAN  │ 线性约束分解，更一般化的值分解            │ 非单调 Q 值任务          │└────────┴───────────────────────────────────────────┴──────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><h3 id="2-2-通信机制">2.2 通信机制</h3><pre class="line-numbers language-text" data-language="text"><code class="language-text">┌─────────┬────────────────────────────┐│  算法   │          核心思想          │├─────────┼────────────────────────────┤│ CommNet │ 连续通信通道，均值聚合     │├─────────┼────────────────────────────┤│ TarMAC  │ Attention-based 选择性通信 │├─────────┼────────────────────────────┤│ IC3Net  │ 门控通信，学习何时通信     │├─────────┼────────────────────────────┤│ DIAL    │ 通过梯度反向传播学通信协议 │└─────────┴────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><h3 id="2-3-对手-队友建模">2.3 对手/队友建模</h3><pre class="line-numbers language-text" data-language="text"><code class="language-text">┌──────────────────────┬───────────────────────────────────────────┐│         算法         │                 核心思想                  │├──────────────────────┼───────────────────────────────────────────┤│ LOLA                 │ Learning with Opponent-Learning Awareness │├──────────────────────┼───────────────────────────────────────────┤│ ToM (Theory of Mind) │ 显式建模对手信念和意图                    │├──────────────────────┼───────────────────────────────────────────┤│ RIAL / DIAL          │ 可微通信 + 智能体间信号                   │└──────────────────────┴───────────────────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><hr><h2 id="3-Reward-Free-Baselines">3. Reward-Free Baselines</h2><pre class="line-numbers language-text" data-language="text"><code class="language-text">┌──────────────────────┬────────────────────┬────────────────────────────┐│         方法         │      你的实现      │          核心思想          │├──────────────────────┼────────────────────┼────────────────────────────┤│ Autoencoder          │ AEPretrainer       │ 重构观测，无监督特征       │├──────────────────────┼────────────────────┼────────────────────────────┤│ Masked AE            │ MaskedAEPretrainer │ 随机遮蔽 + 重构 (类 MAE)   │├──────────────────────┼────────────────────┼────────────────────────────┤│ CPC                  │ CPCPretrainer      │ 对比预测编码，预测未来表征 │├──────────────────────┼────────────────────┼────────────────────────────┤│ Next-Step Prediction │ NextStepPretrainer │ 前向动态模型               │├──────────────────────┼────────────────────┼────────────────────────────┤│ TIMAR                │ TIMARPretrainer    │ 队友信息建模               │├──────────────────────┼────────────────────┼────────────────────────────┤│ MaskMA               │ MaskMAPretrainer   │ 掩码多智能体建模           │└──────────────────────┴────────────────────┴────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><p>其他重要的表征学习 baseline：</p><pre class="line-numbers language-text" data-language="text"><code class="language-text">┌──────────────┬──────────────────────────────────────────────────────────┐│     方法     │                         核心思想                         │├──────────────┼──────────────────────────────────────────────────────────┤│ CURL         │ 对比学习 + 数据增强用于 RL 表征                          │├──────────────┼──────────────────────────────────────────────────────────┤│ DrQ / DrQ-v2 │ 图像增强的 data-efficient RL                             │├──────────────┼──────────────────────────────────────────────────────────┤│ SPR          │ Self-Predictive Representations                          │├──────────────┼──────────────────────────────────────────────────────────┤│ Proto-RL     │ Prototypical representations for reward-free exploration │├──────────────┼──────────────────────────────────────────────────────────┤│ ATC          │ Augmented Temporal Contrast                              │├──────────────┼──────────────────────────────────────────────────────────┤│ BYOL-Explore │ Bootstrap your own latent + 探索                         │└──────────────┴──────────────────────────────────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><hr><h2 id="4-Agentic-RL（LLM-based-Agent）新方向">4. Agentic RL（LLM-based Agent）新方向</h2><p>如果 “Agentic RL” 指的是 LLM 驱动的智能体，还有这些 baselines：</p><pre class="line-numbers language-text" data-language="text"><code class="language-text">┌───────────────────┬───────────────────────────────────────────────┐│       方法        │                   核心思想                    │├───────────────────┼───────────────────────────────────────────────┤│ ReAct             │ Reasoning + Acting 交替，思维链驱动工具调用   │├───────────────────┼───────────────────────────────────────────────┤│ Reflexion         │ 自我反思 + episodic memory 改进决策           │├───────────────────┼───────────────────────────────────────────────┤│ Voyager           │ LLM agent + 技能库 + 自动课程（Minecraft）    │├───────────────────┼───────────────────────────────────────────────┤│ DEPS              │ Describe, Explain, Plan, Select               │├───────────────────┼───────────────────────────────────────────────┤│ SayCan            │ LLM 提供语义知识 + affordance grounding       │├───────────────────┼───────────────────────────────────────────────┤│ Inner Monologue   │ 内部对话反馈闭环                              │├───────────────────┼───────────────────────────────────────────────┤│ AutoGPT / BabyAGI │ 自主任务分解 + 执行循环                       │├───────────────────┼───────────────────────────────────────────────┤│ RLHF / DPO        │ 从人类偏好中学习对齐策略                      │├───────────────────┼───────────────────────────────────────────────┤│ GRPO              │ Group Relative Policy Optimization (DeepSeek) │└───────────────────┴───────────────────────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><hr><h2 id="5-和你-PSR-框架最相关的对比方向">5. 和你 PSR 框架最相关的对比方向</h2><p>结合你项目的定位 (reward-free pretraining + partner modeling + nuisance suppression)，最核心的对比 baselines 应该是：</p><ol><li>无预训练 (Scratch) — 纯在线学习的下界</li><li>AE / Masked AE — 重构型方法（你已证明在 nuisance 高时退化）</li><li>CPC / SPR — 对比/预测型表征方法</li><li>TIMAR — 队友建模型方法（最直接的竞品）</li><li>Random Encoder — 随机特征基线</li><li>Oracle (u-only) — 直接访问 partner type 的上界</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 研究 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Agentic RL </tag>
+            
+            <tag> MARL </tag>
+            
+            <tag> RL </tag>
+            
+            <tag> Baselines </tag>
+            
+            <tag> PPO </tag>
+            
+            <tag> GRPO </tag>
+            
+            <tag> PSR </tag>
             
         </tags>
       
@@ -150,11 +259,11 @@
       
         <tags>
             
-            <tag> 周报 </tag>
+            <tag> MARL </tag>
             
             <tag> PSR </tag>
             
-            <tag> MARL </tag>
+            <tag> 周报 </tag>
             
             <tag> ProbeCommitEnv </tag>
             
@@ -183,9 +292,9 @@
       
         <tags>
             
-            <tag> 周报 </tag>
-            
             <tag> Agentic RL </tag>
+            
+            <tag> 周报 </tag>
             
             <tag> Model-Based RL </tag>
             

@@ -1,0 +1,312 @@
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<title>Stronger-MAS 细读总结 · Yoyo_Lee 的博客</title>
+<meta name="description" content="围绕 Stronger-MAS / AT-GRPO 的核心问题、方法设计、训练系统、实验结果与局限进行结构化整理。" />
+<meta name="keywords" content="AI,LLM,机器学习,深度学习,论文阅读,生活随笔,blog,Yoyo_Lee" />
+<meta name="author" content="Yoyo_Lee" />
+<link rel="canonical" href="https://yo666666yo.github.io/posts/3d8e5b20/" />
+
+<!-- Open Graph / Twitter -->
+<meta property="og:site_name" content="Yoyo_Lee 的博客" />
+<meta property="og:title" content="Stronger-MAS 细读总结" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://yo666666yo.github.io/posts/3d8e5b20/" />
+<meta property="og:description" content="围绕 Stronger-MAS / AT-GRPO 的核心问题、方法设计、训练系统、实验结果与局限进行结构化整理。" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
+
+<link rel="alternate" type="application/atom+xml" title="Yoyo_Lee 的博客" href="/atom.xml" />
+
+
+<!-- Google Fonts (Lora + Open Sans) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Open%20Sans:wght@400;600;700;800&display=swap" />
+
+
+
+<link rel="stylesheet" href="/css/clean-blog.css?v=20260425-6" />
+
+
+
+</head>
+<body id="page-top" class="is-post">
+  
+<nav id="mainNav" class="navbar navbar-light" aria-label="主菜单">
+  <div class="navbar-container">
+    <a class="navbar-brand" href="/">Yoyo_Lee 的博客</a>
+    <button class="navbar-toggler" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="菜单">
+      菜单
+      <span class="navbar-toggler-icon" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+    </button>
+    <div class="navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav">
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/research/">研究</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/life/">生活</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/weekly/">周报</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+<header class="masthead masthead-post" style="background-image: url('/img/post-bg.svg')">
+  <div class="masthead-overlay" aria-hidden="true"></div>
+  <div class="masthead-container">
+    <div class="masthead-inner">
+      
+        <div class="post-heading">
+          <h1>Stronger-MAS 细读总结</h1>
+          <h2 class="subheading">围绕 Stronger-MAS / AT-GRPO 的核心问题、方法设计、训练系统、实验结果与局限进行结构化整理。</h2>
+          <span class="meta">
+            作者
+            <a href="/about/">Yoyo_Lee</a>
+            发表于
+            <time datetime="2026-04-03T12:42:27.000Z">2026-04-03</time>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+</header>
+
+
+  <main id="main-content">
+    <article class="article article-post mb-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col">
+        <div class="post-body"><p>这篇笔记细读 Stronger-MAS，重点关注 AT-GRPO 如何处理多智能体场景中 GRPO 分组假设失效的问题，以及它在训练系统、实验结论和局限上的启发。</p>
+<span id="more"></span>
+<h2 id="1-核心问题">1. 核心问题</h2>
+<p>标准GRPO在多智能体场景下失效，原因是分组假设被违反：</p>
+<ul>
+<li>GRPO要求同一group内所有candidate共享相同的prompt</li>
+<li>但在MAS中，不同agent有不同的role prompt，不同turn有不同的interaction history</li>
+<li>直接用GRPO训MAS → advantage估计偏差 →<br>
+训练不稳定甚至性能下降（实验证实：Qwen3-8B在CodeContests上17.60→10.30，OlympiadBench 56.50→53.20）</li>
+</ul>
+<h2 id="2-AT-GRPO方法（三个核心设计）">2. AT-GRPO方法（三个核心设计）</h2>
+<h3 id="A-Tree-structured-Sampling（树形采样）">A. Tree-structured Sampling（树形采样）</h3>
+<ul>
+<li>问题：如果用并行采样（K条完整轨迹），当t&gt;1时每个(agent, turn)组合只有1个样本，GRPO的variance reduction失效</li>
+<li>解决：在每个turn的每个agent处，从当前状态分支出K个candidate action → 形成有效的size-K comparison group</li>
+<li>用贪心选择（取reward最高的action）推进环境状态到下一step</li>
+</ul>
+<h3 id="B-Agent-and-Turn-wise-Grouping（按agent×turn分组）">B. Agent- and Turn-wise Grouping（按agent×turn分组）</h3>
+<ul>
+<li>Group key = hash(environment_id, agent_id, turn_id)</li>
+<li>确保同一group内的所有candidate共享完全相同的observation（满足GRPO的identical-prompt假设）</li>
+<li>是GiGPO（Group-in-Group PO）在多智能体设定下的自然推广</li>
+</ul>
+<h3 id="C-Agent-wise-Credit-Assignment（混合奖励）">C. Agent-wise Credit Assignment（混合奖励）</h3>
+<ul>
+<li>r_{t,i} = α · r_team + r_i^loc</li>
+<li>team reward：全局任务成功信号</li>
+<li>local reward：agent-specific的子任务评估（如coder的pass rate vs tester的测试质量）</li>
+<li>α=1，未做精细调优</li>
+</ul>
+<h2 id="3-训练系统设计">3. 训练系统设计</h2>
+<ul>
+<li>每个policy有独立的GPU Resource Pool（RolloutWorker + UpdateWorker）</li>
+<li>CPU Environment Pool执行环境交互（沙盒化）</li>
+<li>Router根据agent-policy映射分发轨迹数据</li>
+<li>支持两种模式：
+<ul>
+<li>Role-sharing（M=1）：所有agent共享一个policy，数据pooled</li>
+<li>Role-specialized（M=N）：每个role独立policy，独立更新</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-关键实验结果">4. 关键实验结果</h2>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">┌─────────────────────────────────────┬─────────────────────────────────────────────────────┐
+│                发现                 │                        证据                         │
+├─────────────────────────────────────┼─────────────────────────────────────────────────────┤
+│ AT-GRPO在长horizon任务提升巨大      │ Plan-Path: 5%→96%, Sokoban: 0%→96% (8B)             │
+├─────────────────────────────────────┼─────────────────────────────────────────────────────┤
+│ MAS+GRPO有时反而伤害性能            │ CodeContests 17.60→10.30, OlympiadBench 56.50→53.20 │
+├─────────────────────────────────────┼─────────────────────────────────────────────────────┤
+│ SA训练后组合 vs MAS联合训练差距巨大 │ Plan-Path: 16% vs 96%（Ablation Table 4）           │
+├─────────────────────────────────────┼─────────────────────────────────────────────────────┤
+│ 交换role-specialized policies后崩溃 │ 96%→6%，说明学到了互补的专业化                      │
+├─────────────────────────────────────┼─────────────────────────────────────────────────────┤
+│ 训练中turn数减少                    │ agent协作效率随训练提升                             │
+├─────────────────────────────────────┼─────────────────────────────────────────────────────┤
+│ Scalability                         │ 7-agent时AT-GRPO 47.7% vs GRPO 34.1%（后者饱和）    │
+└─────────────────────────────────────┴─────────────────────────────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="5-Role-sharing-vs-Role-specialized的选择">5. Role-sharing vs Role-specialized的选择</h2>
+<ul>
+<li>高角色异质性（coding: coder vs tester）→ role-specialized更好（+3.05pts）</li>
+<li>角色有overlap（math: reasoner vs tool-user）→ shared policy可能更好（OlympiadBench 39.6% vs 35.2%）</li>
+<li>已饱和任务（game/plan）→ 无显著差异</li>
+</ul>
+<h2 id="6-与其他MARL框架对比">6. 与其他MARL框架对比</h2>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">┌─────────────────────────┬────────────────────────────────────────────────────────┐
+│        对比对象         │                    Stronger-MAS优势                    │
+├─────────────────────────┼────────────────────────────────────────────────────────┤
+│ MAPORL（同质agent辩论） │ 异质角色更好，untrained MAS 84.4% > trained MAPORL 81% │
+├─────────────────────────┼────────────────────────────────────────────────────────┤
+│ MARFT（单轮偏好优化）   │ 多轮交互纠错 > 单步alignment                           │
+├─────────────────────────┼────────────────────────────────────────────────────────┤
+│ CURE（单轮code+test）   │ 迭代self-refinement cycle                              │
+└─────────────────────────┴────────────────────────────────────────────────────────┘<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="7-论文的Gap-局限">7. 论文的Gap/局限</h2>
+<ol>
+<li>奖励设计仍然是手工的：每个domain需要精心设计local reward（coder pass rate, tester quality等），没有自动化</li>
+<li>仅测试了小模型（1.7B, 8B），大模型（70B+）的scaling behavior未知</li>
+<li>tree sampling的计算开销：每个agent每个turn采K=4个candidate，成本随agent数和turn数线性增长</li>
+<li>α=1未调优：team reward和local reward的平衡可能task-specific</li>
+<li>只测了cooperative场景，competitive/mixed-motive未涉及</li>
+<li>通信/信息传递未显式优化：agent间通过自然语言交互，没有优化&quot;该传什么信息&quot;</li>
+</ol>
+</div>
+
+        
+        <div class="post-tags">
+          <span class="post-tags-label">标签:</span>
+          
+            <a class="post-tag" href="/tags/MARL/">#MARL</a>
+          
+            <a class="post-tag" href="/tags/GRPO/">#GRPO</a>
+          
+            <a class="post-tag" href="/tags/LLM-MAS/">#LLM-MAS</a>
+          
+            <a class="post-tag" href="/tags/AT-GRPO/">#AT-GRPO</a>
+          
+            <a class="post-tag" href="/tags/credit-assignment/">#credit assignment</a>
+          
+            <a class="post-tag" href="/tags/Stronger-MAS/">#Stronger-MAS</a>
+          
+        </div>
+        
+
+        <nav class="post-pager" aria-label="post navigation">
+          
+            <a class="post-pager-item post-pager-prev" href="/posts/b7c1a984/">
+              <span class="post-pager-label">上一篇</span>
+              <span class="post-pager-title">多智能体 LLM RL 训练：当前 landscape</span>
+            </a>
+          
+          
+            <a class="post-pager-item post-pager-next" href="/posts/9f2a6c41/">
+              <span class="post-pager-label">下一篇</span>
+              <span class="post-pager-title">Agentic RL 经典 Baselines 综述</span>
+            </a>
+          
+        </nav>
+
+        
+
+<section class="post-comments">
+  <script src="https://giscus.app/client.js"
+    data-repo="yo666666yo/yo666666yo.github.io"
+    data-repo-id="R_kgDOSLiRUQ"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOSLiRUc4C7m3u"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="zh-CN"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async></script>
+</section>
+
+
+      </div>
+    </div>
+  </div>
+</article>
+
+  </main>
+
+  <hr class="section-divider" />
+
+  
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    
+    <ul class="social-list">
+      
+        
+        <li class="social-list-item">
+          <a href="https://github.com/yo666666yo" rel="noopener me external nofollow noreferrer" target="_blank" aria-label="github">
+            <span class="social-circle">
+              <span class="social-label">github</span>
+            </span>
+          </a>
+        </li>
+      
+      
+      <li class="social-list-item">
+        <a href="/atom.xml" rel="alternate" aria-label="rss">
+          <span class="social-circle"><span class="social-label">RSS</span></span>
+        </a>
+      </li>
+      
+    </ul>
+    
+
+    <div class="site-footer-copy">
+      
+        <span>Copyright &copy; Yoyo_Lee 2026</span>
+      
+      
+        <span class="site-footer-dot">·</span>
+        <span><a href="https://hexo.io/" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> · <a href="https://startbootstrap.com/theme/clean-blog" rel="noopener external nofollow noreferrer" target="_blank">Clean Blog</a></span>
+      
+    </div>
+  </div>
+</footer>
+
+  <script defer src="/js/clean-blog.js?v=20260425-6"></script>
+
+
+</body>
+</html>
