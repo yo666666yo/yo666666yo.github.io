@@ -5,49 +5,135 @@
   const range = Math.max(1, maxLen - minLen);
   const tagVariant = typeof variant !== 'undefined' && variant ? String(variant).replace(/[^a-z0-9_-]/gi, '') : '';
   const variantClass = tagVariant ? ' tag-cloud--' + tagVariant : '';
-  const cloudSlots = [
-    [210, 178, 0], [126, 162, -14], [292, 150, 12], [204, 116, 6],
-    [220, 238, -9], [104, 220, 18], [310, 218, -16], [118, 108, 10],
-    [306, 100, -8], [166, 266, 12], [276, 276, -12], [82, 166, -18],
-    [332, 172, 16], [160, 76, -9], [260, 76, 11], [86, 286, 8],
-    [332, 286, -8], [214, 314, 0], [80, 84, 14], [340, 84, -14],
-    [132, 318, -10], [292, 318, 10], [76, 246, 18], [344, 246, -18]
+
+  const cloudWidth = 520;
+  const cloudHeight = 360;
+  const cloudCenterX = cloudWidth / 2;
+  const cloudCenterY = cloudHeight / 2 + 6;
+  const cloudColors = [
+    '#1f4ed8', '#26a269', '#c026d3', '#0f766e', '#7c3aed',
+    '#dc2626', '#16a34a', '#2563eb', '#a16207', '#0891b2',
+    '#be185d', '#4d7c0f', '#9333ea', '#0284c7', '#b45309'
   ];
+
+  function visualUnits(label) {
+    return Array.from(String(label)).reduce(function (sum, ch) {
+      if (/\s/.test(ch)) return sum + 0.32;
+      if (/[-_/]/.test(ch)) return sum + 0.38;
+      if (ch.charCodeAt(0) > 127) return sum + 1.02;
+      if (/[A-Z]/.test(ch)) return sum + 0.72;
+      return sum + 0.58;
+    }, 0);
+  }
+
+  function textBox(label, fontSize, rotation) {
+    const rawWidth = visualUnits(label) * fontSize + 8;
+    const rawHeight = fontSize * 1.08 + 6;
+    const radians = Math.abs(rotation) * Math.PI / 180;
+    return {
+      width: Math.abs(rawWidth * Math.cos(radians)) + Math.abs(rawHeight * Math.sin(radians)),
+      height: Math.abs(rawWidth * Math.sin(radians)) + Math.abs(rawHeight * Math.cos(radians))
+    };
+  }
+
+  function overlaps(a, b, pad) {
+    return Math.abs(a.x - b.x) < (a.width + b.width) / 2 + pad &&
+      Math.abs(a.y - b.y) < (a.height + b.height) / 2 + pad;
+  }
+
+  function rotationFor(label, index, fontSize) {
+    const long = visualUnits(label) > 13;
+    if (index === 0 || fontSize > 34) return 0;
+    if (long) return [0, -7, 7, 0][index % 4];
+    return [-18, 14, 0, -10, 22, -24, 10, 0, 16, -14, 28, -30][index % 12];
+  }
+
+  function placeCloud(tags) {
+    const placed = [];
+
+    tags.slice(0, 30).forEach(function (tag, index) {
+      const name = String(tag.name);
+      const weight = maxLen === minLen ? 0.5 : (tag.length - minLen) / range;
+      const lengthPenalty = Math.max(0, visualUnits(name) - 10) * 0.78;
+      const rankBoost = Math.max(0, 4 - index) * 1.05;
+      let fontSize = Math.max(10.8, 15 + weight * 31 + rankBoost - lengthPenalty);
+      let rotation = rotationFor(name, index, fontSize);
+      let box = textBox(name, fontSize, rotation);
+      const color = cloudColors[index % cloudColors.length];
+      const opacity = Math.min(0.98, 0.76 + weight * 0.2);
+      let chosen = null;
+
+      for (let shrink = 0; shrink < 5 && !chosen; shrink++) {
+        if (shrink > 0) {
+          fontSize = Math.max(9.5, fontSize * 0.86);
+          rotation = rotationFor(name, index, fontSize);
+          box = textBox(name, fontSize, rotation);
+        }
+
+        for (let attempt = 0; attempt < 1800; attempt++) {
+          const theta = attempt * 0.43 + index * 1.79;
+          const radius = Math.sqrt(attempt) * 7.1;
+          const x = cloudCenterX + Math.cos(theta) * radius * 1.32;
+          const y = cloudCenterY + Math.sin(theta) * radius * 0.78;
+          const candidate = { x: x, y: y, width: box.width, height: box.height };
+
+          if (x - box.width / 2 < 14 || x + box.width / 2 > cloudWidth - 14) continue;
+          if (y - box.height / 2 < 18 || y + box.height / 2 > cloudHeight - 16) continue;
+          if (placed.every(function (prev) { return !overlaps(candidate, prev, 3.5); })) {
+            chosen = candidate;
+            break;
+          }
+        }
+      }
+
+      if (!chosen) {
+        return;
+      }
+
+      placed.push({
+        tag: tag,
+        x: chosen.x,
+        y: chosen.y,
+        width: chosen.width,
+        height: chosen.height,
+        rotation: rotation,
+        fontSize: fontSize,
+        color: color,
+        opacity: opacity
+      });
+    });
+
+    return placed;
+  }
+
+  const cloudWords = tagVariant === 'home-svg' ? placeCloud(tagList) : [];
 %>
 <% if (!tagList.length) { %>
   <p class="empty-state"><%= __('tags.empty') %></p>
 <% } else if (tagVariant === 'home-svg') { %>
   <div class="tag-cloud-figure" aria-label="首页标签词云图">
-    <svg class="tag-cloud-svg" viewBox="0 0 420 360" role="img" aria-labelledby="home-tag-cloud-title home-tag-cloud-desc">
+    <svg class="tag-cloud-svg" viewBox="0 0 <%= cloudWidth %> <%= cloudHeight %>" role="img" aria-labelledby="home-tag-cloud-title home-tag-cloud-desc">
       <title id="home-tag-cloud-title">标签词云图</title>
       <desc id="home-tag-cloud-desc">标签出现次数越多，在图中显示越大；每个标签都可以点击进入对应标签页面。</desc>
       <g class="tag-cloud-glow" aria-hidden="true">
-        <circle cx="210" cy="180" r="142"></circle>
-        <circle cx="122" cy="112" r="42"></circle>
-        <circle cx="318" cy="256" r="54"></circle>
+        <ellipse cx="<%= cloudCenterX %>" cy="<%= cloudCenterY %>" rx="205" ry="136"></ellipse>
+        <ellipse cx="168" cy="142" rx="70" ry="44"></ellipse>
+        <ellipse cx="352" cy="236" rx="76" ry="50"></ellipse>
       </g>
-      <% tagList.slice(0, cloudSlots.length).forEach(function (tag, index) { %>
-        <%
-          const weight = maxLen === minLen ? 0.5 : (tag.length - minLen) / range;
-          const longLabelPenalty = Math.max(0, tag.name.length - 10) * 0.45;
-          const fontSize = Math.max(11.5, 14 + weight * 22 + Math.max(0, 4 - index) * 1.2 - longLabelPenalty);
-          const opacity = 0.72 + weight * 0.26;
-          const hue = 188 + ((index * 31) % 96);
-          const slot = cloudSlots[index];
-        %>
+      <% cloudWords.forEach(function (word) { %>
         <a
           class="tag-cloud-svg-link"
-          href="<%- url_for(tag.path) %>"
-          aria-label="<%= tag.name %>，<%= tag.length %> 篇文章"
+          href="<%- url_for(word.tag.path) %>"
+          aria-label="<%= word.tag.name %>，<%= word.tag.length %> 篇文章"
         >
           <text
-            x="<%= slot[0] %>"
-            y="<%= slot[1] %>"
-            transform="rotate(<%= slot[2] %> <%= slot[0] %> <%= slot[1] %>)"
+            x="<%= word.x.toFixed(1) %>"
+            y="<%= word.y.toFixed(1) %>"
+            transform="rotate(<%= word.rotation %> <%= word.x.toFixed(1) %> <%= word.y.toFixed(1) %>)"
             text-anchor="middle"
             dominant-baseline="middle"
-            style="--tag-hue: <%= hue %>; --tag-opacity: <%= opacity.toFixed(2) %>; font-size: <%= fontSize.toFixed(1) %>px;"
-          >#<%= tag.name %></text>
+            style="--tag-color: <%= word.color %>; --tag-opacity: <%= word.opacity.toFixed(2) %>; font-size: <%= word.fontSize.toFixed(1) %>px;"
+          ><%= word.tag.name %></text>
         </a>
       <% }); %>
     </svg>
