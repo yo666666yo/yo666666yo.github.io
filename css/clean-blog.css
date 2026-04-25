@@ -714,11 +714,27 @@ figure.highlight figcaption a { color: inherit; text-decoration: underline; }
   display: inline-block;
   margin: .1rem .45rem;
   font-family: "Lora", Georgia, serif;
-  font-size: calc(1rem * var(--tag-scale, 1));
-  color: hsl(var(--tag-hue, 190), 58%, 30%);
+  font-size: 1rem;
+  color: #1f4f5f;
   text-decoration: none;
   transition: color .2s ease, transform .2s ease, text-shadow .2s ease;
 }
+.tag-cloud-level-1 { font-size: .9rem; }
+.tag-cloud-level-2 { font-size: 1rem; }
+.tag-cloud-level-3 { font-size: 1.1rem; }
+.tag-cloud-level-4 { font-size: 1.2rem; }
+.tag-cloud-level-5 { font-size: 1.33rem; }
+.tag-cloud-level-6 { font-size: 1.48rem; }
+.tag-cloud-level-7 { font-size: 1.64rem; }
+.tag-cloud-level-8 { font-size: 1.82rem; }
+.tag-cloud-color-0 { color: #1f4ed8; }
+.tag-cloud-color-1 { color: #26a269; }
+.tag-cloud-color-2 { color: #c026d3; }
+.tag-cloud-color-3 { color: #0f766e; }
+.tag-cloud-color-4 { color: #7c3aed; }
+.tag-cloud-color-5 { color: #dc2626; }
+.tag-cloud-color-6 { color: #16a34a; }
+.tag-cloud-color-7 { color: #2563eb; }
 .tag-cloud-item a:hover {
   color: #0085a1;
   transform: translateY(-2px);
@@ -779,8 +795,6 @@ figure.highlight figcaption a { color: inherit; text-decoration: underline; }
 .tag-cloud-glow ellipse:nth-child(3) { fill: rgba(127,184,255,.11); }
 .tag-cloud-svg-link { text-decoration: none; }
 .tag-cloud-svg text {
-  fill: var(--tag-color, #0085a1);
-  fill-opacity: var(--tag-opacity, .84);
   font-family: "Open Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
   font-weight: 800;
   paint-order: stroke;

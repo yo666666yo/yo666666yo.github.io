@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/</loc>
+    <loc>https://yo666666yo.github.io/categories/</loc>
     
     <lastmod>2026-04-24</lastmod>
     
@@ -11,7 +11,7 @@
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/categories/</loc>
+    <loc>https://yo666666yo.github.io/tags/</loc>
     
     <lastmod>2026-04-24</lastmod>
     
@@ -92,14 +92,21 @@
 
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/%E9%9A%8F%E7%AC%94/</loc>
+    <loc>https://yo666666yo.github.io/tags/%E6%9D%82%E8%B0%88/</loc>
     <lastmod>2026-04-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/%E7%94%9F%E6%B4%BB/</loc>
+    <loc>https://yo666666yo.github.io/tags/%E5%8D%9A%E5%AE%A2/</loc>
+    <lastmod>2026-04-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/Hexo/</loc>
     <lastmod>2026-04-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -169,21 +176,14 @@
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/%E6%9D%82%E8%B0%88/</loc>
+    <loc>https://yo666666yo.github.io/tags/%E9%9A%8F%E7%AC%94/</loc>
     <lastmod>2026-04-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/%E5%8D%9A%E5%AE%A2/</loc>
-    <lastmod>2026-04-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/Hexo/</loc>
+    <loc>https://yo666666yo.github.io/tags/%E7%94%9F%E6%B4%BB/</loc>
     <lastmod>2026-04-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -255,7 +255,7 @@
 
   
   <url>
-    <loc>https://yo666666yo.github.io/categories/life/</loc>
+    <loc>https://yo666666yo.github.io/categories/research/</loc>
     <lastmod>2026-04-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -269,7 +269,7 @@
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/categories/research/</loc>
+    <loc>https://yo666666yo.github.io/categories/life/</loc>
     <lastmod>2026-04-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
