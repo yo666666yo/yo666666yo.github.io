@@ -61,6 +61,17 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
 .mb-4 { margin-bottom: 1.5rem; }
 .text-center { text-align: center; }
 .text-uppercase { text-transform: uppercase; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* ============ Navbar ============ */
 #mainNav {
@@ -101,7 +112,7 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
 .navbar-nav {
   display: flex;
   flex-direction: row;
-  margin: 0 0 0 auto;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -118,6 +129,122 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
   transition: color .2s ease;
 }
 .nav-link:hover, .nav-link.active { color: #fff; }
+
+.site-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 15.5rem;
+  margin: 0 .5rem 0 auto;
+}
+
+.site-search-input {
+  width: 100%;
+  min-height: 2.3rem;
+  padding: .45rem 2.55rem .45rem .95rem;
+  color: #fff;
+  font-family: "Open Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  background: rgba(255,255,255,.16);
+  border: 1px solid rgba(255,255,255,.42);
+  border-radius: 999px;
+  outline: none;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+}
+
+.site-search-input::placeholder { color: rgba(255,255,255,.72); }
+.site-search-input:focus {
+  background: rgba(255,255,255,.24);
+  border-color: rgba(255,255,255,.82);
+  box-shadow: 0 12px 34px rgba(0,0,0,.12), 0 0 0 3px rgba(0,133,161,.18);
+}
+
+.site-search-button {
+  position: absolute;
+  right: .22rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  color: #fff;
+  background: rgba(255,255,255,.18);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color .2s ease, color .2s ease, transform .2s ease;
+}
+.site-search-button:hover { transform: translateY(-1px); background: rgba(255,255,255,.28); }
+.site-search-icon { width: 1rem; height: 1rem; fill: currentColor; }
+
+.site-search-results {
+  position: absolute;
+  top: calc(100% + .7rem);
+  right: 0;
+  width: min(26rem, calc(100vw - 3rem));
+  max-height: min(28rem, 72vh);
+  overflow: auto;
+  padding: .45rem;
+  color: #212529;
+  background: rgba(255,255,255,.96);
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 1.1rem;
+  box-shadow: 0 24px 70px rgba(0,0,0,.18);
+  backdrop-filter: blur(14px);
+}
+.site-search-results[hidden] { display: none; }
+
+.site-search-result,
+.site-search-status {
+  display: block;
+  padding: .75rem .85rem;
+  border-radius: .8rem;
+  text-decoration: none;
+}
+.site-search-result {
+  color: #212529;
+  transition: background-color .18s ease, color .18s ease, transform .18s ease;
+}
+.site-search-result:hover,
+.site-search-result.is-active {
+  color: #00657b;
+  background: rgba(0,133,161,.09);
+  transform: translateX(2px);
+}
+.site-search-title {
+  display: block;
+  font-family: "Lora", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", Georgia, serif;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+.site-search-excerpt {
+  display: block;
+  margin-top: .25rem;
+  color: #6c757d;
+  font-size: .78rem;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: 0;
+}
+.site-search-meta {
+  display: block;
+  margin-top: .3rem;
+  color: #0085a1;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.site-search-status {
+  color: #6c757d;
+  font-size: .78rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
 
 /* Shrunken (scrolled past hero) */
 #mainNav.is-shrunk,
@@ -136,6 +263,28 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
 #mainNav.is-shrunk .nav-link.active,
 #mainNav.nav-solid .nav-link:hover,
 #mainNav.nav-solid .nav-link.active { color: #0085a1; }
+#mainNav.is-shrunk .site-search-input,
+#mainNav.nav-solid .site-search-input {
+  color: #212529;
+  background: rgba(0,0,0,.035);
+  border-color: rgba(0,0,0,.14);
+  box-shadow: none;
+}
+#mainNav.is-shrunk .site-search-input::placeholder,
+#mainNav.nav-solid .site-search-input::placeholder { color: rgba(33,37,41,.5); }
+#mainNav.is-shrunk .site-search-input:focus,
+#mainNav.nav-solid .site-search-input:focus {
+  background: #fff;
+  border-color: rgba(0,133,161,.45);
+  box-shadow: 0 0 0 3px rgba(0,133,161,.13);
+}
+#mainNav.is-shrunk .site-search-button,
+#mainNav.nav-solid .site-search-button {
+  color: #0085a1;
+  background: rgba(0,133,161,.1);
+}
+#mainNav.is-shrunk .site-search-button:hover,
+#mainNav.nav-solid .site-search-button:hover { background: rgba(0,133,161,.16); }
 
 /* Every page has a masthead hero, so the navbar overlaps it by default (already
    position: absolute above) and becomes fixed/solid once the user scrolls past it. */
@@ -166,7 +315,18 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
 .navbar-toggler-icon { display: inline-flex; flex-direction: column; gap: 3px; }
 .navbar-toggler-icon span { display: block; width: 20px; height: 2px; background: currentColor; border-radius: 1px; }
 
-.navbar-collapse { display: flex; flex-basis: auto; flex-grow: 1; align-items: center; }
+.navbar-collapse {
+  display: flex;
+  flex-basis: auto;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+@media (max-width: 1199.98px) {
+  .site-search { width: 12.75rem; }
+  .nav-link { padding-right: .75rem; padding-left: .75rem; }
+}
 
 @media (max-width: 991.98px) {
   #mainNav { padding: .75rem 0; }
@@ -175,10 +335,22 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
     flex-basis: 100%;
     max-height: 0;
     overflow: hidden;
+    align-items: stretch;
+    justify-content: flex-start;
     transition: max-height .28s ease;
   }
-  .navbar-collapse.is-open { max-height: 24rem; }
-  .navbar-nav { flex-direction: column; width: 100%; margin: 1rem 0 .5rem; }
+  .navbar-collapse.is-open { max-height: 42rem; }
+  .site-search {
+    width: 100%;
+    margin: 1rem 0 .25rem;
+  }
+  .site-search-results {
+    position: static;
+    width: 100%;
+    max-height: 18rem;
+    margin-top: .5rem;
+  }
+  .navbar-nav { flex-direction: column; width: 100%; margin: .5rem 0 .5rem; }
   .nav-item { margin: 0; border-top: 1px solid rgba(255,255,255,.15); }
   .nav-link { padding: .9rem .25rem; }
   #mainNav.is-shrunk .nav-item,

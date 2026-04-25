@@ -32,7 +32,7 @@
 
 
 
-<link rel="stylesheet" href="/css/clean-blog.css?v=20260425-6" />
+<link rel="stylesheet" href="/css/clean-blog.css?v=20260426-1" />
 
 
 
@@ -49,6 +49,16 @@
       </span>
     </button>
     <div class="navbar-collapse" id="navbarResponsive">
+      <form class="site-search" role="search" data-search-url="/search.xml" data-loading="正在搜索..." data-no-results="没有找到匹配文章" data-error="搜索索引暂时不可用">
+        <label class="sr-only" for="site-search-input">搜索文章</label>
+        <input id="site-search-input" class="site-search-input" type="search" placeholder="搜索文章..." autocomplete="off" spellcheck="false" aria-controls="site-search-results" aria-expanded="false" />
+        <button class="site-search-button" type="submit" aria-label="搜索">
+          <svg class="site-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10.8 5.2a5.6 5.6 0 1 0 0 11.2 5.6 5.6 0 0 0 0-11.2Zm-7.1 5.6a7.1 7.1 0 1 1 12.6 4.5l3.7 3.7-1.1 1.1-3.7-3.7A7.1 7.1 0 0 1 3.7 10.8Z" />
+          </svg>
+        </button>
+        <div id="site-search-results" class="site-search-results" role="listbox" hidden></div>
+      </form>
       <ul class="navbar-nav">
         
           
@@ -304,19 +314,6 @@
       <li class="tag-cloud-item">
         <a
           class="tag-cloud-link tag-cloud-level-1 tag-cloud-color-6"
-          href="/tags/RLHF/"
-          title="RLHF (1)"
-          aria-label="RLHF，1 篇文章"
-        >
-          <span class="tag-cloud-name">#RLHF</span>
-          <span class="tag-cloud-count">1</span>
-        </a>
-      </li>
-    
-      
-      <li class="tag-cloud-item">
-        <a
-          class="tag-cloud-link tag-cloud-level-1 tag-cloud-color-7"
           href="/tags/%E9%9A%8F%E7%AC%94/"
           title="随笔 (1)"
           aria-label="随笔，1 篇文章"
@@ -329,12 +326,25 @@
       
       <li class="tag-cloud-item">
         <a
-          class="tag-cloud-link tag-cloud-level-1 tag-cloud-color-0"
+          class="tag-cloud-link tag-cloud-level-1 tag-cloud-color-7"
           href="/tags/%E7%94%9F%E6%B4%BB/"
           title="生活 (1)"
           aria-label="生活，1 篇文章"
         >
           <span class="tag-cloud-name">#生活</span>
+          <span class="tag-cloud-count">1</span>
+        </a>
+      </li>
+    
+      
+      <li class="tag-cloud-item">
+        <a
+          class="tag-cloud-link tag-cloud-level-1 tag-cloud-color-0"
+          href="/tags/RLHF/"
+          title="RLHF (1)"
+          aria-label="RLHF，1 篇文章"
+        >
+          <span class="tag-cloud-name">#RLHF</span>
           <span class="tag-cloud-count">1</span>
         </a>
       </li>
@@ -533,7 +543,7 @@
   </div>
 </footer>
 
-  <script defer src="/js/clean-blog.js?v=20260425-6"></script>
+  <script defer src="/js/clean-blog.js?v=20260426-1"></script>
 
 
 </body>
