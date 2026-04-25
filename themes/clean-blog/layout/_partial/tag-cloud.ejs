@@ -5,9 +5,53 @@
   const range = Math.max(1, maxLen - minLen);
   const tagVariant = typeof variant !== 'undefined' && variant ? String(variant).replace(/[^a-z0-9_-]/gi, '') : '';
   const variantClass = tagVariant ? ' tag-cloud--' + tagVariant : '';
+  const cloudSlots = [
+    [210, 178, 0], [126, 162, -14], [292, 150, 12], [204, 116, 6],
+    [220, 238, -9], [104, 220, 18], [310, 218, -16], [118, 108, 10],
+    [306, 100, -8], [166, 266, 12], [276, 276, -12], [82, 166, -18],
+    [332, 172, 16], [160, 76, -9], [260, 76, 11], [86, 286, 8],
+    [332, 286, -8], [214, 314, 0], [80, 84, 14], [340, 84, -14],
+    [132, 318, -10], [292, 318, 10], [76, 246, 18], [344, 246, -18]
+  ];
 %>
 <% if (!tagList.length) { %>
   <p class="empty-state"><%= __('tags.empty') %></p>
+<% } else if (tagVariant === 'home-svg') { %>
+  <div class="tag-cloud-figure" aria-label="首页标签词云图">
+    <svg class="tag-cloud-svg" viewBox="0 0 420 360" role="img" aria-labelledby="home-tag-cloud-title home-tag-cloud-desc">
+      <title id="home-tag-cloud-title">标签词云图</title>
+      <desc id="home-tag-cloud-desc">标签出现次数越多，在图中显示越大；每个标签都可以点击进入对应标签页面。</desc>
+      <g class="tag-cloud-glow" aria-hidden="true">
+        <circle cx="210" cy="180" r="142"></circle>
+        <circle cx="122" cy="112" r="42"></circle>
+        <circle cx="318" cy="256" r="54"></circle>
+      </g>
+      <% tagList.slice(0, cloudSlots.length).forEach(function (tag, index) { %>
+        <%
+          const weight = maxLen === minLen ? 0.5 : (tag.length - minLen) / range;
+          const longLabelPenalty = Math.max(0, tag.name.length - 10) * 0.45;
+          const fontSize = Math.max(11.5, 14 + weight * 22 + Math.max(0, 4 - index) * 1.2 - longLabelPenalty);
+          const opacity = 0.72 + weight * 0.26;
+          const hue = 188 + ((index * 31) % 96);
+          const slot = cloudSlots[index];
+        %>
+        <a
+          class="tag-cloud-svg-link"
+          href="<%- url_for(tag.path) %>"
+          aria-label="<%= tag.name %>，<%= tag.length %> 篇文章"
+        >
+          <text
+            x="<%= slot[0] %>"
+            y="<%= slot[1] %>"
+            transform="rotate(<%= slot[2] %> <%= slot[0] %> <%= slot[1] %>)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: <%= hue %>; --tag-opacity: <%= opacity.toFixed(2) %>; font-size: <%= fontSize.toFixed(1) %>px;"
+          >#<%= tag.name %></text>
+        </a>
+      <% }); %>
+    </svg>
+  </div>
 <% } else { %>
   <ul class="tag-cloud<%= variantClass %>">
     <% tagList.forEach(function (tag, index) { %>
