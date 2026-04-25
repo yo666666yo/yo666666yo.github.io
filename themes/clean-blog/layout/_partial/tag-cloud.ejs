@@ -54,9 +54,9 @@
     tags.slice(0, 30).forEach(function (tag, index) {
       const name = String(tag.name);
       const weight = maxLen === minLen ? 0.5 : (tag.length - minLen) / range;
-      const lengthPenalty = Math.max(0, visualUnits(name) - 10) * 0.78;
-      const rankBoost = Math.max(0, 4 - index) * 1.05;
-      let fontSize = Math.max(10.8, 15 + weight * 31 + rankBoost - lengthPenalty);
+      const lengthPenalty = Math.max(0, visualUnits(name) - 10) * 0.92;
+      const rankBoost = Math.max(0, 4 - index) * 1.35;
+      let fontSize = Math.max(15, 22 + weight * 46 + rankBoost - lengthPenalty);
       let rotation = rotationFor(name, index, fontSize);
       let box = textBox(name, fontSize, rotation);
       const color = cloudColors[index % cloudColors.length];
@@ -65,7 +65,7 @@
 
       for (let shrink = 0; shrink < 5 && !chosen; shrink++) {
         if (shrink > 0) {
-          fontSize = Math.max(9.5, fontSize * 0.86);
+          fontSize = Math.max(13, fontSize * 0.88);
           rotation = rotationFor(name, index, fontSize);
           box = textBox(name, fontSize, rotation);
         }
