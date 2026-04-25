@@ -31,6 +31,82 @@
     });
   }
 
+  // --- code block copy buttons ---
+  function getCodeText(pre) {
+    const code = pre.querySelector('code');
+    if (!code) return pre.textContent || '';
+    const clone = code.cloneNode(true);
+    clone.querySelectorAll('.line-numbers-rows').forEach(function (row) {
+      row.remove();
+    });
+    return clone.textContent.replace(/\n$/, '');
+  }
+
+  function writeClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+
+    return new Promise(function (resolve, reject) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.top = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      try {
+        const ok = document.execCommand('copy');
+        textarea.remove();
+        ok ? resolve() : reject(new Error('copy failed'));
+      } catch (err) {
+        textarea.remove();
+        reject(err);
+      }
+    });
+  }
+
+  document.querySelectorAll('.post-body pre').forEach(function (pre) {
+    if (pre.closest('.code-block')) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block';
+    pre.parentNode.insertBefore(wrapper, pre);
+    wrapper.appendChild(pre);
+
+    const language = (pre.getAttribute('data-language') || '').trim();
+    if (language) {
+      const label = document.createElement('span');
+      label.className = 'code-language';
+      label.textContent = language;
+      wrapper.appendChild(label);
+    }
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'code-copy-button';
+    button.textContent = '复制';
+    button.setAttribute('aria-label', '复制代码');
+    wrapper.appendChild(button);
+
+    button.addEventListener('click', function () {
+      writeClipboard(getCodeText(pre)).then(function () {
+        button.textContent = '已复制';
+        button.classList.add('is-copied');
+        window.setTimeout(function () {
+          button.textContent = '复制';
+          button.classList.remove('is-copied');
+        }, 1400);
+      }).catch(function () {
+        button.textContent = '复制失败';
+        window.setTimeout(function () {
+          button.textContent = '复制';
+        }, 1400);
+      });
+    });
+  });
+
   // --- reading progress bar (posts only) ---
   if (document.body.classList.contains('is-post')) {
     const bar = document.createElement('div');
