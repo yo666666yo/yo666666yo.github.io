@@ -78,13 +78,13 @@
             
             <tag> 周报 </tag>
             
-            <tag> credit assignment </tag>
-            
-            <tag> SHARP </tag>
-            
             <tag> GRPO </tag>
             
             <tag> PPO </tag>
+            
+            <tag> credit assignment </tag>
+            
+            <tag> SHARP </tag>
             
             <tag> GAE </tag>
             
@@ -115,8 +115,6 @@
             
             <tag> 周报 </tag>
             
-            <tag> credit assignment </tag>
-            
             <tag> GRPO </tag>
             
             <tag> PPO </tag>
@@ -126,6 +124,8 @@
             <tag> LangMARL </tag>
             
             <tag> MHGPO </tag>
+            
+            <tag> credit assignment </tag>
             
         </tags>
       
