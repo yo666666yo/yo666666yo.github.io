@@ -32,7 +32,7 @@
 
 
 
-<link rel="stylesheet" href="/css/clean-blog.css" />
+<link rel="stylesheet" href="/css/clean-blog.css?v=20260425-2" />
 
 
 
@@ -253,313 +253,390 @@
 
     <aside class="home-tags" aria-labelledby="home-tags-title">
       <div class="home-tags-card">
-        <p class="home-tags-eyebrow">Tags</p>
-        <h2 id="home-tags-title" class="home-tags-title">标签云</h2>
-        <p class="home-tags-note">出现越频繁，词越醒目；点击即可进入对应标签。</p>
+        <h2 id="home-tags-title" class="home-tags-title">标签云图</h2>
+        <p class="home-tags-note">词越大，出现越频繁。点击词语进入对应标签。</p>
         
 
-  <ul class="tag-cloud tag-cloud--home">
-    
+  <div class="tag-cloud-figure" aria-label="首页标签词云图">
+    <svg class="tag-cloud-svg" viewBox="0 0 420 360" role="img" aria-labelledby="home-tag-cloud-title home-tag-cloud-desc">
+      <title id="home-tag-cloud-title">标签词云图</title>
+      <desc id="home-tag-cloud-desc">标签出现次数越多，在图中显示越大；每个标签都可以点击进入对应标签页面。</desc>
+      <g class="tag-cloud-glow" aria-hidden="true">
+        <circle cx="210" cy="180" r="142"></circle>
+        <circle cx="122" cy="112" r="42"></circle>
+        <circle cx="318" cy="256" r="54"></circle>
+      </g>
       
-      <li class="tag-cloud-item">
+        
         <a
+          class="tag-cloud-svg-link"
           href="/tags/%E5%91%A8%E6%8A%A5/"
-          style="--tag-scale: 1.85; --tag-hue: 184;"
-          title="周报 (4)"
           aria-label="周报，4 篇文章"
         >
-          <span class="tag-cloud-name">#周报</span>
-          <span class="tag-cloud-count">4</span>
+          <text
+            x="210"
+            y="178"
+            transform="rotate(0 210 178)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 188; --tag-opacity: 0.98; font-size: 40.8px;"
+          >#周报</text>
         </a>
-      </li>
-    
       
-      <li class="tag-cloud-item">
+        
         <a
-          href="/tags/GRPO/"
-          style="--tag-scale: 1.22; --tag-hue: 221;"
-          title="GRPO (2)"
-          aria-label="GRPO，2 篇文章"
-        >
-          <span class="tag-cloud-name">#GRPO</span>
-          <span class="tag-cloud-count">2</span>
-        </a>
-      </li>
-    
-      
-      <li class="tag-cloud-item">
-        <a
-          href="/tags/PPO/"
-          style="--tag-scale: 1.22; --tag-hue: 258;"
-          title="PPO (2)"
-          aria-label="PPO，2 篇文章"
-        >
-          <span class="tag-cloud-name">#PPO</span>
-          <span class="tag-cloud-count">2</span>
-        </a>
-      </li>
-    
-      
-      <li class="tag-cloud-item">
-        <a
+          class="tag-cloud-svg-link"
           href="/tags/credit-assignment/"
-          style="--tag-scale: 1.22; --tag-hue: 201;"
-          title="credit assignment (2)"
           aria-label="credit assignment，2 篇文章"
         >
-          <span class="tag-cloud-name">#credit assignment</span>
-          <span class="tag-cloud-count">2</span>
+          <text
+            x="126"
+            y="162"
+            transform="rotate(-14 126 162)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 219; --tag-opacity: 0.81; font-size: 21.8px;"
+          >#credit assignment</text>
         </a>
-      </li>
-    
       
-      <li class="tag-cloud-item">
+        
         <a
+          class="tag-cloud-svg-link"
+          href="/tags/GRPO/"
+          aria-label="GRPO，2 篇文章"
+        >
+          <text
+            x="292"
+            y="150"
+            transform="rotate(12 292 150)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 250; --tag-opacity: 0.81; font-size: 23.7px;"
+          >#GRPO</text>
+        </a>
+      
+        
+        <a
+          class="tag-cloud-svg-link"
+          href="/tags/PPO/"
+          aria-label="PPO，2 篇文章"
+        >
+          <text
+            x="204"
+            y="116"
+            transform="rotate(6 204 116)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 281; --tag-opacity: 0.81; font-size: 22.5px;"
+          >#PPO</text>
+        </a>
+      
+        
+        <a
+          class="tag-cloud-svg-link"
           href="/tags/%E6%9D%82%E8%B0%88/"
-          style="--tag-scale: 0.90; --tag-hue: 238;"
-          title="杂谈 (1)"
           aria-label="杂谈，1 篇文章"
         >
-          <span class="tag-cloud-name">#杂谈</span>
-          <span class="tag-cloud-count">1</span>
+          <text
+            x="220"
+            y="238"
+            transform="rotate(-9 220 238)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 216; --tag-opacity: 0.72; font-size: 14.0px;"
+          >#杂谈</text>
         </a>
-      </li>
-    
       
-      <li class="tag-cloud-item">
+        
         <a
+          class="tag-cloud-svg-link"
           href="/tags/%E5%8D%9A%E5%AE%A2/"
-          style="--tag-scale: 0.90; --tag-hue: 275;"
-          title="博客 (1)"
           aria-label="博客，1 篇文章"
         >
-          <span class="tag-cloud-name">#博客</span>
-          <span class="tag-cloud-count">1</span>
+          <text
+            x="104"
+            y="220"
+            transform="rotate(18 104 220)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 247; --tag-opacity: 0.72; font-size: 14.0px;"
+          >#博客</text>
         </a>
-      </li>
-    
       
-      <li class="tag-cloud-item">
+        
         <a
+          class="tag-cloud-svg-link"
           href="/tags/Hexo/"
-          style="--tag-scale: 0.90; --tag-hue: 218;"
-          title="Hexo (1)"
           aria-label="Hexo，1 篇文章"
         >
-          <span class="tag-cloud-name">#Hexo</span>
-          <span class="tag-cloud-count">1</span>
+          <text
+            x="310"
+            y="218"
+            transform="rotate(-16 310 218)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 278; --tag-opacity: 0.72; font-size: 14.0px;"
+          >#Hexo</text>
         </a>
-      </li>
-    
       
-      <li class="tag-cloud-item">
+        
         <a
-          href="/tags/Agentic-RL/"
-          style="--tag-scale: 0.90; --tag-hue: 255;"
-          title="Agentic RL (1)"
-          aria-label="Agentic RL，1 篇文章"
-        >
-          <span class="tag-cloud-name">#Agentic RL</span>
-          <span class="tag-cloud-count">1</span>
-        </a>
-      </li>
-    
-      
-      <li class="tag-cloud-item">
-        <a
-          href="/tags/Model-Based-RL/"
-          style="--tag-scale: 0.90; --tag-hue: 198;"
-          title="Model-Based RL (1)"
-          aria-label="Model-Based RL，1 篇文章"
-        >
-          <span class="tag-cloud-name">#Model-Based RL</span>
-          <span class="tag-cloud-count">1</span>
-        </a>
-      </li>
-    
-      
-      <li class="tag-cloud-item">
-        <a
-          href="/tags/World-Model/"
-          style="--tag-scale: 0.90; --tag-hue: 235;"
-          title="World Model (1)"
-          aria-label="World Model，1 篇文章"
-        >
-          <span class="tag-cloud-name">#World Model</span>
-          <span class="tag-cloud-count">1</span>
-        </a>
-      </li>
-    
-      
-      <li class="tag-cloud-item">
-        <a
-          href="/tags/Objective-Mismatch/"
-          style="--tag-scale: 0.90; --tag-hue: 272;"
-          title="Objective Mismatch (1)"
-          aria-label="Objective Mismatch，1 篇文章"
-        >
-          <span class="tag-cloud-name">#Objective Mismatch</span>
-          <span class="tag-cloud-count">1</span>
-        </a>
-      </li>
-    
-      
-      <li class="tag-cloud-item">
-        <a
-          href="/tags/PSR/"
-          style="--tag-scale: 0.90; --tag-hue: 215;"
-          title="PSR (1)"
-          aria-label="PSR，1 篇文章"
-        >
-          <span class="tag-cloud-name">#PSR</span>
-          <span class="tag-cloud-count">1</span>
-        </a>
-      </li>
-    
-      
-      <li class="tag-cloud-item">
-        <a
-          href="/tags/MARL/"
-          style="--tag-scale: 0.90; --tag-hue: 252;"
-          title="MARL (1)"
-          aria-label="MARL，1 篇文章"
-        >
-          <span class="tag-cloud-name">#MARL</span>
-          <span class="tag-cloud-count">1</span>
-        </a>
-      </li>
-    
-      
-      <li class="tag-cloud-item">
-        <a
-          href="/tags/ProbeCommitEnv/"
-          style="--tag-scale: 0.90; --tag-hue: 195;"
-          title="ProbeCommitEnv (1)"
-          aria-label="ProbeCommitEnv，1 篇文章"
-        >
-          <span class="tag-cloud-name">#ProbeCommitEnv</span>
-          <span class="tag-cloud-count">1</span>
-        </a>
-      </li>
-    
-      
-      <li class="tag-cloud-item">
-        <a
-          href="/tags/representation-learning/"
-          style="--tag-scale: 0.90; --tag-hue: 232;"
-          title="representation learning (1)"
-          aria-label="representation learning，1 篇文章"
-        >
-          <span class="tag-cloud-name">#representation learning</span>
-          <span class="tag-cloud-count">1</span>
-        </a>
-      </li>
-    
-      
-      <li class="tag-cloud-item">
-        <a
+          class="tag-cloud-svg-link"
           href="/tags/%E9%9A%8F%E7%AC%94/"
-          style="--tag-scale: 0.90; --tag-hue: 269;"
-          title="随笔 (1)"
           aria-label="随笔，1 篇文章"
         >
-          <span class="tag-cloud-name">#随笔</span>
-          <span class="tag-cloud-count">1</span>
+          <text
+            x="118"
+            y="108"
+            transform="rotate(10 118 108)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 213; --tag-opacity: 0.72; font-size: 14.0px;"
+          >#随笔</text>
         </a>
-      </li>
-    
       
-      <li class="tag-cloud-item">
+        
         <a
+          class="tag-cloud-svg-link"
           href="/tags/%E7%94%9F%E6%B4%BB/"
-          style="--tag-scale: 0.90; --tag-hue: 212;"
-          title="生活 (1)"
           aria-label="生活，1 篇文章"
         >
-          <span class="tag-cloud-name">#生活</span>
-          <span class="tag-cloud-count">1</span>
+          <text
+            x="306"
+            y="100"
+            transform="rotate(-8 306 100)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 244; --tag-opacity: 0.72; font-size: 14.0px;"
+          >#生活</text>
         </a>
-      </li>
-    
       
-      <li class="tag-cloud-item">
+        
         <a
-          href="/tags/LLM-MAS/"
-          style="--tag-scale: 0.90; --tag-hue: 249;"
-          title="LLM-MAS (1)"
-          aria-label="LLM-MAS，1 篇文章"
+          class="tag-cloud-svg-link"
+          href="/tags/Agentic-RL/"
+          aria-label="Agentic RL，1 篇文章"
         >
-          <span class="tag-cloud-name">#LLM-MAS</span>
-          <span class="tag-cloud-count">1</span>
+          <text
+            x="166"
+            y="266"
+            transform="rotate(12 166 266)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 275; --tag-opacity: 0.72; font-size: 14.0px;"
+          >#Agentic RL</text>
         </a>
-      </li>
-    
       
-      <li class="tag-cloud-item">
+        
         <a
-          href="/tags/LangMARL/"
-          style="--tag-scale: 0.90; --tag-hue: 192;"
-          title="LangMARL (1)"
-          aria-label="LangMARL，1 篇文章"
+          class="tag-cloud-svg-link"
+          href="/tags/Model-Based-RL/"
+          aria-label="Model-Based RL，1 篇文章"
         >
-          <span class="tag-cloud-name">#LangMARL</span>
-          <span class="tag-cloud-count">1</span>
+          <text
+            x="276"
+            y="276"
+            transform="rotate(-12 276 276)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 210; --tag-opacity: 0.72; font-size: 12.2px;"
+          >#Model-Based RL</text>
         </a>
-      </li>
-    
       
-      <li class="tag-cloud-item">
+        
         <a
-          href="/tags/MHGPO/"
-          style="--tag-scale: 0.90; --tag-hue: 229;"
-          title="MHGPO (1)"
-          aria-label="MHGPO，1 篇文章"
+          class="tag-cloud-svg-link"
+          href="/tags/World-Model/"
+          aria-label="World Model，1 篇文章"
         >
-          <span class="tag-cloud-name">#MHGPO</span>
-          <span class="tag-cloud-count">1</span>
+          <text
+            x="82"
+            y="166"
+            transform="rotate(-18 82 166)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 241; --tag-opacity: 0.72; font-size: 13.6px;"
+          >#World Model</text>
         </a>
-      </li>
-    
       
-      <li class="tag-cloud-item">
+        
         <a
+          class="tag-cloud-svg-link"
+          href="/tags/Objective-Mismatch/"
+          aria-label="Objective Mismatch，1 篇文章"
+        >
+          <text
+            x="332"
+            y="172"
+            transform="rotate(16 332 172)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 272; --tag-opacity: 0.72; font-size: 11.5px;"
+          >#Objective Mismatch</text>
+        </a>
+      
+        
+        <a
+          class="tag-cloud-svg-link"
           href="/tags/SHARP/"
-          style="--tag-scale: 0.90; --tag-hue: 266;"
-          title="SHARP (1)"
           aria-label="SHARP，1 篇文章"
         >
-          <span class="tag-cloud-name">#SHARP</span>
-          <span class="tag-cloud-count">1</span>
+          <text
+            x="160"
+            y="76"
+            transform="rotate(-9 160 76)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 207; --tag-opacity: 0.72; font-size: 14.0px;"
+          >#SHARP</text>
         </a>
-      </li>
-    
       
-      <li class="tag-cloud-item">
+        
         <a
+          class="tag-cloud-svg-link"
           href="/tags/GAE/"
-          style="--tag-scale: 0.90; --tag-hue: 209;"
-          title="GAE (1)"
           aria-label="GAE，1 篇文章"
         >
-          <span class="tag-cloud-name">#GAE</span>
-          <span class="tag-cloud-count">1</span>
+          <text
+            x="260"
+            y="76"
+            transform="rotate(11 260 76)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 238; --tag-opacity: 0.72; font-size: 14.0px;"
+          >#GAE</text>
         </a>
-      </li>
-    
       
-      <li class="tag-cloud-item">
+        
         <a
+          class="tag-cloud-svg-link"
           href="/tags/policy-gradient/"
-          style="--tag-scale: 0.90; --tag-hue: 246;"
-          title="policy gradient (1)"
           aria-label="policy gradient，1 篇文章"
         >
-          <span class="tag-cloud-name">#policy gradient</span>
-          <span class="tag-cloud-count">1</span>
+          <text
+            x="86"
+            y="286"
+            transform="rotate(8 86 286)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 269; --tag-opacity: 0.72; font-size: 11.8px;"
+          >#policy gradient</text>
         </a>
-      </li>
-    
-  </ul>
+      
+        
+        <a
+          class="tag-cloud-svg-link"
+          href="/tags/LLM-MAS/"
+          aria-label="LLM-MAS，1 篇文章"
+        >
+          <text
+            x="332"
+            y="286"
+            transform="rotate(-8 332 286)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 204; --tag-opacity: 0.72; font-size: 14.0px;"
+          >#LLM-MAS</text>
+        </a>
+      
+        
+        <a
+          class="tag-cloud-svg-link"
+          href="/tags/LangMARL/"
+          aria-label="LangMARL，1 篇文章"
+        >
+          <text
+            x="214"
+            y="314"
+            transform="rotate(0 214 314)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 235; --tag-opacity: 0.72; font-size: 14.0px;"
+          >#LangMARL</text>
+        </a>
+      
+        
+        <a
+          class="tag-cloud-svg-link"
+          href="/tags/MHGPO/"
+          aria-label="MHGPO，1 篇文章"
+        >
+          <text
+            x="80"
+            y="84"
+            transform="rotate(14 80 84)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 266; --tag-opacity: 0.72; font-size: 14.0px;"
+          >#MHGPO</text>
+        </a>
+      
+        
+        <a
+          class="tag-cloud-svg-link"
+          href="/tags/PSR/"
+          aria-label="PSR，1 篇文章"
+        >
+          <text
+            x="340"
+            y="84"
+            transform="rotate(-14 340 84)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 201; --tag-opacity: 0.72; font-size: 14.0px;"
+          >#PSR</text>
+        </a>
+      
+        
+        <a
+          class="tag-cloud-svg-link"
+          href="/tags/MARL/"
+          aria-label="MARL，1 篇文章"
+        >
+          <text
+            x="132"
+            y="318"
+            transform="rotate(-10 132 318)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 232; --tag-opacity: 0.72; font-size: 14.0px;"
+          >#MARL</text>
+        </a>
+      
+        
+        <a
+          class="tag-cloud-svg-link"
+          href="/tags/ProbeCommitEnv/"
+          aria-label="ProbeCommitEnv，1 篇文章"
+        >
+          <text
+            x="292"
+            y="318"
+            transform="rotate(10 292 318)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 263; --tag-opacity: 0.72; font-size: 12.2px;"
+          >#ProbeCommitEnv</text>
+        </a>
+      
+        
+        <a
+          class="tag-cloud-svg-link"
+          href="/tags/representation-learning/"
+          aria-label="representation learning，1 篇文章"
+        >
+          <text
+            x="76"
+            y="246"
+            transform="rotate(18 76 246)"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            style="--tag-hue: 198; --tag-opacity: 0.72; font-size: 11.5px;"
+          >#representation learning</text>
+        </a>
+      
+    </svg>
+  </div>
 
 
       </div>
@@ -608,7 +685,7 @@
   </div>
 </footer>
 
-  <script defer src="/js/clean-blog.js"></script>
+  <script defer src="/js/clean-blog.js?v=20260425-2"></script>
 
 
 </body>
