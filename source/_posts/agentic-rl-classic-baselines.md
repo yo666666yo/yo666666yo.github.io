@@ -172,17 +172,3 @@ updated: 2026-03-31 16:11:13
 └───────────────────┴───────────────────────────────────────────────┘
 ```
 
-
----
-
-## 5. 和你 PSR 框架最相关的对比方向
-
-结合你项目的定位 (reward-free pretraining + partner modeling + nuisance suppression)，最核心的对比 baselines 应该是：
-
-1. 无预训练 (Scratch) — 纯在线学习的下界
-2. AE / Masked AE — 重构型方法（你已证明在 nuisance 高时退化）
-3. CPC / SPR — 对比/预测型表征方法
-4. TIMAR — 队友建模型方法（最直接的竞品）
-5. Random Encoder — 随机特征基线
-6. Oracle (u-only) — 直接访问 partner type 的上界
-
