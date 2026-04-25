@@ -131,7 +131,9 @@
             transform="rotate(<%= word.rotation %> <%= word.x.toFixed(1) %> <%= word.y.toFixed(1) %>)"
             text-anchor="middle"
             dominant-baseline="middle"
-            style="--tag-color: <%= word.color %>; --tag-opacity: <%= word.opacity.toFixed(2) %>; font-size: <%= word.fontSize.toFixed(1) %>px;"
+            fill="<%= word.color %>"
+            fill-opacity="<%= word.opacity.toFixed(2) %>"
+            font-size="<%= word.fontSize.toFixed(1) %>"
           ><%= word.tag.name %></text>
         </a>
       <% }); %>
@@ -142,13 +144,13 @@
     <% tagList.forEach(function (tag, index) { %>
       <%
         const weight = maxLen === minLen ? 0.5 : (tag.length - minLen) / range;
-        const scale = 0.9 + weight * 0.95;
-        const hue = 184 + ((index * 37) % 94);
+        const level = Math.max(1, Math.min(8, Math.round(1 + weight * 7)));
+        const colorIndex = index % 8;
       %>
       <li class="tag-cloud-item">
         <a
+          class="tag-cloud-link tag-cloud-level-<%= level %> tag-cloud-color-<%= colorIndex %>"
           href="<%- url_for(tag.path) %>"
-          style="--tag-scale: <%= scale.toFixed(2) %>; --tag-hue: <%= hue %>;"
           title="<%= tag.name %> (<%= tag.length %>)"
           aria-label="<%= tag.name %>，<%= tag.length %> 篇文章"
         >
