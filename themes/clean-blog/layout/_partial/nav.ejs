@@ -1,6 +1,9 @@
 <%
   const menu = theme.menu || {};
-  const menuEntries = Object.keys(menu);
+  const menuEntries = Object.keys(menu).filter(function (label) {
+    const href = String(menu[label] || '').replace(/\/+$/, '/') || '/';
+    return label !== '分类' && label !== '标签' && href !== '/categories/' && href !== '/tags/';
+  });
   const searchPath = (config.search && config.search.path) || 'search.xml';
   const searchUrl = url_for('/' + searchPath.replace(/^\/+/, ''));
 %>

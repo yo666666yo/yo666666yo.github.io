@@ -1,6 +1,7 @@
 <%
   const masthead = theme.masthead || {};
   const siteMeta = theme.site || {};
+  const displayAuthor = (theme.author && theme.author.name) || config.author || 'Yoyo_Lee';
 
   function formatNumber(value) {
     return String(value).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -107,7 +108,7 @@
           <% if (subheading) { %><h2 class="subheading"><%= subheading %></h2><% } %>
           <span class="meta">
             <%= __('post.posted_by') %>
-            <a href="<%- url_for('/about/') %>"><%= page.author || config.author %></a>
+            <a href="<%- url_for('/about/') %>"><%= displayAuthor %></a>
             <%= __('post.posted_on') %>
             <time datetime="<%= date_xml(page.date) %>"><%= date(page.date, config.date_format) %></time>
           </span>

@@ -5,7 +5,7 @@
   const year = new Date().getFullYear();
   const startYear = footer.since || year;
   const copyYears = startYear === year ? ('' + year) : (startYear + '–' + year);
-  const authorName = config.author || '';
+  const authorName = (theme.author && theme.author.name) || config.author || 'Yoyo_Lee';
 %>
 <footer class="site-footer">
   <div class="site-footer-inner">
@@ -14,7 +14,7 @@
       <% socialEntries.forEach(function (pair) { %>
         <% const key = pair[0]; const href = pair[1]; %>
         <li class="social-list-item">
-          <a href="<%= href %>" rel="noopener me" target="_blank" aria-label="<%= key %>">
+          <a href="<%= href %>" rel="noopener me" target="_blank" aria-label="<%= key === 'github' ? authorName + ' GitHub' : key %>">
             <span class="social-circle">
               <span class="social-label"><%= key %></span>
             </span>

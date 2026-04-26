@@ -1,6 +1,6 @@
 <%
   const postPath = url_for(post.path);
-  const authorName = post.author || config.author;
+  const authorName = (theme.author && theme.author.name) || config.author || 'Yoyo_Lee';
   const excerptLen = (theme.index && theme.index.excerpt_length) || 180;
 
   // Produce a plaintext blurb: prefer excerpt, fall back to content with tags stripped.

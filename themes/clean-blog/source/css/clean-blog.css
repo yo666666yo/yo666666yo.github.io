@@ -979,11 +979,12 @@ figure.highlight figcaption a { color: inherit; text-decoration: underline; }
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 560px;
+  max-width: 600px;
   margin: .35rem auto 0;
-  aspect-ratio: 13 / 9;
+  aspect-ratio: 43 / 31;
 }
 .tag-cloud-svg {
+  display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
@@ -1001,31 +1002,60 @@ figure.highlight figcaption a { color: inherit; text-decoration: underline; }
 .tag-cloud-glow ellipse:nth-child(3) { fill: rgba(127,184,255,.11); }
 .tag-cloud-svg-link {
   text-decoration: none;
-  animation: tagCloudFloat var(--tcf-duration, 6.4s) ease-in-out var(--tcf-delay, 0s) infinite;
+  outline: none;
 }
-@keyframes tagCloudFloat {
-  0%, 100% { transform: translateY(0); }
-  25% { transform: translateY(calc(var(--tcf-amp, 4px) * -1)); }
-  75% { transform: translateY(var(--tcf-amp, 4px)); }
+.tag-cloud-word,
+.tag-cloud-lift {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.tag-cloud-word {
+  transition: transform .24s cubic-bezier(.2,.9,.2,1);
+  will-change: transform;
+}
+.tag-cloud-figure.is-resetting .tag-cloud-word {
+  transition: none;
+}
+.tag-cloud-lift {
+  transition: transform .18s ease;
+  will-change: transform;
+}
+@keyframes tagCloudHoverFloat {
+  0%, 100% { transform: translateY(calc(var(--tcf-rise, 8px) * -1)) scale(1.035); }
+  50% { transform: translateY(calc(var(--tcf-rise, 8px) * -1.55)) scale(1.055); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .tag-cloud-svg-link { animation: none; }
+  .tag-cloud-word,
+  .tag-cloud-lift {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 .tag-cloud-svg text {
   font-family: "Open Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
-  font-weight: 800;
+  font-weight: 900;
+  letter-spacing: 0;
   paint-order: stroke;
   stroke: rgba(255,255,255,.92);
-  stroke-width: 2.6px;
+  stroke-width: 2.35px;
   stroke-linejoin: round;
   cursor: pointer;
   transition: fill .2s ease, fill-opacity .2s ease, filter .2s ease, transform .2s ease;
 }
+.tag-cloud-svg-link:hover .tag-cloud-lift,
+.tag-cloud-svg-link:focus-visible .tag-cloud-lift,
+.tag-cloud-svg-link.is-active .tag-cloud-lift {
+  animation: tagCloudHoverFloat 1.2s ease-in-out infinite;
+}
 .tag-cloud-svg-link:hover text,
-.tag-cloud-svg-link:focus text {
+.tag-cloud-svg-link:focus-visible text,
+.tag-cloud-svg-link.is-active text {
   fill: #0085a1;
   fill-opacity: 1;
   filter: drop-shadow(0 8px 12px rgba(0,133,161,.18));
+}
+.tag-cloud-svg-link.is-repelled text {
+  fill-opacity: .88;
 }
 
 .page-extra { margin-top: 2.5rem; }

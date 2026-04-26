@@ -6,10 +6,10 @@
   const tagVariant = typeof variant !== 'undefined' && variant ? String(variant).replace(/[^a-z0-9_-]/gi, '') : '';
   const variantClass = tagVariant ? ' tag-cloud--' + tagVariant : '';
 
-  const cloudWidth = 820;
-  const cloudHeight = 660;
+  const cloudWidth = 860;
+  const cloudHeight = 620;
   const cloudCenterX = cloudWidth / 2;
-  const cloudCenterY = cloudHeight / 2 + 6;
+  const cloudCenterY = cloudHeight / 2;
   const cloudColors = [
     '#1f4ed8', '#26a269', '#c026d3', '#0f766e', '#7c3aed',
     '#dc2626', '#16a34a', '#2563eb', '#a16207', '#0891b2',
@@ -41,45 +41,77 @@
       Math.abs(a.y - b.y) < (a.height + b.height) / 2 + pad;
   }
 
-  function rotationFor(label, index, fontSize) {
-    const long = visualUnits(label) > 13;
-    if (index === 0 || fontSize > 34) return 0;
-    if (long) return [0, -7, 7, 0][index % 4];
-    return [-18, 14, 0, -10, 22, -24, 10, 0, 16, -14, 28, -30][index % 12];
+  function repeatFor(tag, index) {
+    if (tag.length === maxLen) return 4;
+    if (tag.length >= minLen + range * 0.66) return index < 10 ? 3 : 2;
+    if (tag.length >= minLen + range * 0.34) return 2;
+    return 1;
   }
 
-  function placeCloud(tags) {
+  function expandCloudEntries(tags) {
+    const entries = [];
+
+    tags.forEach(function (tag, sourceIndex) {
+      const repeatCount = repeatFor(tag, sourceIndex);
+      for (let copyIndex = 0; copyIndex < repeatCount; copyIndex++) {
+        entries.push({
+          tag: tag,
+          sourceIndex: sourceIndex,
+          copyIndex: copyIndex,
+          repeatCount: repeatCount
+        });
+      }
+    });
+
+    return entries.slice(0, 68);
+  }
+
+  function rotationFor(entry, index, fontSize) {
+    const units = visualUnits(entry.tag.name);
+    if (entry.copyIndex === 0 && (entry.sourceIndex < 6 || fontSize > 34)) return 0;
+    if (entry.copyIndex > 0 && units < 13 && (fontSize < 42 || units < 8) && (index + entry.copyIndex) % 2 === 0) {
+      return (index + entry.sourceIndex) % 2 === 0 ? 90 : -90;
+    }
+    if (entry.copyIndex > 0 && units < 11 && fontSize < 30 && (index + entry.sourceIndex) % 3 === 0) return 90;
+    if (fontSize < 21 && units < 10 && index % 4 === 0) return -90;
+    return 0;
+  }
+
+  function placeCloud(entries) {
     const placed = [];
 
-    tags.slice(0, 30).forEach(function (tag, index) {
+    entries.forEach(function (entry, index) {
+      const tag = entry.tag;
       const name = String(tag.name);
       const weight = maxLen === minLen ? 0.5 : (tag.length - minLen) / range;
-      const lengthPenalty = Math.max(0, visualUnits(name) - 10) * 0.92;
-      const rankBoost = Math.max(0, 4 - index) * 1.35;
-      let fontSize = Math.max(15, 22 + weight * 46 + rankBoost - lengthPenalty);
-      let rotation = rotationFor(name, index, fontSize);
+      const lengthPenalty = Math.max(0, visualUnits(name) - 9) * 1.05;
+      const rankBoost = Math.max(0, 8 - entry.sourceIndex) * 1.25;
+      const copyScale = entry.copyIndex === 0 ? 1 : Math.max(0.58, 0.84 - entry.copyIndex * 0.1);
+      const tailScale = index > 42 ? 0.86 : 1;
+      let fontSize = Math.max(12.5, (18 + weight * 52 + rankBoost - lengthPenalty) * copyScale * tailScale);
+      let rotation = rotationFor(entry, index, fontSize);
       let box = textBox(name, fontSize, rotation);
       const color = cloudColors[index % cloudColors.length];
-      const opacity = Math.min(0.98, 0.76 + weight * 0.2);
+      const opacity = Math.min(0.98, 0.68 + weight * 0.24 + (entry.copyIndex === 0 ? 0.06 : 0));
       let chosen = null;
 
-      for (let shrink = 0; shrink < 5 && !chosen; shrink++) {
+      for (let shrink = 0; shrink < 7 && !chosen; shrink++) {
         if (shrink > 0) {
-          fontSize = Math.max(13, fontSize * 0.88);
-          rotation = rotationFor(name, index, fontSize);
+          fontSize = Math.max(11.5, fontSize * 0.91);
+          rotation = rotationFor(entry, index, fontSize);
           box = textBox(name, fontSize, rotation);
         }
 
-        for (let attempt = 0; attempt < 1800; attempt++) {
-          const theta = attempt * 0.43 + index * 1.79;
-          const radius = Math.sqrt(attempt) * 7.1;
-          const x = cloudCenterX + Math.cos(theta) * radius * 1.32;
-          const y = cloudCenterY + Math.sin(theta) * radius * 0.78;
+        for (let attempt = 0; attempt < 3600; attempt++) {
+          const theta = attempt * 0.39 + index * 1.73;
+          const radius = Math.sqrt(attempt) * 5.65;
+          const x = cloudCenterX + Math.cos(theta) * radius * 1.43;
+          const y = cloudCenterY + Math.sin(theta) * radius * 0.84;
           const candidate = { x: x, y: y, width: box.width, height: box.height };
 
-          if (x - box.width / 2 < 14 || x + box.width / 2 > cloudWidth - 14) continue;
-          if (y - box.height / 2 < 18 || y + box.height / 2 > cloudHeight - 16) continue;
-          if (placed.every(function (prev) { return !overlaps(candidate, prev, 3.5); })) {
+          if (x - box.width / 2 < 10 || x + box.width / 2 > cloudWidth - 10) continue;
+          if (y - box.height / 2 < 12 || y + box.height / 2 > cloudHeight - 12) continue;
+          if (placed.every(function (prev) { return !overlaps(candidate, prev, 0.5); })) {
             chosen = candidate;
             break;
           }
@@ -92,6 +124,8 @@
 
       placed.push({
         tag: tag,
+        copyIndex: entry.copyIndex,
+        repeatCount: entry.repeatCount,
         x: chosen.x,
         y: chosen.y,
         width: chosen.width,
@@ -106,7 +140,7 @@
     return placed;
   }
 
-  const cloudWords = tagVariant === 'home-svg' ? placeCloud(tagList) : [];
+  const cloudWords = tagVariant === 'home-svg' ? placeCloud(expandCloudEntries(tagList)) : [];
 %>
 <% if (!tagList.length) { %>
   <p class="empty-state"><%= __('tags.empty') %></p>
@@ -114,6 +148,7 @@
   <div class="tag-cloud-figure" aria-label="首页标签词云图">
     <svg class="tag-cloud-svg" viewBox="0 0 <%= cloudWidth %> <%= cloudHeight %>" role="img" aria-labelledby="home-tag-cloud-title home-tag-cloud-desc">
       <title id="home-tag-cloud-title">标签</title>
+      <desc id="home-tag-cloud-desc">按文章数量生成的交互式标签词云。</desc>
       <g class="tag-cloud-glow" aria-hidden="true">
         <ellipse cx="<%= cloudCenterX %>" cy="<%= cloudCenterY %>" rx="205" ry="136"></ellipse>
         <ellipse cx="168" cy="142" rx="70" ry="44"></ellipse>
@@ -124,26 +159,34 @@
         const _name = String(word.tag.name);
         for (let _k = 0; _k < _name.length; _k++) _h = ((_h << 5) - _h + _name.charCodeAt(_k)) | 0;
         const _seed = Math.abs(_h);
-        const floatDuration = (5.6 + (_seed % 53) * 0.085).toFixed(2);
-        const floatDelay = (-(((_seed >> 3) % 71) * 0.13)).toFixed(2);
-        const floatAmp = (2.8 + (_seed % 19) * 0.22).toFixed(2);
+        const hoverRise = (7.5 + (_seed % 15) * 0.22).toFixed(2);
       %>
         <a
           class="tag-cloud-svg-link"
-          style="--tcf-duration: <%= floatDuration %>s; --tcf-delay: <%= floatDelay %>s; --tcf-amp: <%= floatAmp %>px;"
+          style="--tcf-rise: <%= hoverRise %>px;"
+          data-tag-cloud-word
+          data-cloud-x="<%= word.x.toFixed(1) %>"
+          data-cloud-y="<%= word.y.toFixed(1) %>"
+          data-cloud-width="<%= word.width.toFixed(1) %>"
+          data-cloud-height="<%= word.height.toFixed(1) %>"
+          data-cloud-index="<%= idx %>"
           href="<%- url_for(word.tag.path) %>"
           aria-label="<%= word.tag.name %>，<%= word.tag.length %> 篇文章"
         >
-          <text
-            x="<%= word.x.toFixed(1) %>"
-            y="<%= word.y.toFixed(1) %>"
-            transform="rotate(<%= word.rotation %> <%= word.x.toFixed(1) %> <%= word.y.toFixed(1) %>)"
-            text-anchor="middle"
-            dominant-baseline="middle"
-            fill="<%= word.color %>"
-            fill-opacity="<%= word.opacity.toFixed(2) %>"
-            font-size="<%= word.fontSize.toFixed(1) %>"
-          ><%= word.tag.name %></text>
+          <g class="tag-cloud-word">
+            <g class="tag-cloud-lift">
+              <text
+                x="<%= word.x.toFixed(1) %>"
+                y="<%= word.y.toFixed(1) %>"
+                transform="rotate(<%= word.rotation %> <%= word.x.toFixed(1) %> <%= word.y.toFixed(1) %>)"
+                text-anchor="middle"
+                dominant-baseline="middle"
+                fill="<%= word.color %>"
+                fill-opacity="<%= word.opacity.toFixed(2) %>"
+                font-size="<%= word.fontSize.toFixed(1) %>"
+              ><%= word.tag.name %></text>
+            </g>
+          </g>
         </a>
       <% }); %>
     </svg>
