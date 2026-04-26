@@ -11,7 +11,7 @@
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/categories/</loc>
+    <loc>https://yo666666yo.github.io/tags/</loc>
     
     <lastmod>2026-04-24</lastmod>
     
@@ -20,7 +20,7 @@
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/</loc>
+    <loc>https://yo666666yo.github.io/categories/</loc>
     
     <lastmod>2026-04-24</lastmod>
     
@@ -177,6 +177,34 @@
   </url>
   
   <url>
+    <loc>https://yo666666yo.github.io/tags/LLM-MAS/</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/AT-GRPO/</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/credit-assignment/</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/RLHF/</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://yo666666yo.github.io/tags/%E6%9D%82%E8%B0%88/</loc>
     <lastmod>2026-04-26</lastmod>
     <changefreq>weekly</changefreq>
@@ -212,34 +240,6 @@
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/LLM-MAS/</loc>
-    <lastmod>2026-04-26</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/AT-GRPO/</loc>
-    <lastmod>2026-04-26</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/credit-assignment/</loc>
-    <lastmod>2026-04-26</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/RLHF/</loc>
-    <lastmod>2026-04-26</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://yo666666yo.github.io/tags/Stronger-MAS/</loc>
     <lastmod>2026-04-26</lastmod>
     <changefreq>weekly</changefreq>
@@ -248,6 +248,20 @@
   
   <url>
     <loc>https://yo666666yo.github.io/tags/%E5%91%A8%E6%8A%A5/</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/LangMARL/</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/MHGPO/</loc>
     <lastmod>2026-04-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -275,6 +289,27 @@
   </url>
   
   <url>
+    <loc>https://yo666666yo.github.io/tags/SHARP/</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/GAE/</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/policy-gradient/</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://yo666666yo.github.io/tags/ProbeCommitEnv/</loc>
     <lastmod>2026-04-26</lastmod>
     <changefreq>weekly</changefreq>
@@ -283,20 +318,6 @@
   
   <url>
     <loc>https://yo666666yo.github.io/tags/representation-learning/</loc>
-    <lastmod>2026-04-26</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/LangMARL/</loc>
-    <lastmod>2026-04-26</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/MHGPO/</loc>
     <lastmod>2026-04-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -339,27 +360,6 @@
   
   <url>
     <loc>https://yo666666yo.github.io/tags/sub2api/</loc>
-    <lastmod>2026-04-26</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/SHARP/</loc>
-    <lastmod>2026-04-26</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/GAE/</loc>
-    <lastmod>2026-04-26</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/policy-gradient/</loc>
     <lastmod>2026-04-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
