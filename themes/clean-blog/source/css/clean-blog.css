@@ -999,7 +999,18 @@ figure.highlight figcaption a { color: inherit; text-decoration: underline; }
 }
 .tag-cloud-glow ellipse:nth-child(2) { fill: rgba(245,182,107,.12); }
 .tag-cloud-glow ellipse:nth-child(3) { fill: rgba(127,184,255,.11); }
-.tag-cloud-svg-link { text-decoration: none; }
+.tag-cloud-svg-link {
+  text-decoration: none;
+  animation: tagCloudFloat var(--tcf-duration, 6.4s) ease-in-out var(--tcf-delay, 0s) infinite;
+}
+@keyframes tagCloudFloat {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(calc(var(--tcf-amp, 4px) * -1)); }
+  75% { transform: translateY(var(--tcf-amp, 4px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tag-cloud-svg-link { animation: none; }
+}
 .tag-cloud-svg text {
   font-family: "Open Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
   font-weight: 800;

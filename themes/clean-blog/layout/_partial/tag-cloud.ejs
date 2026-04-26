@@ -119,9 +119,18 @@
         <ellipse cx="168" cy="142" rx="70" ry="44"></ellipse>
         <ellipse cx="352" cy="236" rx="76" ry="50"></ellipse>
       </g>
-      <% cloudWords.forEach(function (word) { %>
+      <% cloudWords.forEach(function (word, idx) {
+        let _h = idx + 1;
+        const _name = String(word.tag.name);
+        for (let _k = 0; _k < _name.length; _k++) _h = ((_h << 5) - _h + _name.charCodeAt(_k)) | 0;
+        const _seed = Math.abs(_h);
+        const floatDuration = (5.6 + (_seed % 53) * 0.085).toFixed(2);
+        const floatDelay = (-(((_seed >> 3) % 71) * 0.13)).toFixed(2);
+        const floatAmp = (2.8 + (_seed % 19) * 0.22).toFixed(2);
+      %>
         <a
           class="tag-cloud-svg-link"
+          style="--tcf-duration: <%= floatDuration %>s; --tcf-delay: <%= floatDelay %>s; --tcf-amp: <%= floatAmp %>px;"
           href="<%- url_for(word.tag.path) %>"
           aria-label="<%= word.tag.name %>，<%= word.tag.length %> 篇文章"
         >
