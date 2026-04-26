@@ -1023,8 +1023,8 @@ figure.highlight figcaption a { color: inherit; text-decoration: underline; }
   will-change: transform;
 }
 @keyframes tagCloudHoverFloat {
-  0%, 100% { transform: translateY(calc(var(--tcf-rise, 8px) * -1)) scale(1.035); }
-  50% { transform: translateY(calc(var(--tcf-rise, 8px) * -1.55)) scale(1.055); }
+  0%, 100% { transform: translateY(calc(var(--tcf-rise, 6px) * -0.5)) scale(1.02); }
+  50% { transform: translateY(calc(var(--tcf-rise, 6px) * -0.75)) scale(1.03); }
 }
 @media (prefers-reduced-motion: reduce) {
   .tag-cloud-word,
