@@ -37,6 +37,7 @@
     const searchInput = searchForm.querySelector('.site-search-input');
     const searchResults = searchForm.querySelector('.site-search-results');
     const searchUrl = searchForm.getAttribute('data-search-url') || '/search.xml';
+    const searchPageUrl = searchForm.getAttribute('data-search-page-url') || '/search/';
     const loadingText = searchForm.getAttribute('data-loading') || 'Searching...';
     const noResultsText = searchForm.getAttribute('data-no-results') || 'No matching posts';
     const errorText = searchForm.getAttribute('data-error') || 'Search index is unavailable';
@@ -121,6 +122,12 @@
       activeResultIndex = -1;
     }
 
+    function goToSearchPage(query) {
+      const target = new URL(searchPageUrl, window.location.origin);
+      if (query) target.searchParams.set('q', query);
+      window.location.href = target.pathname + target.search;
+    }
+
     function setSearchStatus(text) {
       searchResults.innerHTML = '<div class="site-search-status">' + escapeHtml(text) + '</div>';
       openSearchResults();
@@ -176,7 +183,7 @@
         return;
       }
 
-      searchResults.innerHTML = items.slice(0, 8).map(function (item) {
+      searchResults.innerHTML = items.map(function (item) {
         const excerpt = makeExcerpt(item, terms);
         return [
           '<a class="site-search-result" href="', escapeHtml(item.url), '" role="option" aria-selected="false" data-search-result>',
@@ -263,17 +270,203 @@
 
     searchForm.addEventListener('submit', function (event) {
       event.preventDefault();
-      const firstResult = searchResults.querySelector('[data-search-result]');
-      if (firstResult) {
-        window.location.href = firstResult.href;
-        return;
-      }
-      runSearch(searchInput.value.trim());
+      goToSearchPage(searchInput.value.trim());
     });
 
     document.addEventListener('click', function (event) {
       if (!searchForm.contains(event.target)) closeSearchResults();
     });
+  }
+
+  // --- full search page ---
+  const searchPage = document.querySelector('[data-search-page]');
+  if (searchPage) {
+    const pageInput = searchPage.querySelector('.search-page-input');
+    const pageResults = searchPage.querySelector('[data-search-page-results]');
+    const pageStatus = searchPage.querySelector('[data-search-page-status]');
+    const pageForm = searchPage.querySelector('.search-page-form');
+    const pageSearchUrl = searchPage.getAttribute('data-search-url') || '/search.xml';
+    const pageLoadingText = searchPage.getAttribute('data-loading') || 'Searching...';
+    const pageEmptyText = searchPage.getAttribute('data-empty') || 'Enter a keyword to search.';
+    const pageNoResultsText = searchPage.getAttribute('data-no-results') || 'No matching posts';
+    const pageErrorText = searchPage.getAttribute('data-error') || 'Search index is unavailable';
+    let pageSearchIndexPromise = null;
+    let latestPageQuery = '';
+
+    function pageEscapeHtml(value) {
+      return String(value || '').replace(/[&<>"']/g, function (char) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[char];
+      });
+    }
+
+    function pageNormalize(value) {
+      return String(value || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    function pageStripHtml(value) {
+      const div = document.createElement('div');
+      div.innerHTML = value || '';
+      return div.textContent || div.innerText || '';
+    }
+
+    function pageReadText(entry, selector) {
+      const node = entry.querySelector(selector);
+      return node ? node.textContent.trim() : '';
+    }
+
+    function pageReadList(entry, selector) {
+      return Array.prototype.slice.call(entry.querySelectorAll(selector)).map(function (node) {
+        return node.textContent.trim();
+      }).filter(Boolean);
+    }
+
+    function loadPageSearchIndex() {
+      if (pageSearchIndexPromise) return pageSearchIndexPromise;
+
+      pageSearchIndexPromise = fetch(pageSearchUrl, { cache: 'force-cache' })
+        .then(function (response) {
+          if (!response.ok) throw new Error('Failed to load search index');
+          return response.text();
+        })
+        .then(function (xmlText) {
+          const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
+          return Array.prototype.slice.call(xml.querySelectorAll('entry')).map(function (entry) {
+            const linkNode = entry.querySelector('link');
+            const title = pageReadText(entry, 'title');
+            const url = pageReadText(entry, 'url') || (linkNode ? linkNode.getAttribute('href') : '#') || '#';
+            const content = pageStripHtml(pageReadText(entry, 'content'));
+            const categories = pageReadList(entry, 'categories category');
+            const tags = pageReadList(entry, 'tags tag');
+            const meta = categories.concat(tags).join(' / ');
+
+            return {
+              title: title,
+              url: url,
+              content: content,
+              meta: meta,
+              searchText: pageNormalize([title, content, meta].join(' '))
+            };
+          });
+        });
+
+      return pageSearchIndexPromise;
+    }
+
+    function makePageExcerpt(item, terms) {
+      const source = item.content || item.title;
+      const lowerSource = source.toLowerCase();
+      let firstMatch = -1;
+
+      terms.forEach(function (term) {
+        const index = lowerSource.indexOf(term);
+        if (index !== -1 && (firstMatch === -1 || index < firstMatch)) {
+          firstMatch = index;
+        }
+      });
+
+      const start = firstMatch > 70 ? firstMatch - 70 : 0;
+      const excerpt = source.slice(start, start + 180).replace(/\s+/g, ' ').trim();
+      return (start > 0 ? '...' : '') + excerpt + (source.length > start + 180 ? '...' : '');
+    }
+
+    function scorePageItem(item, terms) {
+      const title = pageNormalize(item.title);
+      const meta = pageNormalize(item.meta);
+      let score = 0;
+
+      terms.forEach(function (term) {
+        if (title.indexOf(term) !== -1) score += 12;
+        if (meta.indexOf(term) !== -1) score += 6;
+        if (item.searchText.indexOf(term) !== -1) score += 2;
+      });
+
+      return score;
+    }
+
+    function setPageStatus(text) {
+      pageStatus.textContent = text;
+    }
+
+    function renderPageResults(items, terms, query) {
+      if (!items.length) {
+        setPageStatus(pageNoResultsText);
+        pageResults.innerHTML = '';
+        return;
+      }
+
+      setPageStatus('找到 ' + items.length + ' 篇与“' + query + '”相关的文章');
+      pageResults.innerHTML = items.map(function (item) {
+        const excerpt = makePageExcerpt(item, terms);
+        return [
+          '<article class="search-page-result">',
+          '<a class="search-page-result-title" href="', pageEscapeHtml(item.url), '">', pageEscapeHtml(item.title), '</a>',
+          excerpt ? '<p class="search-page-result-excerpt">' + pageEscapeHtml(excerpt) + '</p>' : '',
+          item.meta ? '<div class="search-page-result-meta">' + pageEscapeHtml(item.meta) + '</div>' : '',
+          '</article>'
+        ].join('');
+      }).join('');
+    }
+
+    function runPageSearch(query) {
+      latestPageQuery = query;
+      const normalizedQuery = pageNormalize(query);
+      const terms = normalizedQuery.split(' ').filter(Boolean);
+
+      if (!terms.length) {
+        setPageStatus(pageEmptyText);
+        pageResults.innerHTML = '';
+        return;
+      }
+
+      setPageStatus(pageLoadingText);
+      loadPageSearchIndex()
+        .then(function (index) {
+          if (latestPageQuery !== query) return;
+          const matches = index.filter(function (item) {
+            return terms.every(function (term) {
+              return item.searchText.indexOf(term) !== -1;
+            });
+          }).map(function (item) {
+            return { item: item, score: scorePageItem(item, terms) };
+          }).sort(function (a, b) {
+            return b.score - a.score;
+          }).map(function (match) {
+            return match.item;
+          });
+
+          renderPageResults(matches, terms, query);
+        })
+        .catch(function () {
+          setPageStatus(pageErrorText);
+          pageResults.innerHTML = '';
+        });
+    }
+
+    pageForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+      const query = pageInput.value.trim();
+      const target = new URL(window.location.href);
+      if (query) target.searchParams.set('q', query);
+      else target.searchParams.delete('q');
+      window.history.pushState({}, '', target.pathname + target.search);
+      runPageSearch(query);
+    });
+
+    window.addEventListener('popstate', function () {
+      const query = (new URLSearchParams(window.location.search).get('q') || '').trim();
+      pageInput.value = query;
+      runPageSearch(query);
+    });
+
+    const initialQuery = (new URLSearchParams(window.location.search).get('q') || '').trim();
+    pageInput.value = initialQuery;
+    runPageSearch(initialQuery);
   }
 
   // --- tag cloud hover collisions ---
@@ -459,8 +652,6 @@
       word.link.addEventListener('pointerenter', function () {
         pushFrom(word);
       });
-
-      word.link.addEventListener('pointerleave', resetCloud);
 
       word.link.addEventListener('focus', function () {
         pushFrom(word);

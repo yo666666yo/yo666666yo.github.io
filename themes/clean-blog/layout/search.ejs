@@ -1,0 +1,15 @@
+<%
+  const searchPath = (config.search && config.search.path) || 'search.xml';
+  const searchUrl = url_for('/' + searchPath.replace(/^\/+/, ''));
+%>
+<div class="container search-page-container" data-search-page data-search-url="<%- searchUrl %>" data-loading="正在搜索..." data-empty="输入关键词后开始搜索。" data-no-results="没有找到匹配文章" data-error="搜索索引暂时不可用">
+  <form class="search-page-form" role="search">
+    <label class="sr-only" for="search-page-input">搜索文章</label>
+    <div class="search-page-box">
+      <input id="search-page-input" class="search-page-input" type="search" name="q" placeholder="搜索标题、标签或正文..." autocomplete="off" spellcheck="false" />
+      <button class="search-page-button" type="submit">搜索</button>
+    </div>
+  </form>
+  <div class="search-page-status" data-search-page-status></div>
+  <div class="search-page-results" data-search-page-results></div>
+</div>

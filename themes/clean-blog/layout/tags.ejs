@@ -1,7 +1,7 @@
 <div class="container">
   <div class="row justify-content-center">
-    <div class="col">
-      <%- partial('_partial/tag-cloud') %>
+    <div class="col tag-page-col">
+      <%- partial('_partial/tag-cloud', { variant: 'svg' }) %>
       <% if (page.content) { %><div class="post-body page-extra"><%- page.content %></div><% } %>
     </div>
   </div>

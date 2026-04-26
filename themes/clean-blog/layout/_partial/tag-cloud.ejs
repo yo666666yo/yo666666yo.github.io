@@ -5,6 +5,7 @@
   const range = Math.max(1, maxLen - minLen);
   const tagVariant = typeof variant !== 'undefined' && variant ? String(variant).replace(/[^a-z0-9_-]/gi, '') : '';
   const variantClass = tagVariant ? ' tag-cloud--' + tagVariant : '';
+  const isSvgCloud = tagVariant === 'svg' || tagVariant === 'home-svg';
 
   const cloudWidth = 860;
   const cloudHeight = 620;
@@ -140,15 +141,15 @@
     return placed;
   }
 
-  const cloudWords = tagVariant === 'home-svg' ? placeCloud(expandCloudEntries(tagList)) : [];
+  const cloudWords = isSvgCloud ? placeCloud(expandCloudEntries(tagList)) : [];
 %>
 <% if (!tagList.length) { %>
   <p class="empty-state"><%= __('tags.empty') %></p>
-<% } else if (tagVariant === 'home-svg') { %>
-  <div class="tag-cloud-figure" aria-label="首页标签词云图">
-    <svg class="tag-cloud-svg" viewBox="0 0 <%= cloudWidth %> <%= cloudHeight %>" role="img" aria-labelledby="home-tag-cloud-title home-tag-cloud-desc">
-      <title id="home-tag-cloud-title">标签</title>
-      <desc id="home-tag-cloud-desc">按文章数量生成的交互式标签词云。</desc>
+<% } else if (isSvgCloud) { %>
+  <div class="tag-cloud-figure" aria-label="标签词云图">
+    <svg class="tag-cloud-svg" viewBox="0 0 <%= cloudWidth %> <%= cloudHeight %>" role="img" aria-labelledby="tag-cloud-title tag-cloud-desc">
+      <title id="tag-cloud-title">标签</title>
+      <desc id="tag-cloud-desc">按文章数量生成的交互式标签词云。</desc>
       <g class="tag-cloud-glow" aria-hidden="true">
         <ellipse cx="<%= cloudCenterX %>" cy="<%= cloudCenterY %>" rx="205" ry="136"></ellipse>
         <ellipse cx="168" cy="142" rx="70" ry="44"></ellipse>
