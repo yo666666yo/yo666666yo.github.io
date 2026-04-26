@@ -337,7 +337,7 @@
     }
 
     function resolveOverlaps(moves, target) {
-      for (let pass = 0; pass < 18; pass++) {
+      for (let pass = 0; pass < 8; pass++) {
         let changed = false;
 
         for (let i = 0; i < words.length; i++) {
@@ -355,7 +355,7 @@
             const secondFixed = second === target;
             if (firstFixed && secondFixed) continue;
 
-            const gap = 3.5;
+            const gap = 2;
             const alongX = overlapX < overlapY;
             let sign = alongX
               ? (secondRect.centerX >= firstRect.centerX ? 1 : -1)
@@ -406,12 +406,8 @@
       figure.classList.add('is-colliding');
       const targetRise = readRise(target);
       const targetCenterY = target.y - targetRise * 1.15;
-      const moves = words.map(function (word) {
-        return {
-          dx: 0,
-          dy: 0,
-          scale: word === target ? 1.015 : 1
-        };
+      const moves = words.map(function () {
+        return { dx: 0, dy: 0, scale: 1 };
       });
 
       words.forEach(function (word, index) {
@@ -424,8 +420,8 @@
 
         const dx = word.x - target.x;
         const dy = word.y - targetCenterY;
-        const influenceX = Math.max(108, target.width * 0.82 + word.width * 0.44 + 64);
-        const influenceY = Math.max(86, target.height * 1.28 + word.height * 0.72 + targetRise * 1.8 + 48);
+        const influenceX = Math.max(120, target.width * 0.9 + word.width * 0.5 + 72);
+        const influenceY = Math.max(96, target.height * 1.35 + word.height * 0.8 + targetRise * 2 + 56);
         const normalizedX = dx / influenceX;
         const normalizedY = dy / influenceY;
         const normalizedDistance = Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY);
@@ -439,9 +435,9 @@
         const unitX = rawDistance > 0.01 ? dx / rawDistance : Math.cos(fallbackAngle);
         const unitY = rawDistance > 0.01 ? dy / rawDistance : Math.sin(fallbackAngle);
         const strength = Math.pow((1.12 - normalizedDistance) / 1.12, 1.35);
-        const push = 8 + strength * (24 + Math.min(18, target.width * 0.08));
-        moves[index].dx = unitX * push * 1.12;
-        moves[index].dy = unitY * push * 0.88;
+        const push = 4 + strength * (14 + Math.min(10, target.width * 0.06));
+        moves[index].dx = unitX * push * 0.7;
+        moves[index].dy = unitY * push * 0.55;
       });
 
       resolveOverlaps(moves, target);
@@ -449,11 +445,10 @@
       words.forEach(function (word, index) {
         const move = moves[index];
         if (word === target) {
-          setWordTransform(word, move.dx, move.dy, move.scale);
           return;
         }
 
-        if (Math.abs(move.dx) > 0.4 || Math.abs(move.dy) > 0.4) {
+        if (Math.abs(move.dx) > 0.6 || Math.abs(move.dy) > 0.6) {
           word.link.classList.add('is-repelled');
         }
         setWordTransform(word, move.dx, move.dy, move.scale);
