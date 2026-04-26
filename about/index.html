@@ -32,7 +32,7 @@
 
 
 
-<link rel="stylesheet" href="/css/clean-blog.css?v=20260426-6" />
+<link rel="stylesheet" href="/css/clean-blog.css?v=20260427-2" />
 
 
 
@@ -49,9 +49,9 @@
       </span>
     </button>
     <div class="navbar-collapse" id="navbarResponsive">
-      <form class="site-search" role="search" data-search-url="/search.xml" data-loading="正在搜索..." data-no-results="没有找到匹配文章" data-error="搜索索引暂时不可用">
+      <form class="site-search" role="search" action="/search/" method="get" data-search-url="/search.xml" data-search-page-url="/search/" data-loading="正在搜索..." data-no-results="没有找到匹配文章" data-error="搜索索引暂时不可用">
         <label class="sr-only" for="site-search-input">搜索文章</label>
-        <input id="site-search-input" class="site-search-input" type="search" placeholder="搜索文章..." autocomplete="off" spellcheck="false" aria-controls="site-search-results" aria-expanded="false" />
+        <input id="site-search-input" class="site-search-input" type="search" name="q" placeholder="搜索文章..." autocomplete="off" spellcheck="false" aria-controls="site-search-results" aria-expanded="false" />
         <button class="site-search-button" type="submit" aria-label="搜索">
           <svg class="site-search-icon" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M10.8 5.2a5.6 5.6 0 1 0 0 11.2 5.6 5.6 0 0 0 0-11.2Zm-7.1 5.6a7.1 7.1 0 1 1 12.6 4.5l3.7 3.7-1.1 1.1-3.7-3.7A7.1 7.1 0 0 1 3.7 10.8Z" />
@@ -83,6 +83,12 @@
           
           <li class="nav-item">
             <a class="nav-link" href="/categories/weekly/">周报</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
           </li>
         
           
@@ -194,7 +200,7 @@
   </div>
 </footer>
 
-  <script defer src="/js/clean-blog.js?v=20260426-4"></script>
+  <script defer src="/js/clean-blog.js?v=20260427-2"></script>
 
 
 </body>

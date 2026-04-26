@@ -184,7 +184,7 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
   position: absolute;
   top: calc(100% + .7rem);
   right: 0;
-  width: min(26rem, calc(100vw - 3rem));
+  width: min(32rem, calc(100vw - 3rem));
   max-height: min(28rem, 72vh);
   overflow: auto;
   padding: .45rem;
@@ -244,6 +244,115 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
   font-size: .78rem;
   font-weight: 700;
   line-height: 1.5;
+}
+
+.search-page-container {
+  max-width: 920px;
+}
+
+.search-page-form {
+  margin: 0 0 1.1rem;
+}
+
+.search-page-box {
+  display: flex;
+  gap: .65rem;
+  align-items: center;
+}
+
+.search-page-input {
+  width: 100%;
+  min-height: 3.1rem;
+  padding: .7rem 1rem;
+  color: #212529;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.16);
+  border-radius: 6px;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.search-page-input:focus {
+  border-color: #0085a1;
+  box-shadow: 0 0 0 3px rgba(0,133,161,.14);
+}
+
+.search-page-button {
+  flex: 0 0 auto;
+  min-height: 3.1rem;
+  padding: .7rem 1.25rem;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: .9rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  background: #0085a1;
+  border: 1px solid #0085a1;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color .2s ease, border-color .2s ease, transform .2s ease;
+}
+.search-page-button:hover {
+  background: #00657b;
+  border-color: #00657b;
+  transform: translateY(-1px);
+}
+
+.search-page-status {
+  min-height: 1.6rem;
+  margin: 0 0 1.2rem;
+  color: #6c757d;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: .92rem;
+  font-weight: 700;
+}
+
+.search-page-results {
+  display: grid;
+  gap: 1rem;
+}
+
+.search-page-result {
+  padding: 1.1rem 1.2rem;
+  border: 1px solid rgba(0,0,0,.1);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.search-page-result-title {
+  display: inline-block;
+  color: #212529;
+  font-family: "Lora", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1.35;
+  text-decoration: none;
+}
+.search-page-result-title:hover { color: #0085a1; }
+
+.search-page-result-excerpt {
+  margin: .55rem 0 0;
+  color: #495057;
+  font-size: .95rem;
+  line-height: 1.7;
+}
+
+.search-page-result-meta {
+  margin-top: .55rem;
+  color: #0085a1;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 575.98px) {
+  .search-page-box { align-items: stretch; flex-direction: column; }
+  .search-page-button { width: 100%; }
 }
 
 /* Shrunken — frosted glass (scrolled past hero) */
@@ -504,7 +613,7 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
 }
 
 /* ============ Post preview (index) ============ */
-.home-container { max-width: 1360px; }
+.home-container { max-width: 900px; }
 .home-layout {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr);
@@ -513,26 +622,6 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
 }
 .home-posts { min-width: 0; }
 .home-posts .post-preview:first-child { padding-top: 0; }
-.home-tags { min-width: 0; }
-.home-tags-card {
-  position: relative;
-  padding: 1.1rem 1rem 1.15rem;
-  overflow: hidden;
-  border: 0;
-  border-radius: 28px;
-  background:
-    radial-gradient(circle at 18% 8%, rgba(0,133,161,.18), transparent 32%),
-    radial-gradient(circle at 86% 18%, rgba(245,182,107,.20), transparent 30%),
-    linear-gradient(145deg, #ffffff 0%, #f7fbfc 100%);
-  box-shadow: 0 22px 55px rgba(33,37,41,.06);
-}
-.home-tags-card::before {
-  content: none;
-}
-@media (min-width: 992px) {
-  .home-layout { grid-template-columns: minmax(0, 720px) minmax(470px, 580px) !important; gap: 3.75rem; justify-content: center; }
-  .home-tags-card { position: sticky; top: 5.5rem; }
-}
 
 .post-preview { padding: 2rem 0 0; }
 .post-preview > a { display: block; color: inherit; text-decoration: none; }
@@ -908,6 +997,11 @@ figure.highlight figcaption a { color: inherit; text-decoration: underline; }
 }
 .taxonomy-item a:hover .taxonomy-count { background: #0085a1; color: #fff; }
 
+.row > .tag-page-col {
+  flex-basis: 100%;
+  max-width: 860px;
+}
+
 .tag-cloud { list-style: none; margin: 2rem 0; padding: 0; text-align: center; line-height: 2.2; }
 .tag-cloud-item { display: inline; }
 .tag-cloud-item a {
@@ -973,8 +1067,8 @@ figure.highlight figcaption a { color: inherit; text-decoration: underline; }
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 600px;
-  margin: .35rem auto 0;
+  max-width: 780px;
+  margin: .4rem auto 0;
   aspect-ratio: 43 / 31;
 }
 .tag-cloud-svg {
