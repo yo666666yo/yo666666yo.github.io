@@ -276,6 +276,212 @@
     });
   }
 
+  // --- tag cloud hover collisions ---
+  document.querySelectorAll('.tag-cloud-figure').forEach(function (figure) {
+    const svg = figure.querySelector('.tag-cloud-svg');
+    const links = Array.prototype.slice.call(figure.querySelectorAll('[data-tag-cloud-word]'));
+    if (!svg || links.length < 2) return;
+
+    const words = links.map(function (link, fallbackIndex) {
+      return {
+        link: link,
+        body: link.querySelector('.tag-cloud-word'),
+        x: parseFloat(link.getAttribute('data-cloud-x')) || 0,
+        y: parseFloat(link.getAttribute('data-cloud-y')) || 0,
+        width: parseFloat(link.getAttribute('data-cloud-width')) || 0,
+        height: parseFloat(link.getAttribute('data-cloud-height')) || 0,
+        index: parseInt(link.getAttribute('data-cloud-index') || fallbackIndex, 10)
+      };
+    }).filter(function (word) {
+      return word.body;
+    });
+    if (words.length < 2) return;
+
+    let activeWord = null;
+
+    function setWordTransform(word, dx, dy, scale) {
+      if (!word.body) return;
+      if (!dx && !dy && (!scale || scale === 1)) {
+        word.body.style.transform = '';
+        return;
+      }
+
+      const nextScale = scale || 1;
+      word.body.style.transform = 'translate(' + dx.toFixed(2) + 'px, ' + dy.toFixed(2) + 'px) scale(' + nextScale.toFixed(3) + ')';
+    }
+
+    function readRise(word) {
+      const raw = window.getComputedStyle(word.link).getPropertyValue('--tcf-rise');
+      return parseFloat(raw) || 8;
+    }
+
+    function makeRect(word, move, target) {
+      const isTarget = word === target;
+      const scale = isTarget ? 1.075 : (move.scale || 1);
+      const rise = isTarget ? readRise(word) : 0;
+      const width = word.width * scale + 6;
+      const height = word.height * scale + 6 + rise * 1.7;
+      const centerX = word.x + move.dx;
+      const centerY = word.y + move.dy - rise * 0.9;
+
+      return {
+        left: centerX - width / 2,
+        right: centerX + width / 2,
+        top: centerY - height / 2,
+        bottom: centerY + height / 2,
+        centerX: centerX,
+        centerY: centerY,
+        width: width,
+        height: height
+      };
+    }
+
+    function resolveOverlaps(moves, target) {
+      for (let pass = 0; pass < 18; pass++) {
+        let changed = false;
+
+        for (let i = 0; i < words.length; i++) {
+          for (let j = i + 1; j < words.length; j++) {
+            const first = words[i];
+            const second = words[j];
+            const firstRect = makeRect(first, moves[i], target);
+            const secondRect = makeRect(second, moves[j], target);
+            const overlapX = Math.min(firstRect.right, secondRect.right) - Math.max(firstRect.left, secondRect.left);
+            const overlapY = Math.min(firstRect.bottom, secondRect.bottom) - Math.max(firstRect.top, secondRect.top);
+
+            if (overlapX <= 0 || overlapY <= 0) continue;
+
+            const firstFixed = first === target;
+            const secondFixed = second === target;
+            if (firstFixed && secondFixed) continue;
+
+            const gap = 3.5;
+            const alongX = overlapX < overlapY;
+            let sign = alongX
+              ? (secondRect.centerX >= firstRect.centerX ? 1 : -1)
+              : (secondRect.centerY >= firstRect.centerY ? 1 : -1);
+            if (sign === 0) sign = ((first.index + second.index) % 2) ? 1 : -1;
+            const amount = (alongX ? overlapX : overlapY) + gap;
+
+            if (firstFixed || secondFixed) {
+              const movingIndex = firstFixed ? j : i;
+              const direction = firstFixed ? sign : -sign;
+              if (alongX) {
+                moves[movingIndex].dx += direction * amount;
+              } else {
+                moves[movingIndex].dy += direction * amount;
+              }
+            } else {
+              if (alongX) {
+                moves[i].dx -= sign * amount * 0.5;
+                moves[j].dx += sign * amount * 0.5;
+              } else {
+                moves[i].dy -= sign * amount * 0.5;
+                moves[j].dy += sign * amount * 0.5;
+              }
+            }
+
+            changed = true;
+          }
+        }
+
+        if (!changed) break;
+      }
+    }
+
+    function resetCloud() {
+      activeWord = null;
+      figure.classList.add('is-resetting');
+      figure.classList.remove('is-colliding');
+      words.forEach(function (word) {
+        word.link.classList.remove('is-active', 'is-repelled');
+        setWordTransform(word, 0, 0, 1);
+      });
+      figure.offsetWidth;
+      figure.classList.remove('is-resetting');
+    }
+
+    function pushFrom(target) {
+      activeWord = target;
+      figure.classList.add('is-colliding');
+      const targetRise = readRise(target);
+      const targetCenterY = target.y - targetRise * 1.15;
+      const moves = words.map(function (word) {
+        return {
+          dx: 0,
+          dy: 0,
+          scale: word === target ? 1.015 : 1
+        };
+      });
+
+      words.forEach(function (word, index) {
+        word.link.classList.remove('is-active', 'is-repelled');
+
+        if (word === target) {
+          word.link.classList.add('is-active');
+          return;
+        }
+
+        const dx = word.x - target.x;
+        const dy = word.y - targetCenterY;
+        const influenceX = Math.max(108, target.width * 0.82 + word.width * 0.44 + 64);
+        const influenceY = Math.max(86, target.height * 1.28 + word.height * 0.72 + targetRise * 1.8 + 48);
+        const normalizedX = dx / influenceX;
+        const normalizedY = dy / influenceY;
+        const normalizedDistance = Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY);
+
+        if (normalizedDistance >= 1.12) {
+          return;
+        }
+
+        const rawDistance = Math.sqrt(dx * dx + dy * dy);
+        const fallbackAngle = word.index * 2.399963229728653 + 0.45;
+        const unitX = rawDistance > 0.01 ? dx / rawDistance : Math.cos(fallbackAngle);
+        const unitY = rawDistance > 0.01 ? dy / rawDistance : Math.sin(fallbackAngle);
+        const strength = Math.pow((1.12 - normalizedDistance) / 1.12, 1.35);
+        const push = 8 + strength * (24 + Math.min(18, target.width * 0.08));
+        moves[index].dx = unitX * push * 1.12;
+        moves[index].dy = unitY * push * 0.88;
+      });
+
+      resolveOverlaps(moves, target);
+
+      words.forEach(function (word, index) {
+        const move = moves[index];
+        if (word === target) {
+          setWordTransform(word, move.dx, move.dy, move.scale);
+          return;
+        }
+
+        if (Math.abs(move.dx) > 0.4 || Math.abs(move.dy) > 0.4) {
+          word.link.classList.add('is-repelled');
+        }
+        setWordTransform(word, move.dx, move.dy, move.scale);
+      });
+    }
+
+    words.forEach(function (word) {
+      word.link.addEventListener('pointerenter', function () {
+        pushFrom(word);
+      });
+
+      word.link.addEventListener('pointerleave', resetCloud);
+
+      word.link.addEventListener('focus', function () {
+        pushFrom(word);
+      });
+
+      word.link.addEventListener('blur', function () {
+        resetCloud();
+      });
+    });
+
+    figure.addEventListener('pointerleave', resetCloud);
+    window.addEventListener('blur', resetCloud);
+
+    if (activeWord) pushFrom(activeWord);
+  });
+
   // --- code block copy buttons ---
   function getCodeText(pre) {
     const code = pre.querySelector('code');
