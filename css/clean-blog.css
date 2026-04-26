@@ -529,14 +529,6 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
 .home-tags-card::before {
   content: none;
 }
-.home-tags-title {
-  position: relative;
-  margin: 0;
-  font-family: "Lora", Georgia, serif;
-  font-size: 1.35rem;
-  line-height: 1.15;
-  color: #18232b;
-}
 @media (min-width: 992px) {
   .home-layout { grid-template-columns: minmax(0, 720px) minmax(470px, 580px) !important; gap: 3.75rem; justify-content: center; }
   .home-tags-card { position: sticky; top: 5.5rem; }
