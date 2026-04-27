@@ -5,7 +5,11 @@
         <% page.posts.each(function (post) { %>
           <%- partial('_partial/post-preview', { post: post }) %>
         <% }); %>
-        <%- partial('_partial/pagination') %>
+        <% if (page.next) { %>
+        <div class="load-more-wrap">
+          <button class="btn btn-primary load-more-btn" data-next="<%- url_for(page.next_link) %>"><%= __('pagination.load_more') %></button>
+        </div>
+        <% } %>
       <% } else { %>
         <p class="empty-state"><%= __('index.empty') %></p>
       <% } %>

@@ -414,6 +414,93 @@
     window.addEventListener('resize', requestMastheadDepthUpdate);
   })();
 
+  // --- load more ---
+  (function initLoadMore() {
+    var btn = document.querySelector('.load-more-btn');
+    if (!btn) return;
+    var container = document.querySelector('.home-posts');
+    if (!container) return;
+    var loadingText = btn.getAttribute('data-loading') || '加载中…';
+    var errorText = btn.getAttribute('data-error') || '加载失败，点击重试';
+    var originalLabel = btn.textContent;
+
+    function observeNewCards(cards) {
+      if (prefersReducedMotion() || !('IntersectionObserver' in window)) {
+        cards.forEach(function (card) {
+          card.classList.add('is-visible');
+          var divider = card.nextElementSibling;
+          if (divider && divider.classList.contains('post-divider')) divider.classList.add('is-visible');
+        });
+        return;
+      }
+      var observer = new IntersectionObserver(function (entries, obs) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-visible');
+          var divider = entry.target.nextElementSibling;
+          if (divider && divider.classList.contains('post-divider')) divider.classList.add('is-visible');
+          obs.unobserve(entry.target);
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+      cards.forEach(function (card) {
+        card.setAttribute('data-animate-card', 'true');
+        var divider = card.nextElementSibling;
+        if (divider && divider.classList.contains('post-divider')) divider.setAttribute('data-animate-divider', 'true');
+        observer.observe(card);
+      });
+    }
+
+    btn.addEventListener('click', function () {
+      var nextUrl = btn.getAttribute('data-next');
+      if (!nextUrl || btn.disabled) return;
+
+      btn.disabled = true;
+      btn.textContent = loadingText;
+
+      fetch(nextUrl)
+        .then(function (res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.text();
+        })
+        .then(function (html) {
+          var doc = new DOMParser().parseFromString(html, 'text/html');
+          var newCards = doc.querySelectorAll('.post-preview');
+          var newDividers = doc.querySelectorAll('.post-divider');
+          if (!newCards.length) { btn.parentNode.removeChild(btn); return; }
+
+          newCards.forEach(function (card, i) {
+            var importedCard = document.importNode(card, true);
+            container.insertBefore(importedCard, btn.parentNode);
+            if (newDividers[i]) {
+              var importedDivider = document.importNode(newDividers[i], true);
+              container.insertBefore(importedDivider, btn.parentNode);
+            }
+          });
+
+          // Animate newly inserted cards
+          var insertedCards = container.querySelectorAll('.post-preview[data-animate-card]');
+          // re-query: all post-preview cards that are NOT yet visible
+          var allCards = container.querySelectorAll('.post-preview:not(.is-visible)');
+          if (allCards.length) observeNewCards(Array.prototype.slice.call(allCards));
+
+          // Check for more pages
+          var nextBtn = doc.querySelector('.load-more-btn');
+          var nextLink = nextBtn ? nextBtn.getAttribute('data-next') : null;
+          if (nextLink) {
+            btn.setAttribute('data-next', nextLink);
+            btn.disabled = false;
+            btn.textContent = originalLabel;
+          } else {
+            btn.parentNode.removeChild(btn);
+          }
+        })
+        .catch(function () {
+          btn.disabled = false;
+          btn.textContent = errorText;
+        });
+    });
+  })();
+
   // --- local search ---
   const searchForm = document.querySelector('.site-search');
   if (searchForm) {

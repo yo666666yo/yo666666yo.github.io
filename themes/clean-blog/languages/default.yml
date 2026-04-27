@@ -44,6 +44,7 @@ pagination:
   prev: ← Newer
   next: Older →
   page: "Page %d"
+  load_more: Load more
 
 footer:
   powered_by: Powered by %s

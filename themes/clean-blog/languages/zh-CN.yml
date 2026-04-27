@@ -44,6 +44,7 @@ pagination:
   prev: ← 上一页
   next: 下一页 →
   page: 第 %d 页
+  load_more: 加载更多
 
 footer:
   powered_by: 基于 %s 构建

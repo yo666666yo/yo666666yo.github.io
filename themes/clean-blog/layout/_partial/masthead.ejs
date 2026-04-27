@@ -44,15 +44,48 @@
     if (page.cover) return page.cover;
     if (page.top_img) return page.top_img;
     if (page.masthead) return page.masthead;
+
+    const wp = theme.wallpapers || {};
+
+    if (is_post()) return masthead.post_bg || masthead.default_bg;
+    if (page.type === 'about') return wp.about || masthead.about_bg || masthead.default_bg;
+
+    if (is_category()) {
+      const cat = page.category || '';
+      if ((cat === '研究' || cat === 'research') && wp.research) return wp.research;
+      if ((cat === '生活' || cat === 'life') && wp.life) return wp.life;
+      if ((cat === '周报' || cat === 'weekly') && wp.weekly) return wp.weekly;
+      return wp.archive || masthead.archive_bg || masthead.default_bg;
+    }
+
+    if (is_archive() || page.type === 'categories') {
+      return wp.archive || masthead.archive_bg || masthead.default_bg;
+    }
+
+    if (is_tag() || page.type === 'tags') {
+      return wp.tags || masthead.archive_bg || masthead.default_bg;
+    }
+
+    // Homepage — pool[0] as initial bg; JS randomizes on load
+    if (is_home() && page.current === 1) {
+      if (wp.pool && wp.pool.length) return wp.pool[0];
+      return masthead.default_bg || '/img/home-bg.svg';
+    }
+
+    return masthead.default_bg || '/img/home-bg.svg';
+  }
+
+  const bg = pickBg();
+  const fallbackBg = (function() {
     if (is_post()) return masthead.post_bg || masthead.default_bg;
     if (page.type === 'about') return masthead.about_bg || masthead.default_bg;
     if (is_archive() || is_category() || is_tag() || page.type === 'categories' || page.type === 'tags') {
       return masthead.archive_bg || masthead.default_bg;
     }
-    return masthead.default_bg || '/img/home-bg.svg';
-  }
-
-  const bg = pickBg();
+    return masthead.default_bg || '/img/masthead/home.jpg';
+  })();
+  const bgIsRemote = bg && /^https?:\/\//.test(bg);
+  const isHomePage1 = is_home() && page.current === 1;
   let kind;
   if (is_post()) kind = 'post';
   else if (is_home()) kind = 'site';
@@ -90,7 +123,8 @@
     subheading = page.description || page.subtitle || '';
   }
 %>
-<header class="masthead masthead-<%= kind %>"<% if (bg) { %> style="background-image: url('<%- url_for(bg) %>')"<% } %>>
+<% if (bg && !isHomePage1) { %><img src="<%- url_for(bg) %>" alt="" style="display:none" aria-hidden="true"><% } %>
+<header class="masthead masthead-<%= kind %>"<% if (bg && !isHomePage1) { %> style="background-image: url('<%- url_for(bg) %>')<% if (bgIsRemote) { %>, url('<%- url_for(fallbackBg) %>')<% } %>"<% } %>>
   <div class="masthead-overlay" aria-hidden="true"></div>
   <div class="masthead-container">
     <div class="masthead-inner">

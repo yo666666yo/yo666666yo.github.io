@@ -55,3 +55,13 @@
 <% (theme.inject && theme.inject.head || []).forEach(function (line) { %>
 <%- line %>
 <% }); %>
+
+<% if (is_home() && page.current === 1) { %>
+  <% const wp = theme.wallpapers || {}; %>
+  <% if (wp.pool && wp.pool.length) { %>
+    <% const fb = (theme.masthead && theme.masthead.default_bg) || '/img/masthead/home.jpg'; %>
+  <script>
+    (function(){var p=<%- JSON.stringify(wp.pool) %>;var i=Math.floor(Math.random()*p.length);var u=p[i];var fb='<%- url_for(fb) %>';var s=document.createElement('style');s.textContent='.masthead.masthead-site{background-image:url('+u+'),url('+fb+')}';document.head.appendChild(s);var l=document.createElement('link');l.rel='preload';l.as='image';l.href=u;document.head.appendChild(l);})();
+  </script>
+  <% } %>
+<% } %>

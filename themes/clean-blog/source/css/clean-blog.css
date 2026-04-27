@@ -1213,6 +1213,34 @@ figure.highlight figcaption a { color: inherit; text-decoration: underline; }
   color: #fff;
 }
 
+/* ============ Load More ============ */
+.load-more-wrap {
+  text-align: center;
+  margin: 3rem 0 1rem;
+}
+.load-more-btn {
+  display: inline-block;
+  padding: .75rem 2.5rem;
+  border: 1px solid #212529;
+  border-radius: 4px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: .85rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: #212529;
+  background: #fff;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+.load-more-btn:hover {
+  background: #212529;
+  color: #fff;
+}
+.load-more-btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
 /* ============ Footer ============ */
 .site-footer {
   padding: 3rem 0 2.5rem;
@@ -1296,6 +1324,7 @@ figure.highlight figcaption a { color: inherit; text-decoration: underline; }
   .post-pager { flex-direction: column; }
   .post-pager-next { text-align: left; }
   .pager { justify-content: space-between; }
+  .load-more-btn { width: 100%; }
   .post-body { font-size: 1rem; line-height: 1.75; }
 }
 
