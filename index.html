@@ -36,6 +36,16 @@
 
 
 
+
+  
+  
+    
+  <script>
+    (function(){var p=["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=85","https://images.unsplash.com/photo-1671372954216-a1ed945642cd?w=1920&q=85","https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1920&q=85","https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1920&q=85","https://images.unsplash.com/photo-1446329813274-7c9036bd9a1f?w=1920&q=85","https://images.unsplash.com/photo-1543158266-0066955047b1?w=1920&q=85","https://images.unsplash.com/photo-1559135197-8a45ea74d367?w=1920&q=85","https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&q=85","https://images.unsplash.com/photo-1418065460487-3e41a6c84dc5?w=1920&q=85","https://images.unsplash.com/photo-1496347646636-ea47f7d6b37b?w=1920&q=85"];var i=Math.floor(Math.random()*p.length);var u=p[i];var fb='/img/masthead/home.jpg';var s=document.createElement('style');s.textContent='.masthead.masthead-site{background-image:url('+u+'),url('+fb+')}';document.head.appendChild(s);var l=document.createElement('link');l.rel='preload';l.as='image';l.href=u;document.head.appendChild(l);})();
+  </script>
+  
+
+
 </head>
 <body id="page-top" class="is-home">
   
@@ -109,7 +119,8 @@
 </nav>
 
   
-<header class="masthead masthead-site" style="background-image: url('/img/masthead/home.jpg')">
+
+<header class="masthead masthead-site">
   <div class="masthead-overlay" aria-hidden="true"></div>
   <div class="masthead-container">
     <div class="masthead-inner">
@@ -351,16 +362,10 @@
 
         
         
-<div class="pager">
-  
-    <a class="btn btn-primary text-uppercase" href="/page/2/">
-      下一页 →
-    </a>
-  
-  
-</div>
-
-
+        <div class="load-more-wrap">
+          <button class="btn btn-primary load-more-btn" data-next="/page/2/">加载更多</button>
+        </div>
+        
       
     </section>
   </div>

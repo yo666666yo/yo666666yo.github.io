@@ -234,9 +234,9 @@
             
             <tag> GRPO </tag>
             
-            <tag> AT-GRPO </tag>
-            
             <tag> LLM-MAS </tag>
+            
+            <tag> AT-GRPO </tag>
             
             <tag> credit assignment </tag>
             
@@ -269,13 +269,13 @@
             
             <tag> GRPO </tag>
             
-            <tag> Stronger-MAS </tag>
+            <tag> LLM-MAS </tag>
             
             <tag> AT-GRPO </tag>
             
-            <tag> LLM-MAS </tag>
-            
             <tag> credit assignment </tag>
+            
+            <tag> Stronger-MAS </tag>
             
         </tags>
       
