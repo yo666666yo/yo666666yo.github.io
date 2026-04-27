@@ -111,7 +111,7 @@
 </nav>
 
   
-<header class="masthead masthead-post" style="background-image: url('/img/post-bg.svg')">
+<header class="masthead masthead-post" style="background-image: url('/img/masthead/post.jpg')">
   <div class="masthead-overlay" aria-hidden="true"></div>
   <div class="masthead-container">
     <div class="masthead-inner">
@@ -142,9 +142,23 @@
 
   <main id="main-content">
     <article class="article article-post mb-4">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col">
+  <div class="container article-container">
+    <div class="article-layout" data-article-layout>
+      <aside class="article-toc-sidebar" data-toc-sidebar hidden>
+        <nav class="article-toc" aria-label="Table of contents">
+          <div class="article-toc-header">
+            <span class="article-toc-title">Contents</span>
+            <button class="article-toc-collapse" type="button" data-toc-collapse aria-label="Collapse table of contents" aria-expanded="true">
+              <span aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="article-toc-scroll" data-toc-scroll>
+            <ol class="article-toc-list" data-toc-list></ol>
+          </div>
+        </nav>
+      </aside>
+
+      <div class="article-content-col">
         <div class="post-body"><blockquote>
 <p><strong>姓名：</strong> 李晟昊<br>
 <strong>日期：</strong> 2026 年 3 月 21 日<br>
@@ -574,6 +588,29 @@ Dual Encoder + Disentangled Partial Alignment (成功)
 
       </div>
     </div>
+  </div>
+
+  <button class="toc-fab" type="button" data-toc-open aria-label="Open table of contents" aria-controls="article-toc-drawer" hidden>
+    <span class="toc-fab-icon" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+  </button>
+
+  <div class="toc-drawer" id="article-toc-drawer" data-toc-drawer aria-hidden="true" hidden>
+    <div class="toc-drawer-backdrop" data-toc-close></div>
+    <section class="toc-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="toc-drawer-title" tabindex="-1">
+      <div class="toc-drawer-header">
+        <h2 id="toc-drawer-title">Contents</h2>
+        <button class="toc-drawer-close" type="button" data-toc-close aria-label="Close table of contents">
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="toc-drawer-scroll">
+        <ol class="article-toc-list toc-drawer-list" data-toc-mobile-list></ol>
+      </div>
+    </section>
   </div>
 </article>
 

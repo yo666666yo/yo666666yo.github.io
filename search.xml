@@ -234,9 +234,9 @@
             
             <tag> GRPO </tag>
             
-            <tag> LLM-MAS </tag>
-            
             <tag> AT-GRPO </tag>
+            
+            <tag> LLM-MAS </tag>
             
             <tag> credit assignment </tag>
             
@@ -269,13 +269,13 @@
             
             <tag> GRPO </tag>
             
-            <tag> LLM-MAS </tag>
+            <tag> Stronger-MAS </tag>
             
             <tag> AT-GRPO </tag>
             
-            <tag> credit assignment </tag>
+            <tag> LLM-MAS </tag>
             
-            <tag> Stronger-MAS </tag>
+            <tag> credit assignment </tag>
             
         </tags>
       
@@ -390,6 +390,17 @@
     
     
     <entry>
+      <title>分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>关于</title>
       <link href="/about/index.html"/>
       <url>/about/index.html</url>
@@ -404,17 +415,6 @@
       <title>搜索</title>
       <link href="/search/index.html"/>
       <url>/search/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
