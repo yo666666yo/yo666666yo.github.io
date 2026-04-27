@@ -66,7 +66,7 @@
     subheading = page.description || '';
   } else if (kind === 'site' && page.current > 1) {
     heading = config.title;
-    subheading = __('pagination.page', page.current);
+    subheading = '';
   } else if (kind === 'site') {
     heading = config.title;
     subheading = siteMeta.subheading || config.subtitle || '';

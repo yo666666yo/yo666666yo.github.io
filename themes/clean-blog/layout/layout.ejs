@@ -1,7 +1,9 @@
 <%
   const lang = page.lang || page.language || config.language || 'default';
+  const isHomePaged = is_home() && Number(page.current || 1) > 1;
   const bodyClasses = [];
   if (is_home()) bodyClasses.push('is-home');
+  if (isHomePaged) bodyClasses.push('is-home-paged');
   if (is_post()) bodyClasses.push('is-post');
   if (is_archive()) bodyClasses.push('is-archive');
   if (is_category()) bodyClasses.push('is-category');

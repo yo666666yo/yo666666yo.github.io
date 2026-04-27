@@ -13,10 +13,10 @@ menu:
 # ---------- Masthead (hero) defaults ----------
 masthead:
   # background image used when a page does not declare `cover` / `top_img`
-  default_bg: /img/home-bg.svg
-  post_bg: /img/post-bg.svg
-  about_bg: /img/about-bg.svg
-  archive_bg: /img/post-bg.svg
+  default_bg: /img/masthead/home.jpg
+  post_bg: /img/masthead/post.jpg
+  about_bg: /img/masthead/about.jpg
+  archive_bg: /img/masthead/archive.jpg
 
 # ---------- Site meta ----------
 site:
