@@ -330,14 +330,21 @@
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/ProbeCommitEnv/</loc>
+    <loc>https://yo666666yo.github.io/tags/Model-Based-RL/</loc>
     <lastmod>2026-04-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/representation-learning/</loc>
+    <loc>https://yo666666yo.github.io/tags/World-Model/</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/Objective-Mismatch/</loc>
     <lastmod>2026-04-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -358,21 +365,21 @@
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/Model-Based-RL/</loc>
+    <loc>https://yo666666yo.github.io/tags/SHARP/</loc>
     <lastmod>2026-04-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/World-Model/</loc>
+    <loc>https://yo666666yo.github.io/tags/GAE/</loc>
     <lastmod>2026-04-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/Objective-Mismatch/</loc>
+    <loc>https://yo666666yo.github.io/tags/policy-gradient/</loc>
     <lastmod>2026-04-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -449,21 +456,14 @@
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/SHARP/</loc>
+    <loc>https://yo666666yo.github.io/tags/ProbeCommitEnv/</loc>
     <lastmod>2026-04-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/GAE/</loc>
-    <lastmod>2026-04-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/policy-gradient/</loc>
+    <loc>https://yo666666yo.github.io/tags/representation-learning/</loc>
     <lastmod>2026-04-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
