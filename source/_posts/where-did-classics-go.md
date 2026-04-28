@@ -27,11 +27,11 @@ updated: 2026-04-29 02:00:00
 
 诚然，豆瓣top250里的前十的电影，光1994年就有三部。《肖申克的救赎》《阿甘正传》《这个杀手不太冷》《低俗小说》《狮子王》等等。
 
-![image-20260429022341317](C:\Users\yoyo\AppData\Roaming\Typora\typora-user-images\image-20260429022341317.png)
+![豆瓣TOP250榜单截图：1994年有三部电影进入前十——肖申克的救赎、阿甘正传、这个杀手不太冷](images/douban-top250-1994.png)
 
 2000 年代的周杰伦的《七里香》、陶喆的《黑色柳丁》、王菲的《寓言》、陈奕迅的《U87》二十年后还在被反复播放。
 
-![image-20260429022549015](C:\Users\yoyo\AppData\Roaming\Typora\typora-user-images\image-20260429022549015.png)
+![2000年代华语经典专辑封面：周杰伦《七里香》、陶喆《黑色柳丁》、王菲《寓言》、陈奕迅《U87》等仍在被反复播放的唱片](images/classic-albums-2000s.png)
 
 ## 好莱坞：IP 的胜利，故事的失败
 
