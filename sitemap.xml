@@ -195,41 +195,6 @@
   </url>
   
   <url>
-    <loc>https://yo666666yo.github.io/tags/%E6%9D%82%E8%B0%88/</loc>
-    <lastmod>2026-04-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/%E5%8D%9A%E5%AE%A2/</loc>
-    <lastmod>2026-04-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/Hexo/</loc>
-    <lastmod>2026-04-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/%E9%9A%8F%E7%AC%94/</loc>
-    <lastmod>2026-04-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/%E7%94%9F%E6%B4%BB/</loc>
-    <lastmod>2026-04-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://yo666666yo.github.io/tags/Claude-Code/</loc>
     <lastmod>2026-04-28</lastmod>
     <changefreq>weekly</changefreq>
@@ -307,6 +272,41 @@
   </url>
   
   <url>
+    <loc>https://yo666666yo.github.io/tags/%E9%9A%8F%E7%AC%94/</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/%E7%94%9F%E6%B4%BB/</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/%E6%9D%82%E8%B0%88/</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/%E5%8D%9A%E5%AE%A2/</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/Hexo/</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://yo666666yo.github.io/tags/Stronger-MAS/</loc>
     <lastmod>2026-04-28</lastmod>
     <changefreq>weekly</changefreq>
@@ -315,27 +315,6 @@
   
   <url>
     <loc>https://yo666666yo.github.io/tags/%E5%91%A8%E6%8A%A5/</loc>
-    <lastmod>2026-04-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/Model-Based-RL/</loc>
-    <lastmod>2026-04-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/World-Model/</loc>
-    <lastmod>2026-04-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://yo666666yo.github.io/tags/Objective-Mismatch/</loc>
     <lastmod>2026-04-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -364,6 +343,27 @@
   
   <url>
     <loc>https://yo666666yo.github.io/tags/MHGPO/</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/Model-Based-RL/</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/World-Model/</loc>
+    <lastmod>2026-04-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://yo666666yo.github.io/tags/Objective-Mismatch/</loc>
     <lastmod>2026-04-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>

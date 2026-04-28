@@ -390,6 +390,17 @@
     
     
     <entry>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
+      
+        <content type="html"><![CDATA[<h2 id="你好-👋">你好 👋</h2><p>我是 <strong>Yoyo_Lee</strong>。</p><p>这是我的个人角落，通常会写以下两方面：</p><ul><li>🧪 <strong>研究 / 笔记</strong>：机器学习、深度学习、多智能体、LLM 训练</li><li>🌿 <strong>生活 / 随笔</strong>：日常分享</li></ul><h2 id="联系">联系</h2><ul><li>GitHub: <a href="https://github.com/yo666666yo">Yoyo_Lee</a></li><li>RSS: <a href="/atom.xml">/atom.xml</a></li></ul><h2 id="关于这个博客">关于这个博客</h2><ul><li>框架：<a href="https://hexo.io/">Hexo</a> 8</li><li>主题：本地定制的 Clean Blog（移植自 <a href="https://startbootstrap.com/theme/clean-blog">Start Bootstrap Clean Blog</a>）</li><li>部署：GitHub Pages + GitHub Actions</li><li>评论：Giscus（基于 GitHub Discussions）</li><li>源码：<a href="https://github.com/yo666666yo/yo666666yo.github.io">GitHub Pages 仓库</a></li></ul><p>如果某篇文章对你有帮助，欢迎在评论区留言；有错请不吝指出。</p>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>分类</title>
       <link href="/categories/index.html"/>
       <url>/categories/index.html</url>
@@ -417,17 +428,6 @@
       <url>/tags/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
-      
-        <content type="html"><![CDATA[<h2 id="你好-👋">你好 👋</h2><p>我是 <strong>Yoyo_Lee</strong>。</p><p>这是我的个人角落，通常会写以下两方面：</p><ul><li>🧪 <strong>研究 / 笔记</strong>：机器学习、深度学习、多智能体、LLM 训练</li><li>🌿 <strong>生活 / 随笔</strong>：日常分享</li></ul><h2 id="联系">联系</h2><ul><li>GitHub: <a href="https://github.com/yo666666yo">Yoyo_Lee</a></li><li>RSS: <a href="/atom.xml">/atom.xml</a></li></ul><h2 id="关于这个博客">关于这个博客</h2><ul><li>框架：<a href="https://hexo.io/">Hexo</a> 8</li><li>主题：本地定制的 Clean Blog（移植自 <a href="https://startbootstrap.com/theme/clean-blog">Start Bootstrap Clean Blog</a>）</li><li>部署：GitHub Pages + GitHub Actions</li><li>评论：Giscus（基于 GitHub Discussions）</li><li>源码：<a href="https://github.com/yo666666yo/yo666666yo.github.io">GitHub Pages 仓库</a></li></ul><p>如果某篇文章对你有帮助，欢迎在评论区留言；有错请不吝指出。</p>]]></content>
       
     </entry>
     
