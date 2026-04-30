@@ -6,9 +6,10 @@
     "build": "hexo generate",
     "check": "npm run clean && npm run build",
     "clean": "hexo clean",
-    "deploy": "hexo deploy",
+    "deploy": "npm run build && wrangler deploy",
     "server": "hexo server",
-    "server:draft": "hexo server --draft"
+    "server:draft": "hexo server --draft",
+    "preview": "npm run build && wrangler dev"
   },
   "hexo": {
     "version": "8.1.1"
@@ -28,5 +29,8 @@
     "hexo-renderer-ejs": "^2.0.0",
     "hexo-renderer-markdown-it": "^7.1.1",
     "hexo-server": "^3.0.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.87.0"
   }
 }
