@@ -18,6 +18,7 @@
       </span>
     </button>
     <div class="navbar-collapse" id="navbarResponsive">
+      <div class="navbar-collapse-inner">
       <form class="site-search" role="search" action="<%- searchPageUrl %>" method="get" data-search-url="<%- searchUrl %>" data-search-page-url="<%- searchPageUrl %>" data-loading="正在搜索..." data-no-results="没有找到匹配文章" data-error="搜索索引暂时不可用">
         <label class="sr-only" for="site-search-input">搜索文章</label>
         <input id="site-search-input" class="site-search-input" type="search" name="q" placeholder="搜索文章..." autocomplete="off" spellcheck="false" aria-controls="site-search-results" aria-expanded="false" />
@@ -37,6 +38,7 @@
           </li>
         <% }); %>
       </ul>
+      </div>
     </div>
   </div>
 </nav>
