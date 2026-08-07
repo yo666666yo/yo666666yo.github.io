@@ -4,7 +4,7 @@
   
     
     <entry>
-      <title>研究周报 · 2026.07.26–08.01 · Orchestration Trace、LLM-MAS系统侧与经典RL Pipeline</title>
+      <title>研究周报 · 2026.07.18–08.07 · Orchestration Trace、LLM-MAS系统侧与经典RL Pipeline</title>
       <link href="/posts/8f5c2d1a/"/>
       <url>/posts/8f5c2d1a/</url>
       
@@ -549,6 +549,17 @@
     
     
     <entry>
+      <title>搜索</title>
+      <link href="/search/index.html"/>
+      <url>/search/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>关于</title>
       <link href="/about/index.html"/>
       <url>/about/index.html</url>
@@ -563,17 +574,6 @@
       <title>标签</title>
       <link href="/tags/index.html"/>
       <url>/tags/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>搜索</title>
-      <link href="/search/index.html"/>
-      <url>/search/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
