@@ -589,6 +589,27 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
 .masthead .post-heading .meta a { color: inherit; text-decoration: underline; }
 .masthead .post-heading .meta a:hover { color: #fff; }
 
+/* Keep short CJK phrases and compact technical terms together while still
+   allowing a long Latin identifier to break when the viewport is narrow. */
+.title-word { white-space: nowrap; }
+.title-latin-term {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.title-date-group { display: inline-block; }
+.title-date,
+.title-separator { white-space: nowrap; }
+.masthead .title-latin-term {
+  display: inline;
+  max-width: none;
+  overflow-wrap: break-word;
+}
+@media screen and (max-width: 576px) {
+  .masthead .title-date-group { display: inline; }
+  .masthead .title-separator { white-space: normal; }
+}
+
 .masthead-post { padding: 12rem 0 6rem; }
 
 @media (min-width: 768px) {

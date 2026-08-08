@@ -3,6 +3,72 @@
   const authorName = (theme.author && theme.author.name) || config.author || 'Yoyo_Lee';
   const excerptLen = (theme.index && theme.index.excerpt_length) || 180;
 
+  function keepLatinHyphens(value) {
+    return String(value || '').replace(/[A-Za-z0-9]+(?:-[A-Za-z0-9]+)+/g, function (term) {
+      return term.length <= 18 ? term.replace(/-/g, '\u2011') : term;
+    });
+  }
+
+  function escapeHtml(value) {
+    return String(value || '').replace(/[&<>"']/g, function (char) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char];
+    });
+  }
+
+  function formatCjk(value) {
+    const text = String(value || '').replace(/\s+\u00b7\s+/g, '\u00a0\u00b7\u00a0');
+    if (typeof Intl === 'undefined' || !Intl.Segmenter) return escapeHtml(text);
+    try {
+      const segmenter = new Intl.Segmenter('zh', { granularity: 'word' });
+      const output = [];
+      let pending = '';
+      function flush() {
+        if (pending) output.push('<span class="title-word">' + escapeHtml(pending) + '</span>');
+        pending = '';
+      }
+      Array.from(segmenter.segment(text)).forEach(function (part) {
+        const safe = escapeHtml(part.segment);
+        const isCjk = part.isWordLike && /[\u3400-\u9fff]/.test(part.segment);
+        if (isCjk && part.segment.length <= 6) {
+          if (pending.length && pending.length + part.segment.length > 6) flush();
+          pending += part.segment;
+        } else {
+          flush();
+          output.push(isCjk ? '<span class="title-word">' + safe + '</span>' : safe);
+        }
+      });
+      flush();
+      return output.join('');
+    } catch (error) {
+      return escapeHtml(text);
+    }
+  }
+
+  function formatTitle(value) {
+    const text = String(value || '');
+    const termPattern = /\d{4}\.\d{2}\.\d{2}(?:[\u2013-]\d{2}\.\d{2})?(?:\s+\u00b7)?|[A-Za-z0-9]+(?:-[A-Za-z0-9]+)+/g;
+    const output = [];
+    let cursor = 0;
+    let match;
+    while ((match = termPattern.exec(text))) {
+      output.push(formatCjk(text.slice(cursor, match.index)));
+      const className = /^\d/.test(match[0]) ? 'title-date' : 'title-latin-term';
+      const visible = className === 'title-date' ? match[0] : keepLatinHyphens(match[0]);
+      if (className === 'title-date') {
+        const separator = /\s+\u00b7$/.exec(visible);
+        const dateText = separator ? visible.slice(0, -separator[0].length) : visible;
+        output.push(separator
+          ? '<span class="title-date-group"><span class="title-date">' + escapeHtml(dateText) + '</span><span class="title-separator"> \u00b7</span></span>'
+          : '<span class="title-date">' + escapeHtml(dateText) + '</span>');
+      } else {
+        output.push('<span class="title-latin-term">' + escapeHtml(visible) + '</span>');
+      }
+      cursor = termPattern.lastIndex;
+    }
+    output.push(formatCjk(text.slice(cursor)));
+    return output.join('');
+  }
+
   // Produce a plaintext blurb: prefer excerpt, fall back to content with tags stripped.
   let blurb = '';
   if (post.excerpt) {
@@ -16,11 +82,11 @@
 %>
 <div class="post-preview">
   <a href="<%- postPath %>">
-    <h2 class="post-title"><%= post.title %></h2>
+    <h2 class="post-title"><%- formatTitle(post.title) %></h2>
     <% if (post.subtitle || post.description) { %>
-      <h3 class="post-subtitle"><%= post.subtitle || post.description %></h3>
+      <h3 class="post-subtitle"><%- formatTitle(post.subtitle || post.description) %></h3>
     <% } else if (blurb) { %>
-      <h3 class="post-subtitle"><%= blurb %></h3>
+      <h3 class="post-subtitle"><%- formatTitle(blurb) %></h3>
     <% } %>
   </a>
   <p class="post-meta">
