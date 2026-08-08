@@ -1,0 +1,598 @@
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<title>AutoGen 的 Human-in-the-loop 实现：从两种交互模式到 Fowler 的&#34;非确定性&#34; · Yoyo_Lee 的博客</title>
+<meta name="description" content="拆 AutoGen AgentChat 的两种 Human-in-the-loop 模式：run 内 UserProxyAgent + input_func 的阻塞反馈，和 run 间 max_turns / HandoffTermination 的可持久化反馈。再结合 Martin Fowler 2025 年聊&#34;非确定性&#34;和 tolerance 的那期播客，谈谈我把 HITL 当成 tolerance 工程实现的一点理解。" />
+<meta name="keywords" content="AI,LLM,机器学习,深度学习,论文阅读,生活随笔,blog,Yoyo_Lee" />
+<meta name="author" content="Yoyo_Lee" />
+<link rel="canonical" href="https://yoyo-lee.com/posts/e1c9f4a2/" />
+
+<!-- Open Graph / Twitter -->
+<meta property="og:site_name" content="Yoyo_Lee 的博客" />
+<meta property="og:title" content="AutoGen 的 Human-in-the-loop 实现：从两种交互模式到 Fowler 的&#34;非确定性&#34;" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://yoyo-lee.com/posts/e1c9f4a2/" />
+<meta property="og:description" content="拆 AutoGen AgentChat 的两种 Human-in-the-loop 模式：run 内 UserProxyAgent + input_func 的阻塞反馈，和 run 间 max_turns / HandoffTermination 的可持久化反馈。再结合 Martin Fowler 2025 年聊&#34;非确定性&#34;和 tolerance 的那期播客，谈谈我把 HITL 当成 tolerance 工程实现的一点理解。" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
+
+<link rel="alternate" type="application/atom+xml" title="Yoyo_Lee 的博客" href="/atom.xml" />
+
+
+<!-- Google Fonts (Lora for body, system font stack for UI) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,700;1,400;1,700&display=swap" />
+
+
+
+<link rel="stylesheet" href="/css/clean-blog.css?v=20260427-2" />
+
+
+
+
+
+</head>
+<body id="page-top" class="is-post">
+  
+<nav id="mainNav" class="navbar navbar-light" aria-label="主菜单">
+  <div class="navbar-container">
+    <a class="navbar-brand" href="/">Yoyo_Lee 的博客</a>
+    <button class="navbar-toggler" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="菜单">
+      菜单
+      <span class="navbar-toggler-icon" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+    </button>
+    <div class="navbar-collapse" id="navbarResponsive">
+      <form class="site-search" role="search" action="/search/" method="get" data-search-url="/search.xml" data-search-page-url="/search/" data-loading="正在搜索..." data-no-results="没有找到匹配文章" data-error="搜索索引暂时不可用">
+        <label class="sr-only" for="site-search-input">搜索文章</label>
+        <input id="site-search-input" class="site-search-input" type="search" name="q" placeholder="搜索文章..." autocomplete="off" spellcheck="false" aria-controls="site-search-results" aria-expanded="false" />
+        <button class="site-search-button" type="submit" aria-label="搜索">
+          <svg class="site-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10.8 5.2a5.6 5.6 0 1 0 0 11.2 5.6 5.6 0 0 0 0-11.2Zm-7.1 5.6a7.1 7.1 0 1 1 12.6 4.5l3.7 3.7-1.1 1.1-3.7-3.7A7.1 7.1 0 0 1 3.7 10.8Z" />
+          </svg>
+        </button>
+        <div id="site-search-results" class="site-search-results" role="listbox" hidden></div>
+      </form>
+      <ul class="navbar-nav">
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/research/">研究</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/life/">生活</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/weekly/">周报</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+<img src="/img/masthead/post.jpg" alt="" style="display:none" aria-hidden="true">
+<header class="masthead masthead-post" style="background-image: url('/img/masthead/post.jpg')">
+  <div class="masthead-overlay" aria-hidden="true"></div>
+  <div class="masthead-container">
+    <div class="masthead-inner">
+      
+        <div class="post-heading">
+          <div class="post-title-line">
+            <h1>AutoGen <span class="title-word">的</span> <span class="title-latin-term">Human‑in‑the‑loop</span> <span class="title-word">实现</span>：<span class="title-word">从两种交互</span><span class="title-word">模式到</span> Fowler <span class="title-word">的</span>&quot;<span class="title-word">非确定性</span>&quot;</h1>
+            
+              <span class="post-reading-stats" aria-label="文章字数和预计阅读时间">
+                <span>字数 4,249</span>
+                <span>预计阅读 11 分钟</span>
+              </span>
+            
+          </div>
+          <h2 class="subheading"><span class="title-word">拆</span> AutoGen AgentChat <span class="title-word">的两种</span> <span class="title-latin-term">Human‑in‑the‑loop</span> <span class="title-word">模式</span>：run <span class="title-word">内</span> UserProxyAgent + input_func <span class="title-word">的阻塞反馈</span>，<span class="title-word">和</span> run <span class="title-word">间</span> max_turns / HandoffTermination <span class="title-word">的可持久化</span><span class="title-word">反馈</span>。<span class="title-word">再结合</span> Martin Fowler 2025 <span class="title-word">年聊</span>&quot;<span class="title-word">非确定性</span>&quot;<span class="title-word">和</span> tolerance <span class="title-word">的那期播客</span>，<span class="title-word">谈谈我把</span> HITL <span class="title-word">当成</span> tolerance <span class="title-word">工程实现的</span><span class="title-word">一点理解</span>。</h2>
+          <span class="meta">
+            作者
+            <a href="/about/">Yoyo_Lee</a>
+            发表于
+            <time datetime="2026-05-17T14:00:00.000Z">2026-05-17</time>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+</header>
+
+
+  <main id="main-content">
+    <article class="article article-post mb-4">
+  <div class="container article-container">
+    <div class="article-layout" data-article-layout>
+      <aside class="article-toc-sidebar" data-toc-sidebar hidden>
+        <nav class="article-toc" aria-label="Table of contents">
+          <div class="article-toc-header">
+            <span class="article-toc-title">Contents</span>
+            <button class="article-toc-collapse" type="button" data-toc-collapse aria-label="Collapse table of contents" aria-expanded="true">
+              <span aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="article-toc-scroll" data-toc-scroll>
+            <ol class="article-toc-list" data-toc-list></ol>
+          </div>
+        </nav>
+      </aside>
+
+      <div class="article-content-col">
+        <div class="post-body"><blockquote>
+<p>我先读了 AutoGen 的 Human-in-the-loop 文档，后来又听了 Martin Fowler 在 The Pragmatic Engineer 上的那期访谈。两件事放在一起，问题才变得具体：agent 什么时候应该把人拉进来，什么情况下又应该让它自己继续跑？下面先看 AutoGen 的两条实现路径，再回到 Fowler 讲的“非确定性”和 tolerance，最后写一点我自己的判断。</p>
+</blockquote>
+<span id="more"></span>
+<hr>
+<h2 id="引言">引言</h2>
+<p>刚接触 agent 框架时，我把 Human-in-the-loop 理解成在 tool use loop 里加一个 user agent。重读 AgentChat 文档后，我才发现真正麻烦的不是“把人接进来”，而是接入发生在哪个时刻，以及这次介入会不会把整个 team 卡住。</p>
+<p>先分清一个分叉就够了：人是在 run 内被接进来，还是等 run 结束后再回来。两种模式的工程后果并不小。session 能不能持久化、team 会不会阻塞、UI 要怎么接，连 failure mode 都会跟着变。</p>
+<p>Fowler 在 2025 年 11 月那期访谈里反复谈到 tolerance。这个词刚好能解释，AutoGen 为什么没有把 HITL 做成一条统一的 API。</p>
+<hr>
+<h2 id="一、AutoGen-的两种-Human-in-the-loop-模式">一、AutoGen 的两种 Human-in-the-loop 模式</h2>
+<p>AutoGen 0.4 的 AgentChat 给了两条路。第一条是在 run 内让框架“叫”人提供输入；第二条是让 run 先停下来，把控制权交还给应用，下一轮 <code>run()</code> 再把人的输入作为 <code>task</code> 注入。</p>
+<h3 id="1-1-模式一：run-内反馈——UserProxyAgent-input-func">1.1 模式一：run 内反馈——<code>UserProxyAgent</code> + <code>input_func</code></h3>
+<p>这是最直观的一条路：把 <code>UserProxyAgent</code> 放进 team 的参与者列表，至于什么时候问人，由 team 的选择逻辑（round-robin、selector prompt）决定。轮到 proxy 时，框架直接调用 <code>input_func</code> 取输入。</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> autogen_agentchat<span class="token punctuation">.</span>agents <span class="token keyword">import</span> AssistantAgent<span class="token punctuation">,</span> UserProxyAgent
+<span class="token keyword">from</span> autogen_agentchat<span class="token punctuation">.</span>conditions <span class="token keyword">import</span> TextMentionTermination
+<span class="token keyword">from</span> autogen_agentchat<span class="token punctuation">.</span>teams <span class="token keyword">import</span> RoundRobinGroupChat
+<span class="token keyword">from</span> autogen_agentchat<span class="token punctuation">.</span>ui <span class="token keyword">import</span> Console
+<span class="token keyword">from</span> autogen_ext<span class="token punctuation">.</span>models<span class="token punctuation">.</span>openai <span class="token keyword">import</span> OpenAIChatCompletionClient
+
+model_client <span class="token operator">=</span> OpenAIChatCompletionClient<span class="token punctuation">(</span>model<span class="token operator">=</span><span class="token string">"gpt-4o-mini"</span><span class="token punctuation">)</span>
+assistant <span class="token operator">=</span> AssistantAgent<span class="token punctuation">(</span><span class="token string">"assistant"</span><span class="token punctuation">,</span> model_client<span class="token operator">=</span>model_client<span class="token punctuation">)</span>
+user_proxy <span class="token operator">=</span> UserProxyAgent<span class="token punctuation">(</span><span class="token string">"user_proxy"</span><span class="token punctuation">,</span> input_func<span class="token operator">=</span><span class="token builtin">input</span><span class="token punctuation">)</span>  <span class="token comment"># 默认走 console</span>
+
+termination <span class="token operator">=</span> TextMentionTermination<span class="token punctuation">(</span><span class="token string">"APPROVE"</span><span class="token punctuation">)</span>
+team <span class="token operator">=</span> RoundRobinGroupChat<span class="token punctuation">(</span><span class="token punctuation">[</span>assistant<span class="token punctuation">,</span> user_proxy<span class="token punctuation">]</span><span class="token punctuation">,</span> termination_condition<span class="token operator">=</span>termination<span class="token punctuation">)</span>
+
+stream <span class="token operator">=</span> team<span class="token punctuation">.</span>run_stream<span class="token punctuation">(</span>task<span class="token operator">=</span><span class="token string">"Write a 4-line poem about the ocean."</span><span class="token punctuation">)</span>
+<span class="token keyword">await</span> Console<span class="token punctuation">(</span>stream<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>input_func</code> 的签名是 <code>(prompt: str, cancellation_token: CancellationToken | None) -&gt; str</code>，默认就是 Python 内建的 <code>input</code>。如果把它换成基于 <code>await receive_json()</code> 的函数，console 应用也能接到 web 前端：</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">async</span> <span class="token keyword">def</span> <span class="token function">_user_input</span><span class="token punctuation">(</span>prompt<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> cancellation_token<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    data <span class="token operator">=</span> <span class="token keyword">await</span> websocket<span class="token punctuation">.</span>receive_json<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    message <span class="token operator">=</span> TextMessage<span class="token punctuation">.</span>model_validate<span class="token punctuation">(</span>data<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> message<span class="token punctuation">.</span>content
+
+user_proxy <span class="token operator">=</span> UserProxyAgent<span class="token punctuation">(</span><span class="token string">"user_proxy"</span><span class="token punctuation">,</span> input_func<span class="token operator">=</span>_user_input<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>FastAPI、ChainLit 和 Streamlit 的文档里都能找到类似样例。</p>
+<p>问题也从这里开始：team 会在 <code>input_func</code> 上阻塞。AutoGen 官方文档原话写道：</p>
+<blockquote>
+<p>This call blocks the execution of the team until the user provides feedback or errors out. The team’s state cannot be saved or resumed during this wait.</p>
+</blockquote>
+<p>换句话说，<code>UserProxyAgent</code> 一旦被轮到并开始等人，team state 就停在一个无法保存或恢复的中间态。Worker crash、机器重启、等待超时，任何一个都可能让这段对话直接结束。所以它更适合 approve / deny 这样的短交互，而不是需要隔夜恢复的长会话。</p>
+<p>配套的 <code>UserInputRequestedEvent</code> 仍然有用：它至少告诉应用，proxy 当前停在了哪个等待点。</p>
+<h3 id="1-2-模式二：run-间反馈——max-turns-与-HandoffTermination">1.2 模式二：run 间反馈——<code>max_turns</code> 与 <code>HandoffTermination</code></h3>
+<p>如果对话需要跨轮次、可序列化，甚至要在另一台设备上 resume，AutoGen 提供了另外两个机制。它们可以叠着用：</p>
+<p><strong>(a) <code>max_turns</code>：硬性上限</strong></p>
+<p><code>max_turns=1</code> 就够构成最小的 chatbot loop：team 跑完一个 agent reply 就停，把结果交给用户；用户输入回来后，再启动下一轮。每一轮之间，team state 都可以 dump 到数据库。</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">team <span class="token operator">=</span> RoundRobinGroupChat<span class="token punctuation">(</span><span class="token punctuation">[</span>assistant<span class="token punctuation">]</span><span class="token punctuation">,</span> max_turns<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+task <span class="token operator">=</span> <span class="token string">"Write a 4-line poem about the ocean."</span>
+<span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+    stream <span class="token operator">=</span> team<span class="token punctuation">.</span>run_stream<span class="token punctuation">(</span>task<span class="token operator">=</span>task<span class="token punctuation">)</span>
+    <span class="token keyword">await</span> Console<span class="token punctuation">(</span>stream<span class="token punctuation">)</span>
+    task <span class="token operator">=</span> <span class="token builtin">input</span><span class="token punctuation">(</span><span class="token string">"Enter your feedback (type 'exit' to leave): "</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> task<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">"exit"</span><span class="token punctuation">:</span>
+        <span class="token keyword">break</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>turn counter 会在每次 run 时重置，但对话历史和 round-robin 的位置由 team 内部维护。<code>RoundRobinGroupChat</code>、<code>SelectorGroupChat</code> 和 <code>Swarm</code> 都支持 <code>max_turns</code>。</p>
+<p><strong>(b) <code>HandoffTermination</code>：让 agent 自己决定何时要人</strong></p>
+<p>这种更优雅。Agent 自己判断&quot;我做不下去了，需要人介入&quot;，主动 handoff 给 <code>&quot;user&quot;</code> target，再由 termination condition 捕捉这个事件、停掉整个 team：</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> autogen_agentchat<span class="token punctuation">.</span>base <span class="token keyword">import</span> Handoff
+<span class="token keyword">from</span> autogen_agentchat<span class="token punctuation">.</span>conditions <span class="token keyword">import</span> HandoffTermination<span class="token punctuation">,</span> TextMentionTermination
+
+lazy_agent <span class="token operator">=</span> AssistantAgent<span class="token punctuation">(</span>
+    <span class="token string">"lazy_assistant"</span><span class="token punctuation">,</span>
+    model_client<span class="token operator">=</span>model_client<span class="token punctuation">,</span>
+    handoffs<span class="token operator">=</span><span class="token punctuation">[</span>Handoff<span class="token punctuation">(</span>target<span class="token operator">=</span><span class="token string">"user"</span><span class="token punctuation">,</span> message<span class="token operator">=</span><span class="token string">"Transfer to user."</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    system_message<span class="token operator">=</span><span class="token punctuation">(</span>
+        <span class="token string">"If you cannot complete the task, transfer to user. "</span>
+        <span class="token string">"Otherwise, when finished, respond with 'TERMINATE'."</span>
+    <span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+team <span class="token operator">=</span> RoundRobinGroupChat<span class="token punctuation">(</span>
+    <span class="token punctuation">[</span>lazy_agent<span class="token punctuation">]</span><span class="token punctuation">,</span>
+    termination_condition<span class="token operator">=</span>HandoffTermination<span class="token punctuation">(</span>target<span class="token operator">=</span><span class="token string">"user"</span><span class="token punctuation">)</span> <span class="token operator">|</span> TextMentionTermination<span class="token punctuation">(</span><span class="token string">"TERMINATE"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">await</span> Console<span class="token punctuation">(</span>team<span class="token punctuation">.</span>run_stream<span class="token punctuation">(</span>task<span class="token operator">=</span><span class="token string">"What is the weather in New York?"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token comment"># team 停下，stop_reason 提示已 handoff 给 user</span>
+<span class="token keyword">await</span> Console<span class="token punctuation">(</span>team<span class="token punctuation">.</span>run_stream<span class="token punctuation">(</span>task<span class="token operator">=</span><span class="token string">"The weather in New York is sunny."</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token comment"># 重新进入 run，agent 拿到 user 的输入继续工作</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>有几个点值得留意的是：</p>
+<ul>
+<li>termination 是复合条件 <code>handoff_termination | text_termination</code>，任意一个触发就停</li>
+<li><code>Swarm</code> 在 user-handoff 之后 resume 时，<code>task</code> 必须是 <code>HandoffMessage</code>，还得指明下一步交给谁，接口比 <code>RoundRobinGroupChat</code> 严格</li>
+<li>state 只要 terminate 了就是干净、可序列化的，后面接什么持久化方案都行</li>
+</ul>
+<h3 id="1-3-两种模式的对比">1.3 两种模式的对比</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>模式一（run 内）</th>
+<th>模式二（run 间）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>代表 API</strong></td>
+<td><code>UserProxyAgent</code> + <code>input_func</code></td>
+<td><code>max_turns</code> / <code>HandoffTermination</code></td>
+</tr>
+<tr>
+<td><strong>team 执行</strong></td>
+<td>阻塞等待</td>
+<td>完全 terminate</td>
+</tr>
+<tr>
+<td><strong>状态可持久化</strong></td>
+<td>等待期间不可序列化</td>
+<td>任意时刻可 dump</td>
+</tr>
+<tr>
+<td><strong>谁决定要人</strong></td>
+<td>team 的选择逻辑轮到 proxy</td>
+<td>turn 上限 / termination condition</td>
+</tr>
+<tr>
+<td><strong>输入怎么进来</strong></td>
+<td><code>input_func</code> 返回</td>
+<td>下一轮 <code>run(task=...)</code> 注入</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>同步审批、快速确认</td>
+<td>长会话、异步 UI、跨设备 resume</td>
+</tr>
+<tr>
+<td><strong>典型 failure mode</strong></td>
+<td>等待中 worker 死掉 → 会话丢失</td>
+<td>重 run 时 task 注入错误 → 上下文错乱</td>
+</tr>
+</tbody>
+</table>
+<p>这两种模式与其说是实现细节上的差异，不如说是两档不同的 tolerance——这一点放到第三部分再说。</p>
+<h3 id="1-4-顺便回看一下旧-0-2-API-的-human-input-mode">1.4 顺便回看一下旧 0.2 API 的 <code>human_input_mode</code></h3>
+<p>AutoGen 0.2 的 <code>UserProxyAgent</code> 把 HITL 的策略全压在一个 <code>human_input_mode</code> 参数上：</p>
+<table>
+<thead>
+<tr>
+<th>取值</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ALWAYS</code></td>
+<td>每次收到消息都问人（<code>UserProxyAgent</code> 的默认值）</td>
+</tr>
+<tr>
+<td><code>TERMINATE</code></td>
+<td>只在收到 termination message 或达到 <code>max_consecutive_auto_reply</code> 时问</td>
+</tr>
+<tr>
+<td><code>NEVER</code></td>
+<td>永不问，完全自主</td>
+</tr>
+</tbody>
+</table>
+<p>这个设计更加简单直观，但是把&quot;何时问人&quot;和&quot;怎么问人&quot;耦合在了同一个 agent 上。0.4 则通过<code>UserProxyAgent</code> 的<code>input_func</code>控制问人的方式，通过termination condition + team selection logic控制问人的时机。</p>
+<hr>
+<h2 id="二、Fowler-的-非确定性-与软件工程的-tolerance">二、Fowler 的&quot;非确定性&quot;与软件工程的 tolerance</h2>
+<p>最近软件体系架构课程分享了一篇敏捷开发先驱Fowler的文章。主题大致是说“智能体驱动的软件开发使得软件工程的确定性终结了”。读到这篇文章的时候我便联想到了最近学习的Autogen框架，软件工程的非确定性是否能用HITL思想改善甚至解决？因此我特地找了他2025 年 11 月 19 日的 <a target="_blank" rel="noopener external nofollow noreferrer" href="https://newsletter.pragmaticengineer.com/p/martin-fowler">The Pragmatic Engineer 播客</a>，节目标题是 “How AI will change software engineering – with Martin Fowler”。我把跟今天主题相关的几句原话摘出来：</p>
+<blockquote>
+<p>“It’s a whole new way of thinking. It’s got some interesting parallels to other forms of engineering.”</p>
+</blockquote>
+<blockquote>
+<p>“What are the tolerances of the non-determinism that we have to deal with?”</p>
+</blockquote>
+<blockquote>
+<p>“We need to realize that we can’t skate too close to the edge because otherwise we’re going to have some bridges collapsing. We’re going to have some noticeable crashes.”</p>
+</blockquote>
+<p>Fowler 的妻子是结构工程师：</p>
+<blockquote>
+<p>“My wife’s a structural engineer. She always thinks in terms of what are the tolerances, how much extra stuff do I have to do beyond what the math tells me because I need it for tolerances.”</p>
+</blockquote>
+<p>结构工程里的 tolerance 思维可以用一句话概括：你知道材料的理论强度，但你永远按最坏情况去算余量。木头不会每根都达到手册上的杨氏模量，混凝土的实际抗压强度会随施工波动，所以工程师会在数学算出来的&quot;刚好够&quot;之上，再加一倍、两倍、三倍。</p>
+<p>Fowler 的论点是，软件工程要进非确定性时代了，但软件工程师的思维范式还停在确定性时代。</p>
+<h3 id="2-1-软件工程的-确定性惯性">2.1 软件工程的&quot;确定性惯性&quot;</h3>
+<p>确定性计算可以理解为二元的，结果要么对要么错，错了就 debug，调到对为止。我们整个学科的工具链都是搭在这个假设上的：</p>
+<ul>
+<li><strong>单元测试</strong>：input X → output Y 是固定的</li>
+<li><strong>CI gate</strong>：通过就 deploy，不通过就 fail</li>
+<li><strong>Refactoring</strong>：行为完全不变才叫安全</li>
+<li><strong>Debugging</strong>：bug 是可复现的，复现不了就不算 bug</li>
+</ul>
+<p>但LLM 输出是本质“许愿”的。同一个 prompt 跑两次拿到不同结果在 LLM 里是 baseline。</p>
+<h3 id="2-2-Fowler-所担心的">2.2 Fowler 所担心的</h3>
+<p>那段访谈纪要我反复读了几遍，感觉 Fowler 最担心的不是非确定性本身——他显然觉得这是躲不掉的趋势——而是工程师对它的低估。</p>
+<blockquote>
+<p>“We can’t skate too close to the edge.”</p>
+</blockquote>
+<p>“滑得离边缘太近”，说的是团队默认 AI 是 “deterministic-enough”，把 tolerance 余量压到极低，结果某个本不该出错的边缘场景把生产环境带崩。Fowler 特别点了 security 是 first concern——一个检测 SQL injection 的 prompt，99.5% 准确率你今天可能就敢上线了，可那 0.5% 偏偏落在拖库的攻击上，那就是 “some bridges collapsing”。</p>
+<p>有意思的是，Fowler 自己 2011 年写过一篇 <a target="_blank" rel="noopener external nofollow noreferrer" href="https://martinfowler.com/articles/nonDeterminism.html"><em>Eradicating Non-Determinism in Tests</em></a>——那会儿他的立场是把 non-determinism 当 bug 去根除。15 年过去立场变了，但变的不是原则，而是 non-determinism 的来源：当年是测试基础设施的脏数据 / race condition，那是能根除的；今天是 LLM 本身的统计性质，根除不掉。</p>
+<h3 id="2-3-Rakia-Bensassi-的延伸：从建筑师到园丁">2.3 Rakia Bensassi 的延伸：从建筑师到园丁</h3>
+<p><a target="_blank" rel="noopener external nofollow noreferrer" href="https://rakiabensassi.substack.com/p/the-death-of-the-deterministic-developer">Rakia Bensassi 在 Substack 上写过一篇 <em>The Death of the Deterministic Developer</em></a>，把 Fowler 的观点往更宽的方向拉了拉，提出 Plan-Driven Development 的破产：传统软工默认&quot;项目一开始就知道所有信息&quot;，但云时代加上 AI 时代，这个假设早就失效了。</p>
+<p>她那个比喻挺有画面感——别再当建筑师了，开始当园丁。“You plant seeds. You see what grows. You prune what doesn’t.”</p>
+<p>这种 mindset shift 落到工程实践上，其实就是把&quot;控制论&quot;那个反馈环嵌进系统设计的每一层：你不再是写好规则跑就完事，而是持续盯着系统输出、随时干预、必要时把人拉进来。</p>
+<hr>
+<h2 id="三、把-HITL-看成-tolerance-的工程化实现">三、把 HITL 看成 tolerance 的工程化实现</h2>
+<p>到这里我把前两部分放一起重读，发现几个对应关系挺清楚。</p>
+<p>HITL 不是&quot;LLM 不够好所以加个人&quot;的补救——它是非确定性系统的 tolerance 在工程层面的实例化。Fowler 在结构工程里说的&quot;多算一倍余量&quot;，搬到 agent 系统里没法翻译成&quot;多跑两次推理&quot;或&quot;加大 temperature&quot;，那些只是改了概率分布，没真正引入外部检查。真正的余量得来自异质 verifier，而最便宜也最强的那个异质 verifier，就是 human。</p>
+<p>那 AutoGen 这两种 HITL 模式分别对应什么 tolerance？</p>
+<h3 id="3-1-模式一对应-高-cost、高-tolerance">3.1 模式一对应&quot;高 cost、高 tolerance&quot;</h3>
+<p><code>UserProxyAgent</code> + <code>input_func</code> 是同步强约束：team 必须等人点头才能继续。这一档 tolerance 很高（人是最后的把关者），但 cost 也高（阻塞、不可序列化、延迟全看人）。</p>
+<p>它真正适合的，是 Fowler 那种 “bridges collapsing” 级别的风险——</p>
+<ul>
+<li><strong>不可逆操作的确认</strong>：发布到生产、转账、给客户发邮件</li>
+<li><strong>安全敏感</strong>：生成的 SQL 要不要执行、生成的 shell 命令要不要 run</li>
+<li><strong>法律 / 合规检查</strong>：合同条款、隐私字段输出前的二次确认</li>
+</ul>
+<p>这类场景，应用 cannot skate close to the edge，所以宁可阻塞、宁可丢 session，也要让人 explicit 确认一下。</p>
+<h3 id="3-2-模式二对应-低-cost、低-tolerance">3.2 模式二对应&quot;低 cost、低 tolerance&quot;</h3>
+<p><code>max_turns</code> / <code>HandoffTermination</code> 是异步弱约束：每轮 run 之间留个缝给人，但不强制人必须介入——很多时候用户只是在聊天，并没在&quot;审批&quot;什么。</p>
+<p>它对应的场景：</p>
+<ul>
+<li><strong>长对话 chatbot</strong>：每轮都要等用户回话，本来就是天然的 turn-by-turn 节奏</li>
+<li><strong>任务可中断</strong>：agent 试五分钟不行了 handoff 给人，人给一行 hint，再 handoff 回去</li>
+<li><strong>跨设备 / 跨会话恢复</strong>：今天在桌面开始的对话，明天在手机接着聊</li>
+</ul>
+<p>这档 tolerance 比较&quot;软&quot;，但因为天生可持久化、不阻塞，反而能撑起很长很复杂的会话。它的危险在另一头：状态一旦 dump 出去，第二天 resume 时人对当时的上下文已经忘干净了，做出的决策未必真的基于上下文——这也是一种 “skating close to the edge”，只不过 edge 跑到人这边来了。</p>
+<h3 id="3-3-一张映射表">3.3 一张映射表</h3>
+<p>强行把两边对齐：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>结构工程（Fowler 类比）</th>
+<th>AutoGen 模式一</th>
+<th>AutoGen 模式二</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>被保护的对象</strong></td>
+<td>桥梁、建筑</td>
+<td>不可逆 / 高 stake 操作</td>
+<td>长对话 / 流程任务</td>
+</tr>
+<tr>
+<td><strong>tolerance 来源</strong></td>
+<td>材料余量 + 检查工序</td>
+<td>人在 loop 里阻塞确认</td>
+<td>周期性 handoff + 人审</td>
+</tr>
+<tr>
+<td><strong>极限场景</strong></td>
+<td>地震、超载</td>
+<td>prompt injection / 恶意 SQL</td>
+<td>LLM 跑偏 / 长期 hallucination 累积</td>
+</tr>
+<tr>
+<td><strong>失败代价</strong></td>
+<td>桥塌</td>
+<td>直接生产事故</td>
+<td>用户体验崩坏 + 信任损失</td>
+</tr>
+<tr>
+<td><strong>能否&quot;裸跑&quot;</strong></td>
+<td>可以，按理论值</td>
+<td>可以（去掉 user_proxy）</td>
+<td>可以（让 max_turns 拉得很大）</td>
+</tr>
+<tr>
+<td><strong>裸跑后果</strong></td>
+<td>偶尔倒一座</td>
+<td>大概率某天出事</td>
+<td>慢慢失控但难察觉</td>
+</tr>
+</tbody>
+</table>
+<p>Fowler 这套类比里我觉得最该记住的，是&quot;裸跑后果&quot;的不可见性才是真正的危险。桥塌是一次性事件，所有人都看到了，下一座设计会改。但 LLM agent 的失败往往是慢性的、统计的、被摊到无数次用户交互里——你可能两年都没意识到 production 每天在小幅犯错，直到哪天某个客户拿着一段 racist output 的截图挂上推特。</p>
+<h3 id="3-4-设计-HITL-时的几条原则（自己的总结）">3.4 设计 HITL 时的几条原则（自己的总结）</h3>
+<p>放在做 minimal-agent-harness 的语境里，我能想到几条经验性的原则：</p>
+<ol>
+<li><strong>HITL 不是&quot;要不要加&quot;，而是&quot;加在哪几个 cutpoint&quot;</strong>——一开始就把整条 trajectory 的 risk 点列出来：写文件、调外部 API、做不可逆操作、生成会被直接执行的东西，这些天然就是 HITL cutpoint。</li>
+<li><strong>同步 HITL 只留给不可逆操作</strong>——其余情况都走 async handoff。别图开发方便就到处插 blocking 的 <code>input_func</code>，那样系统会长得像个&quot;半人工&quot;的工单流，没有 agent 该有的样子。</li>
+<li><strong>HITL 之后的&quot;恢复成本&quot;得算进 tolerance 预算</strong>——<code>HandoffTermination</code> 之后人 30 分钟才回来，这段时间的 context decay、用户上下文遗忘，都是被吃掉的余量。</li>
+<li><strong>HITL 的 fallback 也要设计</strong>——人不回怎么办？timeout 之后默认 deny 还是默认 approve？这个默认值本身就是一个 tolerance 决定。</li>
+<li><strong>observability 永远是 HITL 的孪生兄弟</strong>——人之所以能介入，前提是他看得见。看不见的 agent 行为，再好的 HITL 框架也接不进来。</li>
+</ol>
+<hr>
+<h2 id="四、一点更宽的想法">四、一点更宽的想法</h2>
+<p>再往后退一步看，Fowler 的核心论点其实可以这么讲：软件工程师一直在跟不确定性打交道，只是过去我们成功地把它压到了 OS 层、协议层、硬件层底下，让 application 层白白享受了三十年的&quot;伪确定性&quot;假期。LLM 并没有创造新的不确定性，它只是把不确定性从底层抬到了 application 层、抬到了 prompt 这一层、抬到了 user-facing 行为这一层。</p>
+<p>抬上来之后，工程师反倒得去学结构工程师、医生、飞行员一直在用的 tolerance 思维。这事说远不远——手术室的 surgical timeout、航空的 checklist、CI 里的 review gate、金融的 4-eye principle，全是同一种思维的不同实例。HITL 在 LLM agent 里扮演的角色，和这些场景里的 review gate 没有本质区别。</p>
+<p>唯一不太一样的是：LLM 给了我们一次重新挑 tolerance 等级的机会。过去 review gate 加在哪儿，是历史和制度定下来的；今天我们从零写一个 agent 系统，是自己在白纸上决定&quot;哪几个 cutpoint 要 human&quot;。从这个角度看，Fowler 那句 “we need to realize that we can’t skate too close to the edge”，其实是在提醒我们：这一代工程师面对的是一个 design choice，而这个 choice 的代价，会写进未来十年的 production incident report 里。</p>
+<hr>
+<h2 id="结语">结语</h2>
+<p>AutoGen 的两种 HITL 模式，从技术上看是 API 的两条路径，但放到 Fowler 的非确定性视角下，它们其实是 tolerance 工程化的两种方法论——一种把人当硬 gate（同步、阻塞、专供不可逆操作），一种把人当软审查（异步、可恢复、专供长会话）。</p>
+<p>把人塞回 loop 里，不是 LLM 应用的过渡形态，而是非确定性系统绕不开的一块。想清楚这件事，可能比记住任何一个具体 API 都有用。</p>
+<p>如果你也在做 agent 系统相关的工程，希望这篇笔记里关于 tolerance 的几点观察能对你有用。</p>
+<hr>
+<p><strong>参考资料</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener external nofollow noreferrer" href="https://microsoft.github.io/autogen/stable/user-guide/agentchat-user-guide/tutorial/human-in-the-loop.html">Human-in-the-Loop — AutoGen AgentChat 官方文档</a></li>
+<li><a target="_blank" rel="noopener external nofollow noreferrer" href="https://microsoft.github.io/autogen/0.2/docs/reference/agentchat/user_proxy_agent/">agentchat.user_proxy_agent — AutoGen 0.2 文档</a></li>
+<li><a target="_blank" rel="noopener external nofollow noreferrer" href="https://newsletter.pragmaticengineer.com/p/martin-fowler">Martin Fowler on The Pragmatic Engineer Podcast (2025-11-19)</a></li>
+<li><a target="_blank" rel="noopener external nofollow noreferrer" href="https://thenewstack.io/martin-fowler-on-preparing-for-ais-nondeterministic-computing/">Martin Fowler on Preparing for AI’s Nondeterministic Computing — The New Stack</a></li>
+<li><a target="_blank" rel="noopener external nofollow noreferrer" href="https://rakiabensassi.substack.com/p/the-death-of-the-deterministic-developer">The Death of the Deterministic Developer — Rakia Bensassi</a></li>
+<li><a target="_blank" rel="noopener external nofollow noreferrer" href="https://martinfowler.com/articles/nonDeterminism.html">Eradicating Non-Determinism in Tests — Martin Fowler (2011)</a></li>
+</ul>
+</div>
+
+        
+        <div class="post-tags">
+          <span class="post-tags-label">标签:</span>
+          
+            <a class="post-tag" href="/tags/AutoGen/">#AutoGen</a>
+          
+            <a class="post-tag" href="/tags/Human-in-the-loop/">#Human-in-the-loop</a>
+          
+            <a class="post-tag" href="/tags/Agent/">#Agent</a>
+          
+            <a class="post-tag" href="/tags/Multi-Agent/">#Multi-Agent</a>
+          
+            <a class="post-tag" href="/tags/LLM/">#LLM</a>
+          
+            <a class="post-tag" href="/tags/Martin-Fowler/">#Martin Fowler</a>
+          
+            <a class="post-tag" href="/tags/%E9%9D%9E%E7%A1%AE%E5%AE%9A%E6%80%A7/">#非确定性</a>
+          
+            <a class="post-tag" href="/tags/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/">#软件工程</a>
+          
+        </div>
+        
+
+        <nav class="post-pager" aria-label="post navigation">
+          
+            <a class="post-pager-item post-pager-prev" href="/posts/8f5c2d1a/">
+              <span class="post-pager-label">上一篇</span>
+              <span class="post-pager-title">研究周报 · 2026.07.18–08.07 · Orchestration Trace、LLM-MAS系统侧与经典RL Pipeline</span>
+            </a>
+          
+          
+            <a class="post-pager-item post-pager-next" href="/posts/a3d7f21e/">
+              <span class="post-pager-label">下一篇</span>
+              <span class="post-pager-title">研究周报 · 2026.04.26–05.09 · C3/CCPO 反事实信用分配与 minimal-agent-harness 搭建</span>
+            </a>
+          
+        </nav>
+
+        
+
+<section class="post-comments">
+  <script src="https://giscus.app/client.js"
+    data-repo="yo666666yo/yo666666yo.github.io"
+    data-repo-id="R_kgDOSLiRUQ"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOSLiRUc4C7m3u"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="zh-CN"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async></script>
+</section>
+
+
+      </div>
+    </div>
+  </div>
+
+  <button class="toc-fab" type="button" data-toc-open aria-label="Open table of contents" aria-controls="article-toc-drawer" hidden>
+    <span class="toc-fab-icon" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+  </button>
+
+  <div class="toc-drawer" id="article-toc-drawer" data-toc-drawer aria-hidden="true" hidden>
+    <div class="toc-drawer-backdrop" data-toc-close></div>
+    <section class="toc-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="toc-drawer-title" tabindex="-1">
+      <div class="toc-drawer-header">
+        <h2 id="toc-drawer-title">Contents</h2>
+        <button class="toc-drawer-close" type="button" data-toc-close aria-label="Close table of contents">
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="toc-drawer-scroll">
+        <ol class="article-toc-list toc-drawer-list" data-toc-mobile-list></ol>
+      </div>
+    </section>
+  </div>
+</article>
+
+  </main>
+
+  <hr class="section-divider" />
+
+  
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    
+    <ul class="social-list">
+      
+        
+        <li class="social-list-item">
+          <a href="https://github.com/yo666666yo" rel="noopener me external nofollow noreferrer" target="_blank" aria-label="Yoyo_Lee GitHub">
+            <span class="social-circle">
+              <span class="social-label">github</span>
+            </span>
+          </a>
+        </li>
+      
+      
+      <li class="social-list-item">
+        <a href="/atom.xml" rel="alternate" aria-label="rss">
+          <span class="social-circle"><span class="social-label">RSS</span></span>
+        </a>
+      </li>
+      
+    </ul>
+    
+
+    <div class="site-footer-copy">
+      
+        <span>Copyright &copy; Yoyo_Lee 2026</span>
+      
+      
+        <span class="site-footer-dot">·</span>
+        <span><a href="https://hexo.io/" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> · <a href="https://startbootstrap.com/theme/clean-blog" rel="noopener external nofollow noreferrer" target="_blank">Clean Blog</a></span>
+      
+    </div>
+  </div>
+</footer>
+
+  <script defer src="/js/clean-blog.js?v=20260427-2"></script>
+
+
+</body>
+</html>
