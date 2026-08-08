@@ -1,0 +1,402 @@
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<title>研究周报 · 2026.04.06–04.12 · 基础概念补齐与 LLM-MAS 论文精读 · Yoyo_Lee 的博客</title>
+<meta name="description" content="系统补齐 HMM / GRPO / PPO / MARFT / SFT vs RLHF 基础概念；精读 LangMARL、MHGPO 两篇 LLM 多智能体论文；确定申报书方向为 CAD-GRPO（credit assignment）。" />
+<meta name="keywords" content="AI,LLM,机器学习,深度学习,论文阅读,生活随笔,blog,Yoyo_Lee" />
+<meta name="author" content="Yoyo_Lee" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#FBFAF7" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#141310" media="(prefers-color-scheme: dark)" />
+<link rel="canonical" href="https://yoyo-lee.com/posts/13f375aa/" />
+
+<!-- Open Graph / Twitter -->
+<meta property="og:site_name" content="Yoyo_Lee 的博客" />
+<meta property="og:title" content="研究周报 · 2026.04.06–04.12 · 基础概念补齐与 LLM-MAS 论文精读" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://yoyo-lee.com/posts/13f375aa/" />
+<meta property="og:description" content="系统补齐 HMM / GRPO / PPO / MARFT / SFT vs RLHF 基础概念；精读 LangMARL、MHGPO 两篇 LLM 多智能体论文；确定申报书方向为 CAD-GRPO（credit assignment）。" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="file:///D:/blog/public/img/favicon.svg" type="image/svg+xml" />
+
+<link rel="alternate" type="application/atom+xml" title="Yoyo_Lee 的博客" href="file:///D:/blog/public/atom.xml" />
+
+
+<!-- Google Fonts (Lora for body, system font stack for UI) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" />
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous" />
+
+
+<link rel="stylesheet" href="file:///D:/blog/public/css/clean-blog.css?v=20260729-2" />
+
+
+
+
+
+</head>
+<body id="page-top" class="is-post">
+  
+<nav id="mainNav" class="navbar navbar-light" aria-label="主菜单">
+  <div class="navbar-container">
+    <a class="navbar-brand" href="file:///D:/blog/public/">Yoyo_Lee 的博客</a>
+    <button class="navbar-toggler" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="菜单">
+      菜单
+      <span class="navbar-toggler-icon" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+    </button>
+    <div class="navbar-collapse" id="navbarResponsive">
+      <div class="navbar-collapse-inner">
+      <form class="site-search" role="search" action="/search/" method="get" data-search-url="/search.xml" data-search-page-url="/search/" data-loading="正在搜索..." data-no-results="没有找到匹配文章" data-error="搜索索引暂时不可用">
+        <label class="sr-only" for="site-search-input">搜索文章</label>
+        <input id="site-search-input" class="site-search-input" type="search" name="q" placeholder="搜索文章..." autocomplete="off" spellcheck="false" aria-controls="site-search-results" aria-expanded="false" />
+        <button class="site-search-button" type="submit" aria-label="搜索">
+          <svg class="site-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10.8 5.2a5.6 5.6 0 1 0 0 11.2 5.6 5.6 0 0 0 0-11.2Zm-7.1 5.6a7.1 7.1 0 1 1 12.6 4.5l3.7 3.7-1.1 1.1-3.7-3.7A7.1 7.1 0 0 1 3.7 10.8Z" />
+          </svg>
+        </button>
+        <div id="site-search-results" class="site-search-results" role="listbox" hidden></div>
+      </form>
+      <ul class="navbar-nav">
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/">首页</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/categories/research/">研究</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/categories/life/">生活</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/categories/weekly/">周报</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/tags/">标签</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/archives/">归档</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/about/">关于</a>
+          </li>
+        
+      </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+  
+
+<header class="masthead masthead-post">
+  <div class="masthead-container">
+    <div class="masthead-inner">
+      
+        <div class="post-heading">
+          
+          <div class="post-kicker">
+            
+              <a class="post-kicker-cat" href="file:///D:/blog/public/categories/weekly/">周报</a>
+              <span class="post-kicker-sep" aria-hidden="true">·</span>
+            
+            <time datetime="2026-04-11T18:42:00.000Z">2026.04.12</time>
+            
+              <span class="post-kicker-sep" aria-hidden="true">·</span>
+              <span class="post-reading-stats" aria-label="文章字数和预计阅读时间">1,765 字 · 5 分钟</span>
+            
+          </div>
+          <div class="post-title-line">
+            <h1>研究周报 · 2026.04.06–04.12 · 基础概念补齐与 LLM-MAS 论文精读</h1>
+          </div>
+          <h2 class="subheading">系统补齐 HMM / GRPO / PPO / MARFT / SFT vs RLHF 基础概念；精读 LangMARL、MHGPO 两篇 LLM 多智能体论文；确定申报书方向为 CAD-GRPO（credit assignment）。</h2>
+          <span class="meta">
+            作者
+            <a href="file:///D:/blog/public/about/">Yoyo_Lee</a>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+</header>
+
+
+  <main id="main-content">
+    <article class="article article-post mb-4">
+  <div class="container article-container">
+    <div class="article-layout" data-article-layout>
+      <aside class="article-toc-sidebar" data-toc-sidebar hidden>
+        <nav class="article-toc" aria-label="Table of contents">
+          <div class="article-toc-header">
+            <span class="article-toc-title">Contents</span>
+            <button class="article-toc-collapse" type="button" data-toc-collapse aria-label="Collapse table of contents" aria-expanded="true">
+              <span aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="article-toc-scroll" data-toc-scroll>
+            <ol class="article-toc-list" data-toc-list></ol>
+          </div>
+        </nav>
+      </aside>
+
+      <div class="article-content-col">
+        <div class="post-body"><blockquote>
+<p>本周三件事：<strong>基础概念补齐 · LLM-MAS 论文精读 · 申报书撰写</strong>。<br>
+方向逐渐聚焦到 credit assignment。</p>
+</blockquote>
+<h2 id="本周计划">本周计划</h2>
+<ol>
+<li>补齐基础概念</li>
+<li>继续阅读 LLM-MAS 论文</li>
+<li>申报书撰写</li>
+</ol>
+<span id="more"></span>
+<hr>
+<h2 id="一、基础概念">一、基础概念</h2>
+<p>先是回头补了一些之前没有完全掌握的基础知识——在读多智能体 RL 的论文时，经常看到某些重复的概念但是一直没有理清它们之间的关系，遂系统过了一遍。</p>
+<p><strong>隐马尔可夫过程（HMM）</strong>：本质上就是系统的真实状态不可观测，只能通过观测去推断。这个思路其实和之前 PSR 框架里 ProbeCommitEnv 的设计一脉相承——其中的 partner type 就是隐状态，ego agent 只能通过观测（混合了 u 和 nuisance 的信号）间接推断它。</p>
+<p><strong>GRPO 和 PPO 算法</strong>：这两个是目前 LLM RL 训练的核心算法，之前没做过系统对比。PPO 是经典的 Actor-Critic 架构，核心是用 clip 机制约束策略更新幅度，避免一步走太远导致训练崩溃，但需要额外训练一个 value network（critic）来估计 baseline。GRPO 是 DeepSeek 在训练 R1 时提出的，直接去掉了 critic 网络，改用同一个 prompt 下 K 个 rollout 的组内相对排名来估计 advantage。GRPO 的 advantage 是 group-level 的，在多智能体场景下，单个 agent 不知道自己到底贡献了多少，因此需要研究信用分配问题。这也是我们申报书中 CAD-GRPO 要解决的 <strong>credit contamination</strong> 问题的根源。</p>
+<p><strong>MARFT（Multi-Agent Reinforcement Fine-Tuning）</strong>：多智能体场景下对 LLM 进行 RL 微调的基本范式。MARFT 提出了 Flex-MG formalism 来处理异步 LLM agent 的问题。标准的 MARL 假设所有 agent 同步决策，但在 LLM MAS 中，agent 有时候是按 turn 顺序交互的，因此把传统的 MARL 放到 LLM 场景下需要处理很多的 assumption mismatch。</p>
+<p><strong>SFT vs RLHF</strong>：之前一直搞混这两个概念，因为都是通过人的反馈来对机器进行优化微调。现在搞懂了——SFT 依赖固定标注数据集，RLHF 使用人类反馈来训练奖励模型。数据集的质量、代表性和结构直接影响模型的准确性、泛化能力和鲁棒性，因此 SFT 对数据集的要求极高。RLHF 则高度依赖于迭代式、可扩展的人类评估和偏好数据，先训一个 reward model 来捕获人类偏好，然后用 PPO/GRPO 这类策略优化方法去最大化这个 reward。这个近似化的 reward model 可能也是 reward hacking 的成因之一（猜测）。</p>
+<hr>
+<h2 id="二、阅读-LLM-MAS-论文">二、阅读 LLM-MAS 论文</h2>
+<p>精读了 LangMARL 和 MHGPO 两篇。</p>
+<h3 id="2-1-LangMARL-Natural-Language-Multi-Agent-Reinforcement-Learning">2.1 LangMARL: Natural Language Multi-Agent Reinforcement Learning</h3>
+<p>核心 idea 是把传统 MARL 中的 Centralized Training Decentralized Execution (CTDE) 范式完整搬到自然语言空间——把 REINFORCE 算法里每一步数值计算都替换成了一次 LLM 调用，把网络参数 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi></mrow><annotation encoding="application/x-tex">\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span></span></span></span> 换成了 prompt text。它用 LLM 实现了四个组件：</p>
+<ol>
+<li><strong>Language Policy Actor</strong>：每个 agent 维护一个文本形式的策略，执行去中心化的操作</li>
+<li><strong>Centralized Language Critic</strong>：用一个 LLM 充当中心化评论家，分析完整轨迹后给每个 agent 生成文本形式的 credit assignment</li>
+<li><strong>Language Policy Gradient Estimator</strong>：把 credit 信号转化为文本形式的&quot;梯度方向&quot;</li>
+<li><strong>Language Policy Optimizer</strong>：整合多条轨迹的梯度方向，更新文本策略</li>
+</ol>
+<p><img src="file:///D:/blog/public/img/weekly/image-20260412012101674.png" alt="LangMARL 架构示意"></p>
+<p>这篇论文做到了直接在语言空间做 credit assignment，不需要数值计算，也不需要修改模型参数。它的 Centralized Language Critic 如果真的和它所说的一样工作，那么确实能做到 per-agent 的 credit 分解，而且 critic 看到的是完整轨迹，理论上可以做因果推理。</p>
+<p>但和我们目前研究的工作相比，首先它的信用分配质量完全依赖于 critic LLM 的推理能力。传统 MARL 里的 credit assignment（比如 COMA 的 counterfactual baseline）可以证明在某些条件下分解是无偏的、方差是减小的。但是 LangMARL 的这个 Language critic 本质上就是让 GPT 看一遍轨迹然后判断谁的贡献大——本质上还是一个黑盒过程。论文实验主要通过 ablation（去掉 credit assignment 后性能下降）来间接说明其有效性，因此值得推敲。</p>
+<p>同时它的计算开销估计也不会低。虽然 LangMARL 不需要额外生成反事实轨迹（相比于 CCPO/C3），但它的每一步优化都需要多次 LLM 推理调用——critic 要对每条轨迹 × 每个 agent 生成 credit。这些推理开销在大规模训练中可并不 trivial。</p>
+<h3 id="2-2-MHGPO-Heterogeneous-Group-Based-Reinforcement-Learning-for-LLM-based-MAS">2.2 MHGPO: Heterogeneous Group-Based Reinforcement Learning for LLM-based MAS</h3>
+<p>这篇貌似是一篇非常经典的论文，Dr.MAS 和 StrongerMAS 都引用了这篇（好像是，记不太清了）。它解决的是多智能体场景下 GRPO 的<strong>异构 agent 分组策略</strong>问题。在标准 GRPO 中，同一个 group 里的 rollout 需要共享相同的 prompt，但在多智能体系统中，不同 agent 有不同的角色和输入，天然就是异构的。</p>
+<p>这篇论文提出了三种采样策略（之前师兄在分享的时候都讲过自己的理解了，我的理解也大差不差）：</p>
+<ul>
+<li><strong>Independent Sampling (IS)</strong>：每个 agent 独立采 K 个 rollout，互相不耦合。相当于把每个 agent 当成一个独立的单智能体 GRPO 来训，agent 之间的交互关系被切断了。总 rollout 数 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mi>n</mi><mo>×</mo><mi>G</mi></mrow><annotation encoding="application/x-tex">= n \times G</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">G</span></span></span></span>（n 个 agent，每个 G 条）。</li>
+</ul>
+<img src="file:///D:/blog/public/img/weekly/image-20260412022636367.png" alt="IS 采样策略" style="zoom:150%;" />
+<ul>
+<li>
+<p><strong>Fork-on-First (FoF)</strong>：只在第一个 agent（entry agent）这里 fork 出 G 个分支，后续的 agent 每个分支只跑一次（一对一）。这样 entry agent 形成同构 group（相同输入 prompt，G 个不同输出），而下游 agent 的输入天然是异构的（因为上游给的输入就不同），形成异构 group。</p>
+</li>
+<li>
+<p><strong>Round-Robin (RR)</strong>：按概率 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">p_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 随机选一个 agent 作为 fork point。在 fork point 之前的 agent 只跑一次，fork point 及之后的 agent 跑多次。相当于 IS 和 FoF 的折中。</p>
+</li>
+</ul>
+<img src="file:///D:/blog/public/img/weekly/image-20260412022706139.png" alt="RR 采样策略" style="zoom:150%;" />
+<p>训练使用的是一个三 agent 的 Multi-Agent Search System (MASS)：Rewriter → Reranker → Answerer，在 HotpotQA 上实验。</p>
+<p>在我看来，这三种采样策略的差异其实就是 <strong>fork 出多个分支的位置与时机不同</strong>。研究的就是在多 agent 的 pipeline 中，应该在哪个位置投入&quot;多采样&quot;的预算，才能既保证每个 agent 有足够的组内对比信号，又不让总的 rollout 开销爆炸。</p>
+<p>novelty 主要在工程设计层面，理论贡献不算大。</p>
+<hr>
+<h2 id="三、申报书">三、申报书</h2>
+<p>最近一直在忙活的申报书，目前初步定为 <strong>credit assignment 方向</strong>——希望能将观察性因果推断引入 GRPO 框架，即利用 GRPO 已有采样轨迹中的自然变异，通过统计回归分解团队奖励，实现零额外开销（或极低开销，这个 claim 到时候可能需要改一下）的信用分解。</p>
+<blockquote>
+<p>📄 <strong>申报书正文（课题全文）不在博客公开</strong>，仅保留上面这段概要说明。</p>
+</blockquote>
+</div>
+
+        
+        <div class="post-tags">
+          <span class="post-tags-label">标签:</span>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/LLM-MAS/">#LLM-MAS</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/GRPO/">#GRPO</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/credit-assignment/">#credit assignment</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/PPO/">#PPO</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/%E5%91%A8%E6%8A%A5/">#周报</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/LangMARL/">#LangMARL</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/MHGPO/">#MHGPO</a>
+          
+        </div>
+        
+
+        <nav class="post-pager" aria-label="post navigation">
+          
+            <a class="post-pager-item post-pager-prev" href="file:///D:/blog/public/posts/c05e1abd/">
+              <span class="post-pager-label">上一篇</span>
+              <span class="post-pager-title">研究周报 · 2026.04.12–04.18 · Credit Assignment Survey、SHARP 精读与 Q&amp;A</span>
+            </a>
+          
+          
+            <a class="post-pager-item post-pager-next" href="file:///D:/blog/public/posts/b7c1a984/">
+              <span class="post-pager-label">下一篇</span>
+              <span class="post-pager-title">多智能体 LLM RL 训练：当前 landscape</span>
+            </a>
+          
+        </nav>
+
+        
+
+<section class="post-comments">
+  <script src="https://giscus.app/client.js"
+    data-repo="yo666666yo/yo666666yo.github.io"
+    data-repo-id="R_kgDOSLiRUQ"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOSLiRUc4C7m3u"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="preferred_color_scheme"
+    data-lang="zh-CN"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async></script>
+</section>
+
+
+      </div>
+    </div>
+  </div>
+
+  <button class="toc-fab" type="button" data-toc-open aria-label="Open table of contents" aria-controls="article-toc-drawer" hidden>
+    <span class="toc-fab-icon" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+  </button>
+
+  <div class="toc-drawer" id="article-toc-drawer" data-toc-drawer aria-hidden="true" hidden>
+    <div class="toc-drawer-backdrop" data-toc-close></div>
+    <section class="toc-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="toc-drawer-title" tabindex="-1">
+      <div class="toc-drawer-grabber" data-toc-grabber aria-hidden="true"></div>
+      <div class="toc-drawer-header">
+        <h2 id="toc-drawer-title">Contents</h2>
+        <button class="toc-drawer-close" type="button" data-toc-close aria-label="Close table of contents">
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="toc-drawer-scroll">
+        <ol class="article-toc-list toc-drawer-list" data-toc-mobile-list></ol>
+      </div>
+    </section>
+  </div>
+</article>
+
+  </main>
+
+  <hr class="section-divider" />
+
+  
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    
+    <ul class="social-list">
+      
+        
+        <li class="social-list-item">
+          <a href="https://github.com/yo666666yo" rel="noopener me external nofollow noreferrer" target="_blank" aria-label="Yoyo_Lee GitHub">
+            <span class="social-circle">
+              <span class="social-label">github</span>
+            </span>
+          </a>
+        </li>
+      
+      
+      <li class="social-list-item">
+        <a href="file:///D:/blog/public/atom.xml" rel="alternate" aria-label="rss">
+          <span class="social-circle"><span class="social-label">RSS</span></span>
+        </a>
+      </li>
+      
+    </ul>
+    
+
+    <div class="site-footer-copy">
+      
+        <span>Copyright &copy; Yoyo_Lee 2026</span>
+      
+      
+        <span class="site-footer-dot">·</span>
+        <span><a href="https://hexo.io/" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> · <a href="https://startbootstrap.com/theme/clean-blog" rel="noopener external nofollow noreferrer" target="_blank">Clean Blog</a></span>
+      
+    </div>
+  </div>
+</footer>
+
+  <script defer src="file:///D:/blog/public/js/clean-blog.js?v=20260729-2"></script>
+
+
+<script>window.addEventListener("load",function(){setTimeout(function(){
+const targets = [
+  ['.nav-link', 'nav link'],
+  ['.navbar-toggler', 'nav toggler'],
+  ['.toc-fab', 'TOC FAB'],
+  ['.toc-drawer-close', 'drawer close'],
+  ['.article-toc-collapse', 'TOC collapse'],
+  ['.post-tag', 'tag chip'],
+  ['.code-copy-button', 'copy button'],
+  ['.pager .btn', 'pager btn'],
+  ['.back-to-top', 'back to top'],
+  ['.site-search', 'site search'],
+  ['.article-toc-sidebar', 'TOC sidebar'],
+  ['.toc-drawer-grabber', 'grabber'],
+  ['.tag-cloud-svg', 'tag cloud svg'],
+  ['.archive-post-title', 'archive title'],
+  ['.taxonomy-item a', 'taxonomy row'],
+];
+const out = {docScrollW: document.documentElement.scrollWidth, innerW: window.innerWidth, boxes: [], overflow: []};
+for (const [sel, name] of targets) {
+  document.querySelectorAll(sel).forEach((el, i) => {
+    if (i > 0) return;
+    const r = el.getBoundingClientRect();
+    const cs = getComputedStyle(el);
+    out.boxes.push({name, sel, w: +r.width.toFixed(1), h: +r.height.toFixed(1), display: cs.display, vis: cs.visibility, hidden: el.hasAttribute('hidden')});
+  });
+}
+document.querySelectorAll('body *').forEach(el => {
+  const r = el.getBoundingClientRect();
+  if (r.width > 0 && (r.right > window.innerWidth + 1 || r.left < -1)) {
+    const cs = getComputedStyle(el);
+    if (cs.position === 'fixed' || cs.visibility === 'hidden') return;
+    out.overflow.push({tag: el.tagName.toLowerCase(), cls: (el.className||'').toString().slice(0,60), left: +r.left.toFixed(1), right: +r.right.toFixed(1), w: +r.width.toFixed(1), sw: el.scrollWidth, cw: el.clientWidth, ox: cs.overflowX});
+  }
+});
+out.overflow = out.overflow.slice(0, 30);
+parent.postMessage("PROBE:"+JSON.stringify(out),"*");
+
+},600)});</script></body>
+</html>

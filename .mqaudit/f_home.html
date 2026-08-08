@@ -1,0 +1,453 @@
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<title>Yoyo_Lee 的博客</title>
+<meta name="description" content="记录 AI 研究、机器学习、LLM、论文阅读与日常观察的个人博客。" />
+<meta name="keywords" content="AI,LLM,机器学习,深度学习,论文阅读,生活随笔,blog,Yoyo_Lee" />
+<meta name="author" content="Yoyo_Lee" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#FBFAF7" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#141310" media="(prefers-color-scheme: dark)" />
+<link rel="canonical" href="https://yoyo-lee.com/index.html" />
+
+<!-- Open Graph / Twitter -->
+<meta property="og:site_name" content="Yoyo_Lee 的博客" />
+<meta property="og:title" content="Yoyo_Lee 的博客" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://yoyo-lee.com/index.html" />
+<meta property="og:description" content="记录 AI 研究、机器学习、LLM、论文阅读与日常观察的个人博客。" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="file:///D:/blog/public/img/favicon.svg" type="image/svg+xml" />
+
+<link rel="alternate" type="application/atom+xml" title="Yoyo_Lee 的博客" href="file:///D:/blog/public/atom.xml" />
+
+
+<!-- Google Fonts (Lora for body, system font stack for UI) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" />
+
+
+
+<link rel="stylesheet" href="file:///D:/blog/public/css/clean-blog.css?v=20260729-2" />
+
+
+
+
+
+</head>
+<body id="page-top" class="is-home">
+  
+<nav id="mainNav" class="navbar navbar-light" aria-label="主菜单">
+  <div class="navbar-container">
+    <a class="navbar-brand" href="file:///D:/blog/public/">Yoyo_Lee 的博客</a>
+    <button class="navbar-toggler" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="菜单">
+      菜单
+      <span class="navbar-toggler-icon" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+    </button>
+    <div class="navbar-collapse" id="navbarResponsive">
+      <div class="navbar-collapse-inner">
+      <form class="site-search" role="search" action="/search/" method="get" data-search-url="/search.xml" data-search-page-url="/search/" data-loading="正在搜索..." data-no-results="没有找到匹配文章" data-error="搜索索引暂时不可用">
+        <label class="sr-only" for="site-search-input">搜索文章</label>
+        <input id="site-search-input" class="site-search-input" type="search" name="q" placeholder="搜索文章..." autocomplete="off" spellcheck="false" aria-controls="site-search-results" aria-expanded="false" />
+        <button class="site-search-button" type="submit" aria-label="搜索">
+          <svg class="site-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10.8 5.2a5.6 5.6 0 1 0 0 11.2 5.6 5.6 0 0 0 0-11.2Zm-7.1 5.6a7.1 7.1 0 1 1 12.6 4.5l3.7 3.7-1.1 1.1-3.7-3.7A7.1 7.1 0 0 1 3.7 10.8Z" />
+          </svg>
+        </button>
+        <div id="site-search-results" class="site-search-results" role="listbox" hidden></div>
+      </form>
+      <ul class="navbar-nav">
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link active" href="file:///D:/blog/public/">首页</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/categories/research/">研究</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/categories/life/">生活</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/categories/weekly/">周报</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/tags/">标签</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/archives/">归档</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/about/">关于</a>
+          </li>
+        
+      </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+  
+
+<header class="masthead masthead-site">
+  <div class="masthead-container">
+    <div class="masthead-inner">
+      
+        <div class="site-heading">
+          <h1>Yoyo_Lee 的博客</h1>
+          <span class="subheading">研究笔记、论文阅读，以及日常生活分享</span>
+        </div>
+      
+    </div>
+  </div>
+</header>
+
+
+  <main id="main-content">
+    <div class="container home-container">
+  <div class="home-layout">
+    <section class="home-posts" aria-label="Recent posts">
+      
+        
+          
+<div class="post-preview">
+  <a href="file:///D:/blog/public/posts/e1c9f4a2/">
+    <h2 class="post-title">AutoGen 的 Human-in-the-loop 实现：从两种交互模式到 Fowler 的&#34;非确定性&#34;</h2>
+    
+      <h3 class="post-subtitle">拆 AutoGen AgentChat 的两种 Human-in-the-loop 模式：run 内 UserProxyAgent + input_func 的阻塞反馈，和 run 间 max_turns / HandoffTermination 的可持久化反馈。再结合 Martin Fowler 2025 年聊&#34;非确定性&#34;和 tolerance 的那期播客，谈谈我把 HITL 当成 tolerance 工程实现的一点理解。</h3>
+    
+  </a>
+  <p class="post-meta">
+    作者
+    <a href="file:///D:/blog/public/about/">Yoyo_Lee</a>
+    发表于
+    <time datetime="2026-05-17T14:00:00.000Z">2026-05-17</time>
+    
+      <span class="post-meta-sep">·</span>
+      <a class="post-meta-cat" href="file:///D:/blog/public/categories/research/">研究</a>
+    
+  </p>
+</div>
+<hr class="post-divider" />
+
+        
+          
+<div class="post-preview">
+  <a href="file:///D:/blog/public/posts/a3d7f21e/">
+    <h2 class="post-title">研究周报 · 2026.04.26–05.09 · C3/CCPO 反事实信用分配与 minimal-agent-harness 搭建</h2>
+    
+      <h3 class="post-subtitle">精读 C3、CCPO 两篇反事实信用分配论文，对比 message-level/agent-level counterfactual 与 CAD-GRPO 的 tradeoff；Q&amp;A 讨论全对/全错 trajectory 的价值（NPO/DAPO）；搭建 minimal-agent-harness 单 agent rollout 环境；规划 CAD-GRPO 实验框架。</h3>
+    
+  </a>
+  <p class="post-meta">
+    作者
+    <a href="file:///D:/blog/public/about/">Yoyo_Lee</a>
+    发表于
+    <time datetime="2026-05-09T14:00:00.000Z">2026-05-09</time>
+    
+      <span class="post-meta-sep">·</span>
+      <a class="post-meta-cat" href="file:///D:/blog/public/categories/weekly/">周报</a>
+    
+  </p>
+</div>
+<hr class="post-divider" />
+
+        
+          
+<div class="post-preview">
+  <a href="file:///D:/blog/public/posts/a1966f29/">
+    <h2 class="post-title">我为什么最喜欢晴雯——一个被误读的&#34;任性&#34;丫鬟</h2>
+    
+      <h3 class="post-subtitle">晴雯的判词里藏着曹公最锋利的八个字——&#34;心比天高，身为下贱&#34;。她不是红楼梦里最完美的人，但她是最真实的人。</h3>
+    
+  </a>
+  <p class="post-meta">
+    作者
+    <a href="file:///D:/blog/public/about/">Yoyo_Lee</a>
+    发表于
+    <time datetime="2026-04-29T14:00:00.000Z">2026-04-29</time>
+    
+      <span class="post-meta-sep">·</span>
+      <a class="post-meta-cat" href="file:///D:/blog/public/categories/life/">生活</a>
+    
+  </p>
+</div>
+<hr class="post-divider" />
+
+        
+          
+<div class="post-preview">
+  <a href="file:///D:/blog/public/posts/d9f3a1b7/">
+    <h2 class="post-title">你感觉现在的电影和音乐不如以前了，这不是错觉，但原因不是你想的那样</h2>
+    
+      <h3 class="post-subtitle">每天有120000首新歌上传到流媒体平台，Spotify上400万首曲目从未被播放。经典没有消失，它被埋在了噪音山里。</h3>
+    
+  </a>
+  <p class="post-meta">
+    作者
+    <a href="file:///D:/blog/public/about/">Yoyo_Lee</a>
+    发表于
+    <time datetime="2026-04-28T18:00:00.000Z">2026-04-29</time>
+    
+      <span class="post-meta-sep">·</span>
+      <a class="post-meta-cat" href="file:///D:/blog/public/categories/life/">生活</a>
+    
+  </p>
+</div>
+<hr class="post-divider" />
+
+        
+          
+<div class="post-preview">
+  <a href="file:///D:/blog/public/posts/c5cc3e48/">
+    <h2 class="post-title">Claude Code 架构深度解析：Tool Use Loop、Context Management 与 Multi-Agent 机制</h2>
+    
+      <h3 class="post-subtitle">基于 Claude Code 源码的深度架构分析，聚焦三大核心机制：无限循环内的流式工具调用、多层分级上下文管理、 以及多类型子代理的生命周期与协作体系。</h3>
+    
+  </a>
+  <p class="post-meta">
+    作者
+    <a href="file:///D:/blog/public/about/">Yoyo_Lee</a>
+    发表于
+    <time datetime="2026-04-26T19:00:00.000Z">2026-04-27</time>
+    
+      <span class="post-meta-sep">·</span>
+      <a class="post-meta-cat" href="file:///D:/blog/public/categories/research/">研究</a>
+    
+  </p>
+</div>
+<hr class="post-divider" />
+
+        
+          
+<div class="post-preview">
+  <a href="file:///D:/blog/public/posts/c48ba312/">
+    <h2 class="post-title">研究周报 · 2026.04.19–04.25 · DAPO/GiGPO/MAPPA/Dr.MAS 精读与 sub2api 实践</h2>
+    
+      <h3 class="post-subtitle">精读 DAPO、GiGPO、MAPPA、Dr.MAS，梳理 agent-level、step-level、token-level 信用分解的组合思路；开发 sub2api 令牌分发工具；学习 LangGraph、AutoGen、AgentScope、CAMEL 等经典 agent 框架实践。</h3>
+    
+  </a>
+  <p class="post-meta">
+    作者
+    <a href="file:///D:/blog/public/about/">Yoyo_Lee</a>
+    发表于
+    <time datetime="2026-04-25T14:00:00.000Z">2026-04-25</time>
+    
+      <span class="post-meta-sep">·</span>
+      <a class="post-meta-cat" href="file:///D:/blog/public/categories/weekly/">周报</a>
+    
+  </p>
+</div>
+<hr class="post-divider" />
+
+        
+          
+<div class="post-preview">
+  <a href="file:///D:/blog/public/posts/e59f32d9/">
+    <h2 class="post-title">春日随笔 - 一段关于专注的记忆</h2>
+    
+      <h3 class="post-subtitle">一段关于专注、阅读 Deep Work 和日常节奏的小记录。</h3>
+    
+  </a>
+  <p class="post-meta">
+    作者
+    <a href="file:///D:/blog/public/about/">Yoyo_Lee</a>
+    发表于
+    <time datetime="2026-04-24T12:00:00.000Z">2026-04-24</time>
+    
+      <span class="post-meta-sep">·</span>
+      <a class="post-meta-cat" href="file:///D:/blog/public/categories/life/">生活</a>
+    
+  </p>
+</div>
+<hr class="post-divider" />
+
+        
+          
+<div class="post-preview">
+  <a href="file:///D:/blog/public/posts/76ef95e9/">
+    <h2 class="post-title">Hello World - 博客开张</h2>
+    
+      <h3 class="post-subtitle">这篇开篇文章记录博客的定位、写作方向，并验证公式、代码块、引用等基础写作能力。</h3>
+    
+  </a>
+  <p class="post-meta">
+    作者
+    <a href="file:///D:/blog/public/about/">Yoyo_Lee</a>
+    发表于
+    <time datetime="2026-04-24T10:00:00.000Z">2026-04-24</time>
+    
+      <span class="post-meta-sep">·</span>
+      <a class="post-meta-cat" href="file:///D:/blog/public/categories/research/">研究</a>
+    
+  </p>
+</div>
+<hr class="post-divider" />
+
+        
+          
+<div class="post-preview">
+  <a href="file:///D:/blog/public/posts/c05e1abd/">
+    <h2 class="post-title">研究周报 · 2026.04.12–04.18 · Credit Assignment Survey、SHARP 精读与 Q&amp;A</h2>
+    
+      <h3 class="post-subtitle">精读 Pignatelli temporal CA survey、SHARP Shapley 信用分解、LangMARL 补充对比；回答上周关于 GRPO vs PPO、CAD-GRPO 岭回归、RLHF reward model 的追问；系统整理 policy gradient 方法演进与 GAE。</h3>
+    
+  </a>
+  <p class="post-meta">
+    作者
+    <a href="file:///D:/blog/public/about/">Yoyo_Lee</a>
+    发表于
+    <time datetime="2026-04-18T14:00:00.000Z">2026-04-18</time>
+    
+      <span class="post-meta-sep">·</span>
+      <a class="post-meta-cat" href="file:///D:/blog/public/categories/weekly/">周报</a>
+    
+  </p>
+</div>
+<hr class="post-divider" />
+
+        
+          
+<div class="post-preview">
+  <a href="file:///D:/blog/public/posts/13f375aa/">
+    <h2 class="post-title">研究周报 · 2026.04.06–04.12 · 基础概念补齐与 LLM-MAS 论文精读</h2>
+    
+      <h3 class="post-subtitle">系统补齐 HMM / GRPO / PPO / MARFT / SFT vs RLHF 基础概念；精读 LangMARL、MHGPO 两篇 LLM 多智能体论文；确定申报书方向为 CAD-GRPO（credit assignment）。</h3>
+    
+  </a>
+  <p class="post-meta">
+    作者
+    <a href="file:///D:/blog/public/about/">Yoyo_Lee</a>
+    发表于
+    <time datetime="2026-04-11T18:42:00.000Z">2026-04-12</time>
+    
+      <span class="post-meta-sep">·</span>
+      <a class="post-meta-cat" href="file:///D:/blog/public/categories/weekly/">周报</a>
+    
+  </p>
+</div>
+<hr class="post-divider" />
+
+        
+        
+        <div class="load-more-wrap">
+          <button class="btn btn-primary load-more-btn" data-next="/page/2/">加载更多</button>
+        </div>
+        
+      
+    </section>
+  </div>
+</div>
+
+  </main>
+
+  <hr class="section-divider" />
+
+  
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    
+    <ul class="social-list">
+      
+        
+        <li class="social-list-item">
+          <a href="https://github.com/yo666666yo" rel="noopener me external nofollow noreferrer" target="_blank" aria-label="Yoyo_Lee GitHub">
+            <span class="social-circle">
+              <span class="social-label">github</span>
+            </span>
+          </a>
+        </li>
+      
+      
+      <li class="social-list-item">
+        <a href="file:///D:/blog/public/atom.xml" rel="alternate" aria-label="rss">
+          <span class="social-circle"><span class="social-label">RSS</span></span>
+        </a>
+      </li>
+      
+    </ul>
+    
+
+    <div class="site-footer-copy">
+      
+        <span>Copyright &copy; Yoyo_Lee 2026</span>
+      
+      
+        <span class="site-footer-dot">·</span>
+        <span><a href="https://hexo.io/" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> · <a href="https://startbootstrap.com/theme/clean-blog" rel="noopener external nofollow noreferrer" target="_blank">Clean Blog</a></span>
+      
+    </div>
+  </div>
+</footer>
+
+  <script defer src="file:///D:/blog/public/js/clean-blog.js?v=20260729-2"></script>
+
+
+<script>window.addEventListener("load",function(){setTimeout(function(){
+const targets = [
+  ['.nav-link', 'nav link'],
+  ['.navbar-toggler', 'nav toggler'],
+  ['.toc-fab', 'TOC FAB'],
+  ['.toc-drawer-close', 'drawer close'],
+  ['.article-toc-collapse', 'TOC collapse'],
+  ['.post-tag', 'tag chip'],
+  ['.code-copy-button', 'copy button'],
+  ['.pager .btn', 'pager btn'],
+  ['.back-to-top', 'back to top'],
+  ['.site-search', 'site search'],
+  ['.article-toc-sidebar', 'TOC sidebar'],
+  ['.toc-drawer-grabber', 'grabber'],
+  ['.tag-cloud-svg', 'tag cloud svg'],
+  ['.archive-post-title', 'archive title'],
+  ['.taxonomy-item a', 'taxonomy row'],
+];
+const out = {docScrollW: document.documentElement.scrollWidth, innerW: window.innerWidth, boxes: [], overflow: []};
+for (const [sel, name] of targets) {
+  document.querySelectorAll(sel).forEach((el, i) => {
+    if (i > 0) return;
+    const r = el.getBoundingClientRect();
+    const cs = getComputedStyle(el);
+    out.boxes.push({name, sel, w: +r.width.toFixed(1), h: +r.height.toFixed(1), display: cs.display, vis: cs.visibility, hidden: el.hasAttribute('hidden')});
+  });
+}
+document.querySelectorAll('body *').forEach(el => {
+  const r = el.getBoundingClientRect();
+  if (r.width > 0 && (r.right > window.innerWidth + 1 || r.left < -1)) {
+    const cs = getComputedStyle(el);
+    if (cs.position === 'fixed' || cs.visibility === 'hidden') return;
+    out.overflow.push({tag: el.tagName.toLowerCase(), cls: (el.className||'').toString().slice(0,60), left: +r.left.toFixed(1), right: +r.right.toFixed(1), w: +r.width.toFixed(1), sw: el.scrollWidth, cw: el.clientWidth, ox: cs.overflowX});
+  }
+});
+out.overflow = out.overflow.slice(0, 30);
+parent.postMessage("PROBE:"+JSON.stringify(out),"*");
+
+},600)});</script></body>
+</html>

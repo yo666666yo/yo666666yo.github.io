@@ -1,0 +1,556 @@
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<title>Claude Code 架构深度解析：Tool Use Loop、Context Management 与 Multi-Agent 机制 · Yoyo_Lee 的博客</title>
+<meta name="description" content="基于 Claude Code 源码的深度架构分析，聚焦三大核心机制：无限循环内的流式工具调用、多层分级上下文管理、 以及多类型子代理的生命周期与协作体系。" />
+<meta name="keywords" content="AI,LLM,机器学习,深度学习,论文阅读,生活随笔,blog,Yoyo_Lee" />
+<meta name="author" content="Yoyo_Lee" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#FBFAF7" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#141310" media="(prefers-color-scheme: dark)" />
+<link rel="canonical" href="https://yoyo-lee.com/posts/c5cc3e48/" />
+
+<!-- Open Graph / Twitter -->
+<meta property="og:site_name" content="Yoyo_Lee 的博客" />
+<meta property="og:title" content="Claude Code 架构深度解析：Tool Use Loop、Context Management 与 Multi-Agent 机制" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://yoyo-lee.com/posts/c5cc3e48/" />
+<meta property="og:description" content="基于 Claude Code 源码的深度架构分析，聚焦三大核心机制：无限循环内的流式工具调用、多层分级上下文管理、 以及多类型子代理的生命周期与协作体系。" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="file:///D:/blog/public/img/favicon.svg" type="image/svg+xml" />
+
+<link rel="alternate" type="application/atom+xml" title="Yoyo_Lee 的博客" href="file:///D:/blog/public/atom.xml" />
+
+
+<!-- Google Fonts (Lora for body, system font stack for UI) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" />
+
+
+
+<link rel="stylesheet" href="file:///D:/blog/public/css/clean-blog.css?v=20260729-2" />
+
+
+
+
+
+</head>
+<body id="page-top" class="is-post">
+  
+<nav id="mainNav" class="navbar navbar-light" aria-label="主菜单">
+  <div class="navbar-container">
+    <a class="navbar-brand" href="file:///D:/blog/public/">Yoyo_Lee 的博客</a>
+    <button class="navbar-toggler" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="菜单">
+      菜单
+      <span class="navbar-toggler-icon" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+    </button>
+    <div class="navbar-collapse" id="navbarResponsive">
+      <div class="navbar-collapse-inner">
+      <form class="site-search" role="search" action="/search/" method="get" data-search-url="/search.xml" data-search-page-url="/search/" data-loading="正在搜索..." data-no-results="没有找到匹配文章" data-error="搜索索引暂时不可用">
+        <label class="sr-only" for="site-search-input">搜索文章</label>
+        <input id="site-search-input" class="site-search-input" type="search" name="q" placeholder="搜索文章..." autocomplete="off" spellcheck="false" aria-controls="site-search-results" aria-expanded="false" />
+        <button class="site-search-button" type="submit" aria-label="搜索">
+          <svg class="site-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10.8 5.2a5.6 5.6 0 1 0 0 11.2 5.6 5.6 0 0 0 0-11.2Zm-7.1 5.6a7.1 7.1 0 1 1 12.6 4.5l3.7 3.7-1.1 1.1-3.7-3.7A7.1 7.1 0 0 1 3.7 10.8Z" />
+          </svg>
+        </button>
+        <div id="site-search-results" class="site-search-results" role="listbox" hidden></div>
+      </form>
+      <ul class="navbar-nav">
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/">首页</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/categories/research/">研究</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/categories/life/">生活</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/categories/weekly/">周报</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/tags/">标签</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/archives/">归档</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/about/">关于</a>
+          </li>
+        
+      </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+  
+
+<header class="masthead masthead-post">
+  <div class="masthead-container">
+    <div class="masthead-inner">
+      
+        <div class="post-heading">
+          
+          <div class="post-kicker">
+            
+              <a class="post-kicker-cat" href="file:///D:/blog/public/categories/research/">研究</a>
+              <span class="post-kicker-sep" aria-hidden="true">·</span>
+            
+            <time datetime="2026-04-26T19:00:00.000Z">2026.04.27</time>
+            
+              <span class="post-kicker-sep" aria-hidden="true">·</span>
+              <span class="post-reading-stats" aria-label="文章字数和预计阅读时间">2,841 字 · 8 分钟</span>
+            
+          </div>
+          <div class="post-title-line">
+            <h1>Claude Code 架构深度解析：Tool Use Loop、Context Management 与 Multi-Agent 机制</h1>
+          </div>
+          <h2 class="subheading">基于 Claude Code 源码的深度架构分析，聚焦三大核心机制：无限循环内的流式工具调用、多层分级上下文管理、 以及多类型子代理的生命周期与协作体系。</h2>
+          <span class="meta">
+            作者
+            <a href="file:///D:/blog/public/about/">Yoyo_Lee</a>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+</header>
+
+
+  <main id="main-content">
+    <article class="article article-post mb-4">
+  <div class="container article-container">
+    <div class="article-layout" data-article-layout>
+      <aside class="article-toc-sidebar" data-toc-sidebar hidden>
+        <nav class="article-toc" aria-label="Table of contents">
+          <div class="article-toc-header">
+            <span class="article-toc-title">Contents</span>
+            <button class="article-toc-collapse" type="button" data-toc-collapse aria-label="Collapse table of contents" aria-expanded="true">
+              <span aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="article-toc-scroll" data-toc-scroll>
+            <ol class="article-toc-list" data-toc-list></ol>
+          </div>
+        </nav>
+      </aside>
+
+      <div class="article-content-col">
+        <div class="post-body"><blockquote>
+<p>本文是我对 Claude Code 源码架构的阅读笔记，重点剖析三个让我印象最深的核心设计：Tool Use Loop、Context Management 和 Multi-Agent Management。</p>
+</blockquote>
+<span id="more"></span>
+<hr>
+<h2 id="引言">引言</h2>
+<p>Claude Code 是 Anthropic 推出的 AI 编程助手 CLI 工具。与其他 AI 编程工具（如 Cursor、GitHub Copilot）不同，Claude Code 采用了一种&quot;模型自主决策 + 无限工具调用循环&quot;的架构范式。</p>
+<hr>
+<h2 id="1-Tool-Use-Loop：无限循环内的流式工具调用">1. Tool Use Loop：无限循环内的流式工具调用</h2>
+<h3 id="1-1-整体流程">1.1 整体流程</h3>
+<p>Claude Code 的核心是一个<strong>无限循环内的异步生成器</strong>。在 <code>query.ts</code> 的 <code>queryLoop()</code> 函数中，用一个 <code>while(true)</code> 包裹了所有逻辑。只有当模型不再输出 <code>tool_use</code>、达到预算上限、或被用户中断时才会退出。</p>
+<p>整体流程可以简化为：</p>
+<pre class="line-numbers language-none"><code class="language-none">用户输入 → 预处理（context 裁剪&#x2F;压缩）→ 调用模型 API（流式输出）→ &#123;
+    如果模型输出文本（无 tool_use）：
+        → 执行 stop hooks → 返回最终结果，退出
+    如果模型输出 tool_use：
+        → 执行工具 → 收集 tool_result → 拼回对话 → 进入下一轮迭代
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>每轮迭代之前，系统会做一轮 snip（裁剪过时消息）、microcompact（编辑缓存键）、collapse（折叠旧消息），以及必要时触发 auto compact（自动摘要压缩）。这些机制保证了即使在多轮工具调用后，context 也不会无限膨胀。</p>
+<p>模型不只是回答问题，而是在一个受控的沙盒中不断思考、行动、观察反馈、再思考，直到完成任务。和 ReAct 论文里的思路有异曲同工之妙。</p>
+<h3 id="1-2-流式工具执行">1.2 流式工具执行</h3>
+<p>Claude Code 的 <code>StreamingToolExecutor</code> 做到了<strong>在模型 streaming 输出期间就并行执行工具调用</strong>。</p>
+<p>整体流程大致可以简化为：</p>
+<pre class="line-numbers language-none"><code class="language-none">模型开始 streaming →
+  content_block_start (思考文本)   → 实时显示给用户
+  content_block_start (tool_use_1) → 立即开始执行工具1
+  content_block_start (tool_use_2) → 立即开始执行工具2 ← 如果工具1和工具2都是只读的，二者并发
+  content_block_start (tool_use_3) → 排队等待（因为工具3是写操作）
+  message_stop<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>工具执行期间，已完成的结果会通过 <code>yield</code> 立即发送给 UI，用户可以看到工具一个接一个地产出结果，这带来了显著的延迟收益。如果模型要调用 3 个工具，每个平均耗时 2 秒，传统串行做法需要等 6 秒，而这套方案可以压缩到约 2 秒。</p>
+<h3 id="1-3-并发控制">1.3 并发控制</h3>
+<p>工具调度的核心在 <code>toolOrchestration.ts</code> 的 <code>partitionToolCalls()</code>：</p>
+<ul>
+<li><strong>只读工具</strong>（如读文件、搜索代码）：标记为 <code>isConcurrencySafe=true</code>，可以并发执行，最大并发数由环境变量 <code>CLAUDE_CODE_MAX_TOOL_USE_CONCURRENCY</code> 控制（默认 10）</li>
+<li><strong>写入工具</strong>（如编辑文件、运行 Bash 命令）：标记为 <code>isConcurrencySafe=false</code>，必须串行执行</li>
+<li><strong>混合场景</strong>：工具被 partition 成连续的 batch，batch 内并发，batch 间串行</li>
+</ul>
+<p>同时，Bash 支持<strong>错误级联取消</strong>。如果并行运行的多个 Bash 命令中有一个失败了，<code>siblingAbortController.abort('sibling_error')</code> 会取消所有其他正在运行的 Bash 子进程。这是因为 Bash 命令之间通常有隐式依赖（比如 <code>mkdir</code> 失败后，后面的 <code>cp</code> 就无意义了），但读文件和网络请求这类独立操作不受影响。</p>
+<h3 id="1-4-Tool-Result-如何反馈回-Context">1.4 Tool Result 如何反馈回 Context</h3>
+<p>在 query loop 中，每一轮迭代结束时，有三种消息被拼回对话数组：</p>
+<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token keyword">const</span> next<span class="token operator">:</span> State <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  messages<span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token operator">...</span>messagesForQuery<span class="token punctuation">,</span>      <span class="token comment">// 当前已有的对话</span>
+    <span class="token operator">...</span>assistantMessages<span class="token punctuation">,</span>     <span class="token comment">// 模型本轮输出的 tool_use 块</span>
+    <span class="token operator">...</span>toolResults<span class="token punctuation">,</span>           <span class="token comment">// 工具执行结果 → 以 user 消息类型拼入</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>tool_result</code> 以 <strong>user 消息类型</strong>拼入 dialogue，符合 Anthropic Messages API 的规范（<code>tool_use</code> 和 <code>tool_result</code> 必须交替出现）。这意味着下一轮 API 调用时，模型将工具执行的结果以 user 消息类型拼入context中。</p>
+<h3 id="1-5-QueryEngine：多轮对话的封装">1.5 QueryEngine：多轮对话的封装</h3>
+<p><code>QueryEngine</code>（<code>QueryEngine.ts</code>）是对单次 query loop 的高层封装。每次 <code>submitMessage()</code> 触发一个完整的 tool use loop，内部可以产生多轮 tool call。它维护 <code>mutableMessages</code> 累积对话、管理 <code>maxTurns</code>/<code>maxBudgetUsd</code> 终止条件、处理 structured output 的重试逻辑，以及在 token 预算接近上限时自动注入 &quot;继续&quot;或&quot;结束&quot;的提示。</p>
+<hr>
+<h2 id="2-Context-Management：多层分级上下文管理">2. Context Management：多层分级上下文管理</h2>
+<h3 id="2-1-六层-Context-管理机制">2.1 六层 Context 管理机制</h3>
+<p>Claude Code 有六层 context 管理机制，按激进程度从低到高排列：</p>
+<table>
+<thead>
+<tr>
+<th>机制</th>
+<th>触发时机</th>
+<th>原理</th>
+<th>激进程度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Snip</strong></td>
+<td>每轮 query 前</td>
+<td>删除过时的 tool message，基于规则</td>
+<td>保守</td>
+</tr>
+<tr>
+<td><strong>Microcompact</strong></td>
+<td>每轮 query 前</td>
+<td>编辑 API cache key，删除未使用的 tool schema</td>
+<td>保守</td>
+</tr>
+<tr>
+<td><strong>Context Collapse</strong></td>
+<td>每轮 query 前</td>
+<td>将旧消息块&quot;折叠&quot;成摘要行（可在 UI 展开）</td>
+<td>中等</td>
+</tr>
+<tr>
+<td><strong>Auto Compact</strong></td>
+<td>token 超过阈值</td>
+<td>将历史发送给 fork agent 做摘要压缩</td>
+<td>激进</td>
+</tr>
+<tr>
+<td><strong>Reactive Compact</strong></td>
+<td>API 返回 413 错误</td>
+<td>收到 prompt-too-long 后的紧急压缩</td>
+<td>激进</td>
+</tr>
+<tr>
+<td><strong>Manual Compact</strong></td>
+<td>用户手动触发 <code>/compact</code></td>
+<td>同 auto compact</td>
+<td>激进</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-2-Auto-Compact：自动摘要压缩">2.2 Auto Compact：自动摘要压缩</h3>
+<p><strong>触发条件</strong>：当 token 用量超过 <code>effectiveContextWindow - 13000</code>（窗口快要爆了），且 auto compact 未被禁用时触发。同时有 circuit breaker 保护，使得连续失败 3 次后自动停止尝试，防止无限重试。</p>
+<p><strong>执行流程亮点</strong>：</p>
+<ol>
+<li><strong>优先尝试 Session Memory Compaction</strong></li>
+<li><strong>Fork Agent 生成摘要</strong>：启动一个 fork 子 agent 来做摘要，子 agent 共享主 agent 的 system prompt 和 tool pool，因此可以复用 API 的 prompt cache，节省成本</li>
+<li><strong>如果 fork 失败，fallback 到 regular streaming</strong></li>
+<li><strong>Post-compact 恢复</strong>：压缩完成后，恢复最近编辑过的文件（最多 5 个，限制 50K tokens）、恢复被调用的 skills、恢复 plan 文件、重新注入 tool 描述等</li>
+</ol>
+<h3 id="2-3-Snip-和-Context-Collapse">2.3 Snip 和 Context Collapse</h3>
+<p><strong>Snip</strong>（<code>snipCompact.ts</code>）是最温和的清理方式：删除已完成的、不再需要 context 的工具调用，删除过时的进度消息，压缩重复的文件读取结果。它通过 <code>feature('HISTORY_SNIP')</code> 控制。</p>
+<p><strong>Context Collapse</strong> 介于 Snip 和 Auto Compact 之间，把大段对话折叠成一行摘要，在 UI 上仍然可以展开查看。如果 collapse 启用，auto compact 就不会触发。在遇到 413 错误时，已经 staged 的 collapse 也可以被 drain 掉来释放空间。</p>
+<h3 id="2-4-Token-Budget-管理">2.4 Token Budget 管理</h3>
+<p><code>feature('TOKEN_BUDGET')</code>（<code>query/tokenBudget.ts</code>）追踪每次 API 调用的 input/output token。当接近预算时提示模型&quot;你可以继续，也可以结束&quot;。它还能检测边际效应递减，当模型在后续轮次中产出越来越少时，提前结束而不是继续消耗 token。</p>
+<h3 id="2-5-消息存储与恢复">2.5 消息存储与恢复</h3>
+<p>Claude Code 的 transcript 存储也设计得很仔细：</p>
+<ul>
+<li>每个 conversation turn 写入 <code>~/.claude/history.jsonl</code></li>
+<li>支持 <code>--resume</code> 恢复历史会话</li>
+<li>Session 持久化 + <code>compact_boundary</code> 机制支持跨 compact 的对话恢复</li>
+<li>每个 subagent 有独立的 sidechain transcript（通过 <code>agentId</code> 区分）</li>
+</ul>
+<hr>
+<h2 id="3-Multi-Agent-Management：多代理协作体系">3. Multi-Agent Management：多代理协作体系</h2>
+<h3 id="3-1-Agent-类型全景">3.1 Agent 类型全景</h3>
+<pre class="line-numbers language-none"><code class="language-none">TaskType:
+  - local_agent           → 本地 agent（AgentTool 调用）
+  - local_bash            → 本地 shell 命令
+  - remote_agent          → 远程 agent
+  - in_process_teammate   → 进程内 teammate（TeamCreateTool）
+  - local_workflow        → 本地 workflow
+  - monitor_mcp           → MCP 监控
+  - dream                 → 后台沉思<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>值得注意的设计点：</p>
+<ul>
+<li><strong>in_process_teammate</strong> 和 local_agent 不同——teammate 在同一个进程内运行，通过 <code>SendMessageTool</code> 进行 agent 间通信，而 local_agent 通过 <code>runForkedAgent</code> 创建</li>
+<li><strong>dream</strong> 类型暗示了后台异步思考的能力——agent 可以在后台持续工作，不阻塞主 agent</li>
+<li><strong>remote_agent</strong> 为分布式部署预留了扩展空间</li>
+</ul>
+<h3 id="3-2-Agent-创建">3.2 Agent 创建</h3>
+<p>Subagent 的创建由 <code>createSubagentContext()</code>（<code>forkedAgent.ts</code>）完成，它是 context 隔离的枢纽：</p>
+<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token comment">// Sync agent: 共享 setAppState、abortController</span>
+<span class="token comment">// Async agent: 完全隔离的 context</span>
+<span class="token keyword">const</span> agentToolUseContext <span class="token operator">=</span> <span class="token function">createSubagentContext</span><span class="token punctuation">(</span>parentContext<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
+  options<span class="token operator">:</span> agentOptions<span class="token punctuation">,</span>
+  agentId<span class="token punctuation">,</span>
+  messages<span class="token operator">:</span> initialMessages<span class="token punctuation">,</span>       <span class="token comment">// 独立的消息历史</span>
+  readFileState<span class="token operator">:</span> cloneOrFresh<span class="token punctuation">,</span>     <span class="token comment">// 独立的文件缓存</span>
+  abortController<span class="token operator">:</span> agentAbortController<span class="token punctuation">,</span>
+  shareSetAppState<span class="token operator">:</span> <span class="token operator">!</span>isAsync<span class="token punctuation">,</span>      <span class="token comment">// async 不共享状态</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>关键的设计决策：</p>
+<ul>
+<li><strong>Sync agents 共享 parent 的 abort signal</strong>：用户按 Ctrl+C 会同时取消 parent 和 sync subagent</li>
+<li><strong>Async agents 有独立的 abortController</strong>：可以后台运行，完成后再通知 parent</li>
+<li><strong>权限隔离</strong>：subagent 的 <code>allowedTools</code> 独立于 parent，通过 <code>resolveAgentTools()</code> 解析</li>
+<li><strong>MCP 服务器隔离</strong>：subagent 可以有自己的 MCP 服务器配置</li>
+</ul>
+<p>既保证了安全性和可控性（工具权限、MCP 连接独立），又保留了灵活性（sync/async 两种模式）。</p>
+<h3 id="3-3-Coordinator-Mode">3.3 Coordinator Mode</h3>
+<p><code>feature('COORDINATOR_MODE')</code>（<code>coordinator/coordinatorMode.ts</code>）引入了一个非常有趣的概念：主 agent 不再直接操作文件，而是成为 “coordinator”，通过<strong>异步 workers</strong> 完成所有实际工作。</p>
+<p>Worker 的调度模型如下：</p>
+<pre class="line-numbers language-none"><code class="language-none">Coordinator (主 agent)
+  ├─ AgentTool(worker) → task_id: &quot;agent-x7q&quot;
+  ├─ AgentTool(worker) → task_id: &quot;agent-y3k&quot;
+  │
+  ├─ worker &quot;agent-x7q&quot; 完成 → &lt;task-notification&gt; → coordinator 继续指挥它
+  │   SendMessage(&#123; to: &quot;agent-x7q&quot;, message: &quot;fix the bug in ...&quot; &#125;)
+  │
+  └─ worker &quot;agent-y3k&quot; 失败 → coordinator 重新生成一个新 worker
+      AgentTool(&#123; prompt: &quot;new approach ...&quot; &#125;)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这样使得coordinator 的 context 不会被具体实现细节污染，可以保持全局视角；同时 workers 可以并行工作，互不干扰。当一个 worker 失败时，coordinator 可以基于它学到的信息重新生成一个新的 worker，而不是从头再来。</p>
+<p>这其实就是软件工程里&quot;任务分解 + 委派&quot;的模式应用到了 LLM agent 上。</p>
+<h3 id="3-4-Fork-Subagent">3.4 Fork Subagent</h3>
+<p>Fork subagent（<code>forkSubagent.ts</code>）是一个精巧的 cache 优化设计。它的核心思路是，当你 fork 一个子 agent 时，子 agent 的 context 与父 agent 几乎相同，因此 prompt cache 可以完全命中。</p>
+<p>具体做法是：</p>
+<ul>
+<li>所有 tool_result 使用相同的 placeholder 文本</li>
+<li>只有最后的 DIRECTIVE（任务指令）不同</li>
+<li>子 agent 继承 parent 的完整 context（system prompt + conversation + tool pool）</li>
+</ul>
+<pre class="line-numbers language-none"><code class="language-none">Parent: ... conversation ... assistant(all_tool_uses)
+Child:  ... conversation ... assistant(all_tool_uses) → user(placeholder_results..., DIRECTIVE)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                           所有 fork 子 agent 的这一段都相同 → cache hit
+                                           只有最后的 DIRECTIVE 不同<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这个设计把 cache hit rate 推到了极致。在大量使用 subagent 的场景下（比如 Coordinator Mode），这个优化省下的 token 成本是非常可观的。</p>
+<p>额外还有递归 fork 保护——通过检测 <code>&lt;fork-boilerplate&gt;</code> tag 判断是否已经在 fork 中，避免无限嵌套。</p>
+<h3 id="3-5-Team-Agent">3.5 Team Agent</h3>
+<p><code>TeamCreateTool</code> / <code>TeamDeleteTool</code>（<code>feature('AGENT_SWARMS')</code>）实现了进程内 teammate 的创建和销毁。与 fork subagent 不同，teammate 在同一个进程中运行，但有自己的独立 context。通过 <code>SendMessageTool</code> 进行 agent 间通信，通过 UDS（Unix Domain Socket）进行跨进程状态同步。</p>
+<h3 id="3-6-Agent-生命周期管理">3.6 Agent 生命周期管理</h3>
+<p>每个 subagent 都经过了严格的生命周期管理：</p>
+<pre class="line-numbers language-none"><code class="language-none">创建:
+  runAgent()
+  → initializeAgentMcpServers()    &#x2F;&#x2F; 连接 agent 专属 MCP
+  → executeSubagentStartHooks()    &#x2F;&#x2F; 执行启动钩子
+  → registerFrontmatterHooks()     &#x2F;&#x2F; 注册 agent 的钩子
+  → skill preloading               &#x2F;&#x2F; 预加载 skills
+  → query() loop                   &#x2F;&#x2F; 进入核心循环
+
+结束 (finally 块):
+  → cleanup MCP servers
+  → clear session hooks
+  → cleanup prompt cache tracking
+  → clear read file state cache
+  → kill background bash tasks
+  → kill monitor MCP tasks
+  → release todo entry
+  → unregister from Perfetto tracing<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="4-全局数据流：把一切串起来">4. 全局数据流：把一切串起来</h2>
+<pre class="line-numbers language-none"><code class="language-none">用户输入
+  ↓
+processUserInput()        ← 解析 slash commands、注入 skills、处理 attachments
+  ↓
+QueryEngine.submitMessage()
+  ↓
+queryLoop()               ← 核心 while(true) 循环
+  ├─ snip                 ← 清理过时消息
+  ├─ microcompact         ← 编辑 API cache key
+  ├─ collapse             ← 折叠旧消息
+  ├─ autocompact          ← token 超阈值时压缩
+  ├─ callModel (stream)   ← 调用 LLM API
+  │   ├─ StreamingToolExecutor ← streaming 期间并行执行工具
+  │   │   ├─ 并发执行只读工具
+  │   │   ├─ 串行执行写入工具
+  │   │   └─ Bash 错误级联取消
+  │   └─ yield tool_result (以 user 消息类型)
+  ├─ tool execution       ← 非 streaming 路径下的工具执行
+  ├─ attachments          ← 文件变化 &#x2F; memory &#x2F; skill &#x2F; queue
+  ├─ stop hooks           ← post-response 钩子
+  └─ messages &#x3D; [...messages + assistant + toolResults]
+      ↓ (循环到下一轮迭代)
+  Terminal (完成 &#x2F; 达到限制 &#x2F; 被中断)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="5-一点感受">5. 一点感受</h2>
+<p>从 fork subagent 的 placeholder 到 compact 的 runForkedAgent，cache 友好的思想渗透进了架构的每个细节。这种设计思维值得在任何需要长 conversation 的 LLM 应用中借鉴。</p>
+<p>如果你也在做 AI agent 相关的工程，希望这篇笔记能给你一些启发。</p>
+</div>
+
+        
+        <div class="post-tags">
+          <span class="post-tags-label">标签:</span>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/Agent/">#Agent</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/Multi-Agent/">#Multi-Agent</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/LLM/">#LLM</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/Claude-Code/">#Claude Code</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/%E6%9E%B6%E6%9E%84%E5%88%86%E6%9E%90/">#架构分析</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/Context-Management/">#Context Management</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/Tool-Use/">#Tool Use</a>
+          
+        </div>
+        
+
+        <nav class="post-pager" aria-label="post navigation">
+          
+            <a class="post-pager-item post-pager-prev" href="file:///D:/blog/public/posts/d9f3a1b7/">
+              <span class="post-pager-label">上一篇</span>
+              <span class="post-pager-title">你感觉现在的电影和音乐不如以前了，这不是错觉，但原因不是你想的那样</span>
+            </a>
+          
+          
+            <a class="post-pager-item post-pager-next" href="file:///D:/blog/public/posts/c48ba312/">
+              <span class="post-pager-label">下一篇</span>
+              <span class="post-pager-title">研究周报 · 2026.04.19–04.25 · DAPO/GiGPO/MAPPA/Dr.MAS 精读与 sub2api 实践</span>
+            </a>
+          
+        </nav>
+
+        
+
+<section class="post-comments">
+  <script src="https://giscus.app/client.js"
+    data-repo="yo666666yo/yo666666yo.github.io"
+    data-repo-id="R_kgDOSLiRUQ"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOSLiRUc4C7m3u"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="preferred_color_scheme"
+    data-lang="zh-CN"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async></script>
+</section>
+
+
+      </div>
+    </div>
+  </div>
+
+  <button class="toc-fab" type="button" data-toc-open aria-label="Open table of contents" aria-controls="article-toc-drawer" hidden>
+    <span class="toc-fab-icon" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+  </button>
+
+  <div class="toc-drawer" id="article-toc-drawer" data-toc-drawer aria-hidden="true" hidden>
+    <div class="toc-drawer-backdrop" data-toc-close></div>
+    <section class="toc-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="toc-drawer-title" tabindex="-1">
+      <div class="toc-drawer-grabber" data-toc-grabber aria-hidden="true"></div>
+      <div class="toc-drawer-header">
+        <h2 id="toc-drawer-title">Contents</h2>
+        <button class="toc-drawer-close" type="button" data-toc-close aria-label="Close table of contents">
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="toc-drawer-scroll">
+        <ol class="article-toc-list toc-drawer-list" data-toc-mobile-list></ol>
+      </div>
+    </section>
+  </div>
+</article>
+
+  </main>
+
+  <hr class="section-divider" />
+
+  
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    
+    <ul class="social-list">
+      
+        
+        <li class="social-list-item">
+          <a href="https://github.com/yo666666yo" rel="noopener me external nofollow noreferrer" target="_blank" aria-label="Yoyo_Lee GitHub">
+            <span class="social-circle">
+              <span class="social-label">github</span>
+            </span>
+          </a>
+        </li>
+      
+      
+      <li class="social-list-item">
+        <a href="file:///D:/blog/public/atom.xml" rel="alternate" aria-label="rss">
+          <span class="social-circle"><span class="social-label">RSS</span></span>
+        </a>
+      </li>
+      
+    </ul>
+    
+
+    <div class="site-footer-copy">
+      
+        <span>Copyright &copy; Yoyo_Lee 2026</span>
+      
+      
+        <span class="site-footer-dot">·</span>
+        <span><a href="https://hexo.io/" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> · <a href="https://startbootstrap.com/theme/clean-blog" rel="noopener external nofollow noreferrer" target="_blank">Clean Blog</a></span>
+      
+    </div>
+  </div>
+</footer>
+
+  <script defer src="file:///D:/blog/public/js/clean-blog.js?v=20260729-2"></script>
+
+
+<script>window.addEventListener("load",function(){
+setTimeout(function(){
+  const out={innerW:window.innerWidth,root:getComputedStyle(document.documentElement).fontSize,docScrollW:document.documentElement.scrollWidth,bodySW:document.body.scrollWidth,boxes:[],overflow:[]};
+  const t=[['.code-copy-button','copy button'],['.code-language','code lang'],['.code-block','code block'],['.post-body pre','pre'],['.post-body table','table'],['.katex-display','katex display'],['.post-body :not(pre) > code','inline code'],['.toc-fab','FAB']];
+  for(const [s,n] of t){const els=document.querySelectorAll(s); if(!els.length){out.boxes.push({name:n,missing:true});continue;} let el=els[0]; const r=el.getBoundingClientRect(); const cs=getComputedStyle(el); out.boxes.push({name:n,count:els.length,w:+r.width.toFixed(1),h:+r.height.toFixed(1),l:+r.left.toFixed(1),rt:+r.right.toFixed(1),display:cs.display,sw:el.scrollWidth,cw:el.clientWidth,ox:cs.overflowX});}
+  // widest pre / table
+  ['pre','table'].forEach(tag=>{let mx=null; document.querySelectorAll('.post-body '+tag).forEach(el=>{if(!mx||el.scrollWidth>mx.scrollWidth)mx=el;}); if(mx){const r=mx.getBoundingClientRect(); out.boxes.push({name:'widest '+tag,sw:mx.scrollWidth,cw:mx.clientWidth,w:+r.width.toFixed(1),l:+r.left.toFixed(1),rt:+r.right.toFixed(1),ox:getComputedStyle(mx).overflowX});}});
+  document.querySelectorAll('body *').forEach(el=>{const r=el.getBoundingClientRect(); if(r.width>0&&(r.right>window.innerWidth+1||r.left<-1)){const cs=getComputedStyle(el); if(cs.visibility==='hidden'||cs.position==='fixed')return; out.overflow.push({tag:el.tagName.toLowerCase(),cls:(el.className||'').toString().slice(0,45),l:+r.left.toFixed(1),rt:+r.right.toFixed(1),sw:el.scrollWidth,cw:el.clientWidth,ox:cs.overflowX});}});
+  out.overflow=out.overflow.slice(0,25);
+  parent.postMessage("PROBE:"+JSON.stringify(out),"*");
+},1200);
+
+});</script></body>
+</html>

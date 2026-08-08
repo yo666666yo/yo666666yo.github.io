@@ -1,0 +1,686 @@
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<title>研究周报 · 2026.03.15–03.21 · Agentic RL 综述与 WM/Policy 对齐 · Yoyo_Lee 的博客</title>
+<meta name="description" content="精读 4 篇 Agentic RL 综述，提出 Disentangled Partial Alignment 解决 WM/Policy Objective Mismatch，通过 7 轮迭代实验验证方案有效。" />
+<meta name="keywords" content="AI,LLM,机器学习,深度学习,论文阅读,生活随笔,blog,Yoyo_Lee" />
+<meta name="author" content="Yoyo_Lee" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#FBFAF7" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#141310" media="(prefers-color-scheme: dark)" />
+<link rel="canonical" href="https://yoyo-lee.com/posts/e3b0936b/" />
+
+<!-- Open Graph / Twitter -->
+<meta property="og:site_name" content="Yoyo_Lee 的博客" />
+<meta property="og:title" content="研究周报 · 2026.03.15–03.21 · Agentic RL 综述与 WM/Policy 对齐" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://yoyo-lee.com/posts/e3b0936b/" />
+<meta property="og:description" content="精读 4 篇 Agentic RL 综述，提出 Disentangled Partial Alignment 解决 WM/Policy Objective Mismatch，通过 7 轮迭代实验验证方案有效。" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="file:///D:/blog/public/img/favicon.svg" type="image/svg+xml" />
+
+<link rel="alternate" type="application/atom+xml" title="Yoyo_Lee 的博客" href="file:///D:/blog/public/atom.xml" />
+
+
+<!-- Google Fonts (Lora for body, system font stack for UI) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" />
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous" />
+
+
+<link rel="stylesheet" href="file:///D:/blog/public/css/clean-blog.css?v=20260729-2" />
+
+
+
+
+
+</head>
+<body id="page-top" class="is-post">
+  
+<nav id="mainNav" class="navbar navbar-light" aria-label="主菜单">
+  <div class="navbar-container">
+    <a class="navbar-brand" href="file:///D:/blog/public/">Yoyo_Lee 的博客</a>
+    <button class="navbar-toggler" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="菜单">
+      菜单
+      <span class="navbar-toggler-icon" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+    </button>
+    <div class="navbar-collapse" id="navbarResponsive">
+      <div class="navbar-collapse-inner">
+      <form class="site-search" role="search" action="/search/" method="get" data-search-url="/search.xml" data-search-page-url="/search/" data-loading="正在搜索..." data-no-results="没有找到匹配文章" data-error="搜索索引暂时不可用">
+        <label class="sr-only" for="site-search-input">搜索文章</label>
+        <input id="site-search-input" class="site-search-input" type="search" name="q" placeholder="搜索文章..." autocomplete="off" spellcheck="false" aria-controls="site-search-results" aria-expanded="false" />
+        <button class="site-search-button" type="submit" aria-label="搜索">
+          <svg class="site-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10.8 5.2a5.6 5.6 0 1 0 0 11.2 5.6 5.6 0 0 0 0-11.2Zm-7.1 5.6a7.1 7.1 0 1 1 12.6 4.5l3.7 3.7-1.1 1.1-3.7-3.7A7.1 7.1 0 0 1 3.7 10.8Z" />
+          </svg>
+        </button>
+        <div id="site-search-results" class="site-search-results" role="listbox" hidden></div>
+      </form>
+      <ul class="navbar-nav">
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/">首页</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/categories/research/">研究</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/categories/life/">生活</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/categories/weekly/">周报</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/tags/">标签</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/archives/">归档</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="file:///D:/blog/public/about/">关于</a>
+          </li>
+        
+      </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+  
+
+<header class="masthead masthead-post">
+  <div class="masthead-container">
+    <div class="masthead-inner">
+      
+        <div class="post-heading">
+          
+          <div class="post-kicker">
+            
+              <a class="post-kicker-cat" href="file:///D:/blog/public/categories/weekly/">周报</a>
+              <span class="post-kicker-sep" aria-hidden="true">·</span>
+            
+            <time datetime="2026-03-21T08:30:00.000Z">2026.03.21</time>
+            
+              <span class="post-kicker-sep" aria-hidden="true">·</span>
+              <span class="post-reading-stats" aria-label="文章字数和预计阅读时间">1,770 字 · 5 分钟</span>
+            
+          </div>
+          <div class="post-title-line">
+            <h1>研究周报 · 2026.03.15–03.21 · Agentic RL 综述与 WM/Policy 对齐</h1>
+          </div>
+          <h2 class="subheading">精读 4 篇 Agentic RL 综述，提出 Disentangled Partial Alignment 解决 WM/Policy Objective Mismatch，通过 7 轮迭代实验验证方案有效。</h2>
+          <span class="meta">
+            作者
+            <a href="file:///D:/blog/public/about/">Yoyo_Lee</a>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+</header>
+
+
+  <main id="main-content">
+    <article class="article article-post mb-4">
+  <div class="container article-container">
+    <div class="article-layout" data-article-layout>
+      <aside class="article-toc-sidebar" data-toc-sidebar hidden>
+        <nav class="article-toc" aria-label="Table of contents">
+          <div class="article-toc-header">
+            <span class="article-toc-title">Contents</span>
+            <button class="article-toc-collapse" type="button" data-toc-collapse aria-label="Collapse table of contents" aria-expanded="true">
+              <span aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="article-toc-scroll" data-toc-scroll>
+            <ol class="article-toc-list" data-toc-list></ol>
+          </div>
+        </nav>
+      </aside>
+
+      <div class="article-content-col">
+        <div class="post-body"><blockquote>
+<p><strong>姓名：</strong> 李晟昊<br>
+<strong>日期：</strong> 2026 年 3 月 21 日<br>
+<strong>指导老师：</strong> 冯磊<br>
+<strong>研究方向：</strong> Agentic Reinforcement Learning / Model-Based RL</p>
+</blockquote>
+<h2 id="一、本周工作概览">一、本周工作概览</h2>
+<p>本周主要完成以下三部分工作：</p>
+<ol>
+<li><strong>文献阅读</strong>：精读 4 篇 Agentic RL 领域的综述与实验论文，建立领域知识框架</li>
+<li><strong>研究问题提出</strong>：聚焦 World Model 与 Policy 的 Objective Mismatch 问题，提出基于 Contrastive Alignment 的解决思路</li>
+<li><strong>实验验证</strong>：通过 7 轮迭代实验，从 idea 到可验证方案，初步验证了 Disentangled Partial Alignment 方法的有效性</li>
+</ol>
+<span id="more"></span>
+<hr>
+<h2 id="二、文献阅读">二、文献阅读</h2>
+<h3 id="2-1-论文列表">2.1 论文列表</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">序号</th>
+<th>论文</th>
+<th>发表</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td>Zhang et al., <em>The Landscape of Agentic Reinforcement Learning for LLMs: A Survey</em></td>
+<td>TMLR 2026</td>
+<td>综述 (95pp)</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td>Wang &amp; Ammanabrolu, <em>A Practitioner’s Guide to Multi-turn Agentic Reinforcement Learning</em></td>
+<td>Under Review 2025</td>
+<td>实验 (20pp)</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td>Pignatelli et al., <em>A Survey of Temporal Credit Assignment in Deep Reinforcement Learning</em></td>
+<td>TMLR 2024</td>
+<td>综述 (56pp)</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td>Wei et al., <em>Agentic Reasoning for Large Language Models</em></td>
+<td>Survey 2026</td>
+<td>综述 (135pp)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-2-核心概念梳理">2.2 核心概念梳理</h3>
+<p><strong>Agentic RL 的范式转变：</strong> 传统 LLM RL（如 RLHF）本质上是一个退化的单步 MDP，而 Agentic RL 将 LLM 视为嵌入动态环境中的多步决策者，建模为 POMDP：</p>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mo stretchy="false">⟨</mo><mi mathvariant="script">S</mi><mo separator="true">,</mo><mi mathvariant="script">O</mi><mo separator="true">,</mo><mi mathvariant="script">A</mi><mo separator="true">,</mo><mi>P</mi><mo separator="true">,</mo><mi>R</mi><mo separator="true">,</mo><mi>γ</mi><mo stretchy="false">⟩</mo></mrow><annotation encoding="application/x-tex">\langle \mathcal{S}, \mathcal{O}, \mathcal{A}, P, R, \gamma \rangle
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⟨</span><span class="mord mathcal" style="margin-right:0.075em;">S</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathcal" style="margin-right:0.0278em;">O</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathcal">A</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0556em;">γ</span><span class="mclose">⟩</span></span></span></span></span></p>
+<p>其中 agent 只能观察到部分状态 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>o</mi><mi>t</mi></msub><mo>=</mo><mi>O</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">o_t = O(s_t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">o</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>，动作空间包含文本生成和环境交互两个子空间 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">A</mi><mo>=</mo><msub><mi mathvariant="script">A</mi><mtext>text</mtext></msub><mo>∪</mo><msub><mi mathvariant="script">A</mi><mtext>action</mtext></msub></mrow><annotation encoding="application/x-tex">\mathcal{A} = \mathcal{A}_{\text{text}} \cup \mathcal{A}_{\text{action}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathcal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathcal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">text</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∪</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathcal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3175em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">action</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>。优化目标为：</p>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>J</mi><mo stretchy="false">(</mo><mi>θ</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi mathvariant="double-struck">E</mi><mrow><mi>τ</mi><mo>∼</mo><msub><mi>π</mi><mi>θ</mi></msub></mrow></msub><mrow><mo fence="true">[</mo><munderover><mo>∑</mo><mrow><mi>t</mi><mo>=</mo><mn>0</mn></mrow><mrow><mi>T</mi><mo>−</mo><mn>1</mn></mrow></munderover><msup><mi>γ</mi><mi>t</mi></msup><mi>R</mi><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo fence="true">]</mo></mrow></mrow><annotation encoding="application/x-tex">J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}\left[\sum_{t=0}^{T-1} \gamma^t R(s_t, a_t)\right]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0962em;">J</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3.0954em;vertical-align:-1.2671em;"></span><span class="mord"><span class="mord mathbb">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.1132em;">τ</span><span class="mrel mtight">∼</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:-0.0359em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1512em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2559em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size4">[</span></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8283em;"><span style="top:-1.8829em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mrel mtight">=</span><span class="mord mtight">0</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2671em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0556em;">γ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8436em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size4">]</span></span></span></span></span></span></span></p>
+<p><strong>Temporal Credit Assignment 问题（Pignatelli et al.）：</strong> 在多步决策中，如何将最终奖励归因到各步动作，是 Agentic RL 区别于传统 LLM RL 的核心难题。该综述提出了统一的赋值函数形式化：</p>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>K</mi><mo>:</mo><mi mathvariant="script">C</mi><mo>×</mo><mi mathvariant="script">A</mi><mo>×</mo><mi mathvariant="script">G</mi><mo>→</mo><mi mathvariant="script">Y</mi></mrow><annotation encoding="application/x-tex">K: \mathcal{C} \times \mathcal{A} \times \mathcal{G} \to \mathcal{Y}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathcal" style="margin-right:0.0583em;">C</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathcal">A</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7805em;vertical-align:-0.0972em;"></span><span class="mord mathcal" style="margin-right:0.0593em;">G</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7805em;vertical-align:-0.0972em;"></span><span class="mord mathcal" style="margin-right:0.0822em;">Y</span></span></span></span></span></p>
+<p>并将挑战归纳为三个 MDP 维度：Depth（延迟效应）、Density（稀疏奖励）、Breadth（credit 稀释）。</p>
+<h3 id="2-3-论文对比分析">2.3 论文对比分析</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Zhang 2026</th>
+<th>Wang 2025</th>
+<th>Pignatelli 2024</th>
+<th>Wei 2026</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>核心视角</td>
+<td>RL 赋能 Agent 能力</td>
+<td>多轮 RL 实践 recipe</td>
+<td>CA 数学本质</td>
+<td>Reasoning 组织行为</td>
+</tr>
+<tr>
+<td>形式化</td>
+<td>PBRFT MDP vs POMDP</td>
+<td>POMDP 三支柱</td>
+<td>Assignment function</td>
+<td>POMDP + reasoning trace</td>
+</tr>
+<tr>
+<td>关键发现</td>
+<td>RL 是静态→自适应的关键</td>
+<td>PPO &gt;&gt; GRPO（多轮）</td>
+<td>Depth/Density/Breadth</td>
+<td>In-context vs Post-training 互补</td>
+</tr>
+<tr>
+<td>核心瓶颈</td>
+<td>Temporal CA</td>
+<td>Reward density</td>
+<td>Delayed effects</td>
+<td>World modeling</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-4-启发">2.4 启发</h3>
+<ul>
+<li><strong>RL 算法选择</strong>：在多轮 agentic 任务中，PPO 显著优于 GRPO（Wang 2025 实验：w4-o6-q8 任务上 PPO 72% vs GRPO 36%）</li>
+<li><strong>World Model 是开放问题</strong>：Wei et al. 在 Section 8.3 明确指出 “An open problem is how to <strong>jointly train, update, and evaluate world models</strong> in non-stationary environments”</li>
+<li><strong>Objective Mismatch</strong>：Zhang et al. 引用 Pignatelli 的 temporal credit assignment 工作，指出这是 long-horizon tool-integrated reasoning 的核心瓶颈</li>
+</ul>
+<hr>
+<h2 id="三、研究问题与思路">三、研究问题与思路</h2>
+<h3 id="3-1-问题定义">3.1 问题定义</h3>
+<p>在 Model-Based RL 中，World Model（WM）和 Policy 存在 <strong>Objective Mismatch</strong>（Lambert et al., 2020）：</p>
+<ul>
+<li><strong>WM 训练目标</strong>：最小化预测误差（next-state/token prediction）</li>
+</ul>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="script">L</mi><mtext>model</mtext></msub><mo>=</mo><mi mathvariant="double-struck">E</mi><mrow><mo fence="true">[</mo><mi mathvariant="normal">∥</mi><msub><mi>f</mi><mi>θ</mi></msub><mo stretchy="false">(</mo><msub><mi>s</mi><mi>t</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>−</mo><msub><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><msup><mi mathvariant="normal">∥</mi><mn>2</mn></msup><mo fence="true">]</mo></mrow></mrow><annotation encoding="application/x-tex">\mathcal{L}_{\text{model}} = \mathbb{E}\left[\|f_\theta(s_t, a_t) - s_{t+1}\|^2\right]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">model</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2141em;vertical-align:-0.35em;"></span><span class="mord mathbb">E</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size1">[</span></span><span class="mord">∥</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord">∥</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size1">]</span></span></span></span></span></span></span></p>
+<ul>
+<li><strong>Policy 训练目标</strong>：最大化期望回报</li>
+</ul>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>J</mi><mo stretchy="false">(</mo><mi>π</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi mathvariant="double-struck">E</mi><mi>π</mi></msub><mrow><mo fence="true">[</mo><munder><mo>∑</mo><mi>t</mi></munder><msup><mi>γ</mi><mi>t</mi></msup><msub><mi>r</mi><mi>t</mi></msub><mo fence="true">]</mo></mrow></mrow><annotation encoding="application/x-tex">J(\pi) = \mathbb{E}_\pi\left[\sum_t \gamma^t r_t\right]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0962em;">J</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3em;vertical-align:-1.25em;"></span><span class="mord"><span class="mord mathbb">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">π</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size4">[</span></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.9em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.25em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0556em;">γ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8436em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size4">]</span></span></span></span></span></span></span></p>
+<p>WM 在状态空间中均匀追求预测精度，但 Policy 只关心对决策有影响的状态区域。这导致 WM 可能在 policy 不会访问的区域浪费拟合能力，同时在关键决策边界上精度不足。</p>
+<h3 id="3-2-已有方法">3.2 已有方法</h3>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>核心思路</th>
+<th>局限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VaGraM (Voelcker 2023)</td>
+<td>用 value gradient 加权 model loss</td>
+<td>单向对齐</td>
+</tr>
+<tr>
+<td>MuZero (2020)</td>
+<td>纯 value/policy/reward loss 训练 model</td>
+<td>依赖 MCTS</td>
+</tr>
+<tr>
+<td>TD-MPC (Hansen 2022)</td>
+<td>Latent consistency + TD + reward</td>
+<td>未显式对齐</td>
+</tr>
+<tr>
+<td>DreamerV3 (Hafner 2023)</td>
+<td>Shared latent + stop-gradient</td>
+<td>隐式对齐，仍有 reconstruction</td>
+</tr>
+<tr>
+<td>Value Equivalence (Grimm 2020)</td>
+<td>Model 只需 value-equivalent</td>
+<td>理论框架</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-3-我的研究思路：Contrastive-Objective-Alignment-COA">3.3 我的研究思路：Contrastive Objective Alignment (COA)</h3>
+<p><strong>核心 idea：</strong> 类比多模态对齐（如 CLIP 将图像和文本映射到同一空间），将 WM 和 Policy 的表征映射到一个 <strong>shared latent space</strong> 进行 joint training。</p>
+<p><strong>具体方案（经过实验迭代后的最终版本）：</strong> Disentangled Partial Alignment</p>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mtext>enc</mtext><mtext>wm</mtext></msub><mo stretchy="false">(</mo><msub><mi>o</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>→</mo><mo stretchy="false">[</mo><msubsup><mi>z</mi><mtext>wm</mtext><mtext>shared</mtext></msubsup><mo separator="true">,</mo><msubsup><mi>z</mi><mtext>wm</mtext><mtext>private</mtext></msubsup><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">\text{enc}_{\text{wm}}(o_t) \to [z^{\text{shared}}_{\text{wm}}, z^{\text{private}}_{\text{wm}}]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord text"><span class="mord">enc</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">wm</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">o</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1491em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8991em;"><span style="top:-2.453em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">wm</span></span></span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">shared</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8805em;"><span style="top:-2.453em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">wm</span></span></span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">private</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mclose">]</span></span></span></span></span></p>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mtext>enc</mtext><mi>π</mi></msub><mo stretchy="false">(</mo><msub><mi>o</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>→</mo><mo stretchy="false">[</mo><msubsup><mi>z</mi><mi>π</mi><mtext>shared</mtext></msubsup><mo separator="true">,</mo><msubsup><mi>z</mi><mi>π</mi><mtext>private</mtext></msubsup><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">\text{enc}_\pi(o_t) \to [z^{\text{shared}}_\pi, z^{\text{private}}_\pi]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord text"><span class="mord">enc</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">π</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">o</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1491em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8991em;"><span style="top:-2.453em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">π</span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">shared</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8805em;"><span style="top:-2.453em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">π</span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">private</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mclose">]</span></span></span></span></span></p>
+<p>对齐 loss 仅作用于 shared subspace：</p>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi mathvariant="script">L</mi><mtext>align</mtext></msub><mo>=</mo><msup><mrow><mo fence="true">∥</mo><mfrac><msubsup><mi>z</mi><mtext>wm</mtext><mtext>shared</mtext></msubsup><mrow><mi mathvariant="normal">∥</mi><msubsup><mi>z</mi><mtext>wm</mtext><mtext>shared</mtext></msubsup><mi mathvariant="normal">∥</mi></mrow></mfrac><mo>−</mo><mfrac><msubsup><mi>z</mi><mi>π</mi><mtext>shared</mtext></msubsup><mrow><mi mathvariant="normal">∥</mi><msubsup><mi>z</mi><mi>π</mi><mtext>shared</mtext></msubsup><mi mathvariant="normal">∥</mi></mrow></mfrac><mo fence="true">∥</mo></mrow><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\mathcal{L}_{\text{align}} = \left\|\frac{z^{\text{shared}}_{\text{wm}}}{\|z^{\text{shared}}_{\text{wm}}\|} - \frac{z^{\text{shared}}_\pi}{\|z^{\text{shared}}_\pi\|}\right\|^2
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">align</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.6801em;vertical-align:-0.95em;"></span><span class="minner"><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.45em;"><span class="pstrut" style="height:4.4em;"></span><span style="width:0.556em;height:2.4em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.556em" height="2.4em" viewBox="0 0 556 2400"><path d="M145 15 v585 v1200 v585 c2.667,10,9.667,15,21,15
+c10,0,16.667,-5,20,-15 v-585 v-1200 v-585 c-2.667,-10,-9.667,-15,-21,-15
+c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v1200 v585 h43z
+M367 15 v585 v1200 v585 c2.667,10,9.667,15,21,15
+c10,0,16.667,-5,20,-15 v-585 v-1200 v-585 c-2.667,-10,-9.667,-15,-21,-15
+c-10,0,-16.667,5,-20,15z M410 15 H367 v585 v1200 v585 h43z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.95em;"><span></span></span></span></span></span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.5261em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">∥</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7751em;"><span style="top:-2.453em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">wm</span></span></span></span></span><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">shared</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mord">∥</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-2.453em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">wm</span></span></span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">shared</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.5261em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">∥</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7751em;"><span style="top:-2.453em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">π</span></span></span><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">shared</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mord">∥</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-2.453em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">π</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">shared</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.45em;"><span class="pstrut" style="height:4.4em;"></span><span style="width:0.556em;height:2.4em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.556em" height="2.4em" viewBox="0 0 556 2400"><path d="M145 15 v585 v1200 v585 c2.667,10,9.667,15,21,15
+c10,0,16.667,-5,20,-15 v-585 v-1200 v-585 c-2.667,-10,-9.667,-15,-21,-15
+c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v1200 v585 h43z
+M367 15 v585 v1200 v585 c2.667,10,9.667,15,21,15
+c10,0,16.667,-5,20,-15 v-585 v-1200 v-585 c-2.667,-10,-9.667,-15,-21,-15
+c-10,0,-16.667,5,-20,15z M410 15 H367 v585 v1200 v585 h43z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.95em;"><span></span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.7301em;"><span style="top:-3.979em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>总损失为：</p>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="script">L</mi><mo>=</mo><munder><munder><mrow><msub><mi mathvariant="script">L</mi><mtext>dynamics</mtext></msub><mo>+</mo><msub><mi mathvariant="script">L</mi><mtext>reward</mtext></msub></mrow><mo stretchy="true">⏟</mo></munder><mtext>WM pathway</mtext></munder><mo>+</mo><munder><munder><mrow><msub><mi mathvariant="script">L</mi><mtext>value</mtext></msub><mo>+</mo><msub><mi mathvariant="script">L</mi><mtext>policy</mtext></msub></mrow><mo stretchy="true">⏟</mo></munder><mtext>Policy pathway</mtext></munder><mo>+</mo><mi>λ</mi><mo>⋅</mo><msub><mi mathvariant="script">L</mi><mtext>align</mtext></msub></mrow><annotation encoding="application/x-tex">\mathcal{L} = \underbrace{\mathcal{L}_{\text{dynamics}} + \mathcal{L}_{\text{reward}}}_{\text{WM pathway}} + \underbrace{\mathcal{L}_{\text{value}} + \mathcal{L}_{\text{policy}}}_{\text{Policy pathway}} + \lambda \cdot \mathcal{L}_{\text{align}}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathcal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.4397em;vertical-align:-1.7563em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6833em;"><span style="top:-1.3798em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">WM pathway</span></span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6833em;"><span class="svg-align" style="top:-2.0659em;"><span class="pstrut" style="height:3em;"></span><span class="stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMinYMin slice"><path d="M0 6l6-6h17c12.688 0 19.313.3 20 1 4 4 7.313 8.3 10 13
+ 35.313 51.3 80.813 93.8 136.5 127.5 55.688 33.7 117.188 55.8 184.5 66.5.688
+ 0 2 .3 4 1 18.688 2.7 76 4.3 172 5h399450v120H429l-6-1c-124.688-8-235-61.7
+-331-161C60.687 138.7 32.312 99.3 7 54L0 41V6z"/></svg></span><span class="brace-center" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMidYMin slice"><path d="M199572 214
+c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
+ 53.3-86.7 123.7-153 211-199 66.7-36 137.3-56.3 212-62h199568v120H200432c-178.3
+ 11.7-311.7 78.3-403 201-6 8-9.7 12-11 12-.7.7-6.7 1-18 1s-17.3-.3-18-1c-1.3 0
+-5-4-11-12-44.7-59.3-101.3-106.3-170-141s-145.3-54.3-229-60H0V214z"/></svg></span><span class="brace-right" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMaxYMin slice"><path d="M399994 0l6 6v35l-6 11c-56 104-135.3 181.3-238 232-57.3
+ 28.7-117 45-179 50H-300V214h399897c43.3-7 81-15 113-26 100.7-33 179.7-91 237
+-174 2.7-5 6-9 10-13 .7-1 7.3-1 20-1h17z"/></svg></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">dynamics</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">reward</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9341em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.7563em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.4397em;vertical-align:-1.7563em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6833em;"><span style="top:-1.3798em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Policy pathway</span></span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="minner munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6833em;"><span class="svg-align" style="top:-2.0659em;"><span class="pstrut" style="height:3em;"></span><span class="stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMinYMin slice"><path d="M0 6l6-6h17c12.688 0 19.313.3 20 1 4 4 7.313 8.3 10 13
+ 35.313 51.3 80.813 93.8 136.5 127.5 55.688 33.7 117.188 55.8 184.5 66.5.688
+ 0 2 .3 4 1 18.688 2.7 76 4.3 172 5h399450v120H429l-6-1c-124.688-8-235-61.7
+-331-161C60.687 138.7 32.312 99.3 7 54L0 41V6z"/></svg></span><span class="brace-center" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMidYMin slice"><path d="M199572 214
+c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
+ 53.3-86.7 123.7-153 211-199 66.7-36 137.3-56.3 212-62h199568v120H200432c-178.3
+ 11.7-311.7 78.3-403 201-6 8-9.7 12-11 12-.7.7-6.7 1-18 1s-17.3-.3-18-1c-1.3 0
+-5-4-11-12-44.7-59.3-101.3-106.3-170-141s-145.3-54.3-229-60H0V214z"/></svg></span><span class="brace-right" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.548em" viewBox="0 0 400000 548" preserveAspectRatio="xMaxYMin slice"><path d="M399994 0l6 6v35l-6 11c-56 104-135.3 181.3-238 232-57.3
+ 28.7-117 45-179 50H-300V214h399897c43.3-7 81-15 113-26 100.7-33 179.7-91 237
+-174 2.7-5 6-9 10-13 .7-1 7.3-1 20-1h17z"/></svg></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">value</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">policy</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9341em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.7563em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">align</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<p><strong>设计动机：</strong></p>
+<ul>
+<li><strong>Dual encoder</strong>：WM 和 Policy 各自拥有独立编码器，objective mismatch 体现在两个编码器学到不同的表征</li>
+<li><strong>Disentangled</strong>：每个编码器输出分为 shared（对齐）和 private（自由）两部分，防止对齐约束过强锁住 policy 优化</li>
+<li><strong>Partial alignment</strong>：只对齐 shared subspace，允许 private subspace 保留各自任务特有信息</li>
+</ul>
+<hr>
+<h2 id="四、实验验证">四、实验验证</h2>
+<h3 id="4-1-实验环境">4.1 实验环境</h3>
+<ul>
+<li><strong>SimpleEnv</strong>：自定义 4 维状态空间，其中维度 0、1 与 reward 相关，维度 2、3 为干扰项（distractor），天然存在 objective mismatch</li>
+<li>状态转移：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mrow><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></msubsup><mo>=</mo><mn>0.8</mn><msubsup><mi>s</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></msubsup><mo>+</mo><mn>0.5</mn><msub><mi>a</mi><mi>t</mi></msub><mo>+</mo><mi>ϵ</mi></mrow><annotation encoding="application/x-tex">s^{(0)}_{t+1} = 0.8 s^{(0)}_t + 0.5 a_t + \epsilon</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.3694em;vertical-align:-0.3246em;"></span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.4337em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">0</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3246em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2906em;vertical-align:-0.2458em;"></span><span class="mord">0.8</span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.4542em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">0</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2458em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7944em;vertical-align:-0.15em;"></span><span class="mord">0.5</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">ϵ</span></span></span></span>，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msubsup><mo>=</mo><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><msubsup><mi>s</mi><mi>t</mi><mrow><mo stretchy="false">(</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></msubsup><mo>+</mo><mn>0.5</mn><mo stretchy="false">)</mo><mo>+</mo><msup><mi>ϵ</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">s^{(2)}_{t+1} = \sin(s^{(2)}_t + 0.5) + \epsilon&#x27;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.3694em;vertical-align:-0.3246em;"></span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.4337em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">2</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3246em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2948em;vertical-align:-0.25em;"></span><span class="mop">sin</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.4542em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">2</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2458em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">0.5</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal">ϵ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span></li>
+<li>奖励：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>r</mi><mi>t</mi></msub><mo>=</mo><mo>−</mo><mo stretchy="false">(</mo><msubsup><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mrow><mo stretchy="false">(</mo><mn>0</mn><mo stretchy="false">)</mo></mrow></msubsup><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>−</mo><mo stretchy="false">(</mo><msubsup><mi>s</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></msubsup><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>+</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">r_t = -(s^{(0)}_{t+1})^2 - (s^{(1)}_{t+1})^2 + 1.0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.3694em;vertical-align:-0.3246em;"></span><span class="mord">−</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.4337em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">0</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3246em;"><span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.3694em;vertical-align:-0.3246em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.4337em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">1</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3246em;"><span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1.0</span></span></span></span>（仅依赖维度 0、1）</li>
+<li>Horizon = 5 步</li>
+</ul>
+<h3 id="4-2-迭代过程与关键发现">4.2 迭代过程与关键发现</h3>
+<p>实验共进行 <strong>7 轮迭代</strong>，逐步修正方案：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">轮次</th>
+<th>方案</th>
+<th>结果</th>
+<th>关键发现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">R1</td>
+<td>Shared encoder + COA</td>
+<td>稳定但不学习</td>
+<td>InfoNCE 过强</td>
+</tr>
+<tr>
+<td style="text-align:center">R2</td>
+<td>多 seed 验证 (5 seeds)</td>
+<td>COA 完全锁住 policy</td>
+<td>Shared encoder 下 COA 退化</td>
+</tr>
+<tr>
+<td style="text-align:center">R3</td>
+<td>Lambda sweep (7 values)</td>
+<td>任何 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\lambda &gt; 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7335em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">λ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> 都锁住</td>
+<td>问题不在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span> 大小</td>
+</tr>
+<tr>
+<td style="text-align:center">R4</td>
+<td>Dual encoder + COA</td>
+<td>消除 diverge 但锁住</td>
+<td>InfoNCE 在 dual encoder 下仍过强</td>
+</tr>
+<tr>
+<td style="text-align:center">R5</td>
+<td>软对齐 (soft_cos / mse_norm / annealing)</td>
+<td>全空间对齐均锁住；annealing 证实因果</td>
+<td>问题在于对齐整个表征空间</td>
+</tr>
+<tr>
+<td style="text-align:center">R6</td>
+<td><strong>Disentangled partial alignment</strong></td>
+<td><strong>首次同时稳定且学习</strong></td>
+<td>突破：只对齐 shared subspace</td>
+</tr>
+<tr>
+<td style="text-align:center">R7</td>
+<td>扩展到 2000eps + ratio sweep</td>
+<td><strong>验证通过</strong></td>
+<td>最终方案确定</td>
+</tr>
+</tbody>
+</table>
+<h3 id="4-3-最终实验结果">4.3 最终实验结果</h3>
+<p><strong>实验配置：</strong> 2000 episodes, 3 random seeds, target networks (Polyak <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>τ</mi><mo>=</mo><mn>0.005</mn></mrow><annotation encoding="application/x-tex">\tau=0.005</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.005</span></span></span></span>)</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th style="text-align:center">Ep200</th>
+<th style="text-align:center">Ep1000</th>
+<th style="text-align:center">Ep1500</th>
+<th style="text-align:center">Ep2000</th>
+<th style="text-align:center">稳定性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SharedEnc (Dreamer-style)</td>
+<td style="text-align:center">3.91</td>
+<td style="text-align:center"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>6.2</mn><mo>×</mo><msup><mn>10</mn><mn>14</mn></msup></mrow><annotation encoding="application/x-tex">-6.2 \times 10^{14}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">6.2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">14</span></span></span></span></span></span></span></span></span></span></span></span></td>
+<td style="text-align:center"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>2.8</mn><mo>×</mo><msup><mn>10</mn><mn>15</mn></msup></mrow><annotation encoding="application/x-tex">-2.8 \times 10^{15}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">2.8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">15</span></span></span></span></span></span></span></span></span></span></span></span></td>
+<td style="text-align:center"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>2.8</mn><mo>×</mo><msup><mn>10</mn><mn>15</mn></msup></mrow><annotation encoding="application/x-tex">-2.8 \times 10^{15}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">2.8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">15</span></span></span></span></span></span></span></span></span></span></span></span></td>
+<td style="text-align:center">灾难</td>
+</tr>
+<tr>
+<td>DualEnc (无对齐)</td>
+<td style="text-align:center">-6.21</td>
+<td style="text-align:center"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>4.9</mn><mo>×</mo><msup><mn>10</mn><mn>10</mn></msup></mrow><annotation encoding="application/x-tex">-4.9 \times 10^{10}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">4.9</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span></span></span></span></td>
+<td style="text-align:center"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>3.6</mn><mo>×</mo><msup><mn>10</mn><mn>12</mn></msup></mrow><annotation encoding="application/x-tex">-3.6 \times 10^{12}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">3.6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span></td>
+<td style="text-align:center"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>4.7</mn><mo>×</mo><msup><mn>10</mn><mn>12</mn></msup></mrow><annotation encoding="application/x-tex">-4.7 \times 10^{12}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">4.7</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span></td>
+<td style="text-align:center">灾难</td>
+</tr>
+<tr>
+<td>Partial (s=8, p=24)</td>
+<td style="text-align:center">3.37</td>
+<td style="text-align:center">-5.04</td>
+<td style="text-align:center">-273</td>
+<td style="text-align:center"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><mn>1.2</mn><mo>×</mo><msup><mn>10</mn><mn>15</mn></msup></mrow><annotation encoding="application/x-tex">-1.2 \times 10^{15}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">1.2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">15</span></span></span></span></span></span></span></span></span></span></span></span></td>
+<td style="text-align:center">最终 diverge</td>
+</tr>
+<tr>
+<td><strong>Partial (s=16, p=16, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span>=0.2)</strong></td>
+<td style="text-align:center"><strong>3.17</strong></td>
+<td style="text-align:center"><strong>3.27</strong></td>
+<td style="text-align:center"><strong>3.39</strong></td>
+<td style="text-align:center"><strong>3.41 ± 0.09</strong></td>
+<td style="text-align:center"><strong>稳定</strong></td>
+</tr>
+<tr>
+<td><strong>Partial (s=24, p=8, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span>=0.1)</strong></td>
+<td style="text-align:center"><strong>3.15</strong></td>
+<td style="text-align:center"><strong>3.20</strong></td>
+<td style="text-align:center"><strong>3.22</strong></td>
+<td style="text-align:center"><strong>3.24 ± 0.05</strong></td>
+<td style="text-align:center"><strong>最稳定</strong></td>
+</tr>
+<tr>
+<td>Partial (<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span>=0.05)</td>
+<td style="text-align:center">3.24</td>
+<td style="text-align:center">3.42</td>
+<td style="text-align:center">-22.25</td>
+<td style="text-align:center">-22.05</td>
+<td style="text-align:center">后期 diverge</td>
+</tr>
+</tbody>
+</table>
+<p><strong>核心结论：</strong></p>
+<ol>
+<li><strong>Objective mismatch 导致灾难性训练崩溃</strong>：所有无对齐的 baseline 均 diverge 到极端负值（<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>12</mn></msup></mrow><annotation encoding="application/x-tex">10^{12}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span>–<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>15</mn></msup></mrow><annotation encoding="application/x-tex">10^{15}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">15</span></span></span></span></span></span></span></span></span></span></span></span> 量级）</li>
+<li><strong>Disentangled Partial Alignment 有效解决该问题</strong>：Partial (s=16, p=16, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span>=0.2) 在 2000 episodes 内持续改善（3.17→3.41）且完全稳定（std=0.09）</li>
+<li><strong>Shared/Private 比例存在 trade-off</strong>：更多 shared dim → 更稳定但学习更慢；更多 private dim → 学习更快但可能 diverge</li>
+</ol>
+<h3 id="4-4-方法演进逻辑">4.4 方法演进逻辑</h3>
+<pre class="line-numbers language-none"><code class="language-none">Shared Encoder COA (失败：COA退化)
+    ↓ 发现需要独立编码器
+Dual Encoder + InfoNCE (失败：锁住policy)
+    ↓ 发现对齐过强
+Dual Encoder + 软对齐 (失败：全空间对齐仍过强)
+    ↓ 发现不应对齐全部表征
+Dual Encoder + Disentangled Partial Alignment (成功)
+    ↓ 只对齐shared subspace，保留private自由度<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<hr>
+<h2 id="五、下周计划">五、下周计划</h2>
+<ol>
+<li><strong>扩展验证</strong>：将 COA 方法集成到 DreamerV3 框架中，在 DMControl 标准 benchmark 上测试</li>
+<li><strong>LLM Agent 场景</strong>：在 TextWorld/ALFWorld 上验证，其中 LLM 的 next-token prediction 作为 WM</li>
+<li><strong>理论分析</strong>：推导 partial alignment 对 policy performance bound 的影响</li>
+<li><strong>论文写作准备</strong>：整理相关工作，确定投稿目标</li>
+</ol>
+<hr>
+<h2 id="六、参考文献">六、参考文献</h2>
+<ol>
+<li>Lambert, N., Amos, B., Yadan, O., &amp; Calandra, R. (2020). Objective mismatch in model-based reinforcement learning. <em>arXiv:2002.04523</em>.</li>
+<li>Voelcker, C., Liao, V., Garg, A., &amp; Farahmand, A. (2023). Value gradient weighted model-based reinforcement learning. <em>ICLR 2023</em>.</li>
+<li>Schrittwieser, J., et al. (2020). Mastering Atari, Go, Chess and Shogi by planning with a learned model. <em>Nature</em>.</li>
+<li>Hafner, D., et al. (2023). Mastering diverse domains through world models. <em>arXiv:2301.04104</em>.</li>
+<li>Hansen, N., Wang, X., &amp; Su, H. (2022). Temporal difference learning for model-based planning. <em>ICML 2022</em>.</li>
+<li>Grimm, C., Barreto, A., Singh, S., &amp; Silver, D. (2020). The value equivalence principle for model-based reinforcement learning. <em>NeurIPS 2020</em>.</li>
+<li>Zhang, G., et al. (2026). The landscape of agentic reinforcement learning for LLMs: A survey. <em>TMLR</em>.</li>
+<li>Wang, R., &amp; Ammanabrolu, P. (2025). A practitioner’s guide to multi-turn agentic reinforcement learning. <em>Under Review</em>.</li>
+<li>Pignatelli, E., et al. (2024). A survey of temporal credit assignment in deep reinforcement learning. <em>TMLR</em>.</li>
+<li>Wei, T., et al. (2026). Agentic reasoning for large language models. <em>Survey</em>.</li>
+</ol>
+</div>
+
+        
+        <div class="post-tags">
+          <span class="post-tags-label">标签:</span>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/Agentic-RL/">#Agentic RL</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/%E5%91%A8%E6%8A%A5/">#周报</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/Model-Based-RL/">#Model-Based RL</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/World-Model/">#World Model</a>
+          
+            <a class="post-tag" href="file:///D:/blog/public/tags/Objective-Mismatch/">#Objective Mismatch</a>
+          
+        </div>
+        
+
+        <nav class="post-pager" aria-label="post navigation">
+          
+            <a class="post-pager-item post-pager-prev" href="file:///D:/blog/public/posts/2caf4e5e/">
+              <span class="post-pager-label">上一篇</span>
+              <span class="post-pager-title">研究周报 · 2026.03.22–03.28 · PSR 实验 Block1-3 与方向复盘</span>
+            </a>
+          
+          
+        </nav>
+
+        
+
+<section class="post-comments">
+  <script src="https://giscus.app/client.js"
+    data-repo="yo666666yo/yo666666yo.github.io"
+    data-repo-id="R_kgDOSLiRUQ"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOSLiRUc4C7m3u"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="preferred_color_scheme"
+    data-lang="zh-CN"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async></script>
+</section>
+
+
+      </div>
+    </div>
+  </div>
+
+  <button class="toc-fab" type="button" data-toc-open aria-label="Open table of contents" aria-controls="article-toc-drawer" hidden>
+    <span class="toc-fab-icon" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+  </button>
+
+  <div class="toc-drawer" id="article-toc-drawer" data-toc-drawer aria-hidden="true" hidden>
+    <div class="toc-drawer-backdrop" data-toc-close></div>
+    <section class="toc-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="toc-drawer-title" tabindex="-1">
+      <div class="toc-drawer-grabber" data-toc-grabber aria-hidden="true"></div>
+      <div class="toc-drawer-header">
+        <h2 id="toc-drawer-title">Contents</h2>
+        <button class="toc-drawer-close" type="button" data-toc-close aria-label="Close table of contents">
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="toc-drawer-scroll">
+        <ol class="article-toc-list toc-drawer-list" data-toc-mobile-list></ol>
+      </div>
+    </section>
+  </div>
+</article>
+
+  </main>
+
+  <hr class="section-divider" />
+
+  
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    
+    <ul class="social-list">
+      
+        
+        <li class="social-list-item">
+          <a href="https://github.com/yo666666yo" rel="noopener me external nofollow noreferrer" target="_blank" aria-label="Yoyo_Lee GitHub">
+            <span class="social-circle">
+              <span class="social-label">github</span>
+            </span>
+          </a>
+        </li>
+      
+      
+      <li class="social-list-item">
+        <a href="file:///D:/blog/public/atom.xml" rel="alternate" aria-label="rss">
+          <span class="social-circle"><span class="social-label">RSS</span></span>
+        </a>
+      </li>
+      
+    </ul>
+    
+
+    <div class="site-footer-copy">
+      
+        <span>Copyright &copy; Yoyo_Lee 2026</span>
+      
+      
+        <span class="site-footer-dot">·</span>
+        <span><a href="https://hexo.io/" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> · <a href="https://startbootstrap.com/theme/clean-blog" rel="noopener external nofollow noreferrer" target="_blank">Clean Blog</a></span>
+      
+    </div>
+  </div>
+</footer>
+
+  <script defer src="file:///D:/blog/public/js/clean-blog.js?v=20260729-2"></script>
+
+
+<script>window.addEventListener("load",function(){
+setTimeout(function(){
+  const out={innerW:window.innerWidth,root:getComputedStyle(document.documentElement).fontSize,docScrollW:document.documentElement.scrollWidth,bodySW:document.body.scrollWidth,boxes:[],overflow:[]};
+  const t=[['.code-copy-button','copy button'],['.code-language','code lang'],['.code-block','code block'],['.post-body pre','pre'],['.post-body table','table'],['.katex-display','katex display'],['.post-body :not(pre) > code','inline code'],['.toc-fab','FAB']];
+  for(const [s,n] of t){const els=document.querySelectorAll(s); if(!els.length){out.boxes.push({name:n,missing:true});continue;} let el=els[0]; const r=el.getBoundingClientRect(); const cs=getComputedStyle(el); out.boxes.push({name:n,count:els.length,w:+r.width.toFixed(1),h:+r.height.toFixed(1),l:+r.left.toFixed(1),rt:+r.right.toFixed(1),display:cs.display,sw:el.scrollWidth,cw:el.clientWidth,ox:cs.overflowX});}
+  // widest pre / table
+  ['pre','table'].forEach(tag=>{let mx=null; document.querySelectorAll('.post-body '+tag).forEach(el=>{if(!mx||el.scrollWidth>mx.scrollWidth)mx=el;}); if(mx){const r=mx.getBoundingClientRect(); out.boxes.push({name:'widest '+tag,sw:mx.scrollWidth,cw:mx.clientWidth,w:+r.width.toFixed(1),l:+r.left.toFixed(1),rt:+r.right.toFixed(1),ox:getComputedStyle(mx).overflowX});}});
+  document.querySelectorAll('body *').forEach(el=>{const r=el.getBoundingClientRect(); if(r.width>0&&(r.right>window.innerWidth+1||r.left<-1)){const cs=getComputedStyle(el); if(cs.visibility==='hidden'||cs.position==='fixed')return; out.overflow.push({tag:el.tagName.toLowerCase(),cls:(el.className||'').toString().slice(0,45),l:+r.left.toFixed(1),rt:+r.right.toFixed(1),sw:el.scrollWidth,cw:el.clientWidth,ox:cs.overflowX});}});
+  out.overflow=out.overflow.slice(0,25);
+  parent.postMessage("PROBE:"+JSON.stringify(out),"*");
+},1200);
+
+});</script></body>
+</html>
