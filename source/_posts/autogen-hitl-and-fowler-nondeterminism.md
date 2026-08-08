@@ -108,7 +108,7 @@ turn counter 会在每次 run 时重置，但对话历史和 round-robin 的位�
 
 **(b) `HandoffTermination`：让 agent 自己决定何时要人**
 
-这种更优雅。Agent 自己判断"我做不下去了，需要人介入"，主动 handoff 给 `"user"` target，再由 termination condition 捕捉这个事件、停掉整个 team：
+另一条路把“什么时候需要人”交给 agent 自己判断。它可以主动 handoff 给 `"user"` target，再由 termination condition 捕捉事件并停掉整个 team：
 
 ```python
 from autogen_agentchat.base import Handoff
@@ -135,7 +135,7 @@ await Console(team.run_stream(task="The weather in New York is sunny."))
 # 重新进入 run，agent 拿到 user 的输入继续工作
 ```
 
-有几个点值得留意的是：
+这里有三个容易漏掉的细节：
 
 - termination 是复合条件 `handoff_termination | text_termination`，任意一个触发就停
 - `Swarm` 在 user-handoff 之后 resume 时，`task` 必须是 `HandoffMessage`，还得指明下一步交给谁，接口比 `RoundRobinGroupChat` 严格
@@ -153,11 +153,11 @@ await Console(team.run_stream(task="The weather in New York is sunny."))
 | **适用场景** | 同步审批、快速确认 | 长会话、异步 UI、跨设备 resume |
 | **典型 failure mode** | 等待中 worker 死掉 → 会话丢失 | 重 run 时 task 注入错误 → 上下文错乱 |
 
-这两种模式与其说是实现细节上的差异，不如说是两档不同的 tolerance——这一点放到第三部分再说。
+所以这不只是实现细节的差异，而是两档不同的 tolerance。第三部分再回到这个判断。
 
 ### 1.4 顺便回看一下旧 0.2 API 的 `human_input_mode`
 
-AutoGen 0.2 的 `UserProxyAgent` 把 HITL 的策略全压在一个 `human_input_mode` 参数上：
+AutoGen 0.2 的 `UserProxyAgent` 把 HITL 策略集中在一个 `human_input_mode` 参数上：
 
 | 取值 | 行为 |
 |---|---|
@@ -165,13 +165,15 @@ AutoGen 0.2 的 `UserProxyAgent` 把 HITL 的策略全压在一个 `human_input_
 | `TERMINATE` | 只在收到 termination message 或达到 `max_consecutive_auto_reply` 时问 |
 | `NEVER` | 永不问，完全自主 |
 
-这个设计更加简单直观，但是把"何时问人"和"怎么问人"耦合在了同一个 agent 上。0.4 则通过`UserProxyAgent` 的`input_func`控制问人的方式，通过termination condition + team selection logic控制问人的时机。
+这种设计更直观，但“何时问人”和“怎么问人”都落在同一个 agent 上。0.4 把两件事拆开了：`UserProxyAgent` 的 `input_func` 负责输入方式，termination condition 和 team selection logic 负责触发时机。
 
 ---
 
 ## 二、Fowler 的"非确定性"与软件工程的 tolerance
 
-最近软件体系架构课程分享了一篇敏捷开发先驱Fowler的文章。主题大致是说“智能体驱动的软件开发使得软件工程的确定性终结了”。读到这篇文章的时候我便联想到了最近学习的Autogen框架，软件工程的非确定性是否能用HITL思想改善甚至解决？因此我特地找了他2025 年 11 月 19 日的 [The Pragmatic Engineer 播客](https://newsletter.pragmaticengineer.com/p/martin-fowler)，节目标题是 "How AI will change software engineering – with Martin Fowler"。我把跟今天主题相关的几句原话摘出来：
+最近在软件体系架构课程里，我听到一篇讨论 Fowler 的文章。它把智能体驱动的软件开发概括成一个很激进的判断：软件工程正在失去过去那种确定性。这个说法让我立刻想到刚读过的 AutoGen——如果 agent 的输出本来就有波动，HITL 到底能补上哪一段？
+
+带着这个问题，我找到了 Fowler 在 2025 年 11 月 19 日参加的 [The Pragmatic Engineer 播客](https://newsletter.pragmaticengineer.com/p/martin-fowler)，节目标题是 "How AI will change software engineering – with Martin Fowler"。和这篇笔记最相关的是下面几句：
 
 > "It's a whole new way of thinking. It's got some interesting parallels to other forms of engineering."
 
@@ -179,28 +181,28 @@ AutoGen 0.2 的 `UserProxyAgent` 把 HITL 的策略全压在一个 `human_input_
 
 > "We need to realize that we can't skate too close to the edge because otherwise we're going to have some bridges collapsing. We're going to have some noticeable crashes."
 
-Fowler 的妻子是结构工程师：
+Fowler 还提到，他的妻子是一名结构工程师：
 
 > "My wife's a structural engineer. She always thinks in terms of what are the tolerances, how much extra stuff do I have to do beyond what the math tells me because I need it for tolerances."
 
-结构工程里的 tolerance 思维可以用一句话概括：你知道材料的理论强度，但你永远按最坏情况去算余量。木头不会每根都达到手册上的杨氏模量，混凝土的实际抗压强度会随施工波动，所以工程师会在数学算出来的"刚好够"之上，再加一倍、两倍、三倍。
+结构工程里的 tolerance 思维，我理解成一句话：知道材料的理论强度，却不按“刚好够”去设计余量。木头不会每根都达到手册上的杨氏模量，混凝土的实际抗压强度也会受施工波动影响，所以工程师会在计算结果之上再留出空间。
 
-Fowler 的论点是，软件工程要进非确定性时代了，但软件工程师的思维范式还停在确定性时代。
+我听下来，Fowler 的重点并不是宣布软件工程“进入新时代”，而是提醒工程师：系统的波动变得更靠近 application 层了，但我们的习惯还停留在确定性计算那一边。
 
 ### 2.1 软件工程的"确定性惯性"
 
-确定性计算可以理解为二元的，结果要么对要么错，错了就 debug，调到对为止。我们整个学科的工具链都是搭在这个假设上的：
+确定性计算很容易被理解成二元结果：对，或者错；错了就 debug，直到调对为止。很多工具链都建立在这个前提上：
 
-- **单元测试**：input X → output Y 是固定的
-- **CI gate**：通过就 deploy，不通过就 fail
-- **Refactoring**：行为完全不变才叫安全
-- **Debugging**：bug 是可复现的，复现不了就不算 bug
+- 单元测试：input X → output Y 应该固定
+- CI gate：通过就 deploy，不通过就 fail
+- Refactoring：行为完全不变才算安全
+- Debugging：bug 最好能复现，否则很难定位
 
-但LLM 输出是本质“许愿”的。同一个 prompt 跑两次拿到不同结果在 LLM 里是 baseline。
+但 LLM 输出更像“许愿”：同一个 prompt 跑两次得到不同结果，在这里反而是 baseline。
 
 ### 2.2 Fowler 所担心的
 
-那段访谈纪要我反复读了几遍，感觉 Fowler 最担心的不是非确定性本身——他显然觉得这是躲不掉的趋势——而是工程师对它的低估。
+那段访谈我来回听了几遍。Fowler 真正在意的似乎不是非确定性本身——他并不认为这股趋势还能绕开——而是工程师仍然按确定性系统的习惯去估计风险。
 
 > "We can't skate too close to the edge."
 
@@ -210,70 +212,70 @@ Fowler 的论点是，软件工程要进非确定性时代了，但软件工程�
 
 ### 2.3 Rakia Bensassi 的延伸：从建筑师到园丁
 
-[Rakia Bensassi 在 Substack 上写过一篇 *The Death of the Deterministic Developer*](https://rakiabensassi.substack.com/p/the-death-of-the-deterministic-developer)，把 Fowler 的观点往更宽的方向拉了拉，提出 Plan-Driven Development 的破产：传统软工默认"项目一开始就知道所有信息"，但云时代加上 AI 时代，这个假设早就失效了。
+Rakia Bensassi 在 Substack 上写过一篇 [*The Death of the Deterministic Developer*](https://rakiabensassi.substack.com/p/the-death-of-the-deterministic-developer)。她把 Fowler 的观点往更宽处推了一步，讨论 Plan-Driven Development 为什么会失效：传统软工默认“项目一开始就知道所有信息”，但云时代和 AI 时代都让这个前提变得不可靠。
 
-她那个比喻挺有画面感——别再当建筑师了，开始当园丁。"You plant seeds. You see what grows. You prune what doesn't."
+她给的比喻很有画面感：别再只做建筑师，开始当园丁。“You plant seeds. You see what grows. You prune what doesn't.”
 
-这种 mindset shift 落到工程实践上，其实就是把"控制论"那个反馈环嵌进系统设计的每一层：你不再是写好规则跑就完事，而是持续盯着系统输出、随时干预、必要时把人拉进来。
+我把这个 mindset shift 放回工程实践里，看到的是一个持续反馈的设计：规则写完并不等于工作结束，还要盯着系统输出，必要时干预，必要时把人拉进来。
 
 ---
 
 ## 三、把 HITL 看成 tolerance 的工程化实现
 
-到这里我把前两部分放一起重读，发现几个对应关系挺清楚。
+把前两部分放在一起重读，AutoGen 的两种 HITL 模式和 Fowler 说的 tolerance 开始对上了。
 
-HITL 不是"LLM 不够好所以加个人"的补救——它是非确定性系统的 tolerance 在工程层面的实例化。Fowler 在结构工程里说的"多算一倍余量"，搬到 agent 系统里没法翻译成"多跑两次推理"或"加大 temperature"，那些只是改了概率分布，没真正引入外部检查。真正的余量得来自异质 verifier，而最便宜也最强的那个异质 verifier，就是 human。
+HITL 不是“LLM 不够好所以加个人”的补救，而是把非确定性系统的 tolerance 落到工程层面。Fowler 在结构工程里说的“多算一倍余量”，搬到 agent 系统里不能简单变成“多跑两次推理”或“加大 temperature”。那只是改变概率分布，没有真正引入外部检查。真正的余量来自异质 verifier；成本最低、判断又最直接的那个，通常就是 human。
 
-那 AutoGen 这两种 HITL 模式分别对应什么 tolerance？
+问题也就变成了：AutoGen 的两种 HITL 模式，各自在容忍什么风险？
 
 ### 3.1 模式一对应"高 cost、高 tolerance"
 
-`UserProxyAgent` + `input_func` 是同步强约束：team 必须等人点头才能继续。这一档 tolerance 很高（人是最后的把关者），但 cost 也高（阻塞、不可序列化、延迟全看人）。
+`UserProxyAgent` + `input_func` 是同步强约束：team 必须等人点头才能继续。这一档 tolerance 高，因为人是最后的把关者；代价也很明确，team 会阻塞，状态不能序列化，延迟取决于人什么时候回来。
 
-它真正适合的，是 Fowler 那种 "bridges collapsing" 级别的风险——
+它适合 Fowler 所说的 “bridges collapsing” 级别风险：
 
-- **不可逆操作的确认**：发布到生产、转账、给客户发邮件
-- **安全敏感**：生成的 SQL 要不要执行、生成的 shell 命令要不要 run
-- **法律 / 合规检查**：合同条款、隐私字段输出前的二次确认
+- 不可逆操作的确认：发布到生产、转账、给客户发邮件
+- 安全敏感：生成的 SQL 要不要执行、生成的 shell 命令要不要 run
+- 法律 / 合规检查：合同条款、隐私字段输出前的二次确认
 
-这类场景，应用 cannot skate close to the edge，所以宁可阻塞、宁可丢 session，也要让人 explicit 确认一下。
+这类场景不能 skate close to the edge。宁可阻塞，宁可丢掉 session，也要让人 explicit 确认一次。
 
 ### 3.2 模式二对应"低 cost、低 tolerance"
 
-`max_turns` / `HandoffTermination` 是异步弱约束：每轮 run 之间留个缝给人，但不强制人必须介入——很多时候用户只是在聊天，并没在"审批"什么。
+`max_turns` / `HandoffTermination` 是异步弱约束：每轮 run 之间给人留一个入口，但不强制人必须介入。很多时候用户只是在聊天，并没有审批什么高风险动作。
 
-它对应的场景：
+这条路更适合下面几种情况：
 
-- **长对话 chatbot**：每轮都要等用户回话，本来就是天然的 turn-by-turn 节奏
-- **任务可中断**：agent 试五分钟不行了 handoff 给人，人给一行 hint，再 handoff 回去
-- **跨设备 / 跨会话恢复**：今天在桌面开始的对话，明天在手机接着聊
+- 长对话 chatbot：每轮本来就要等用户回话，turn-by-turn 是它的自然节奏
+- 任务可中断：agent 试了几分钟仍然没有进展，就 handoff 给人；人补一行 hint，再 handoff 回去
+- 跨设备 / 跨会话恢复：今天在桌面开始，明天在手机接着聊
 
-这档 tolerance 比较"软"，但因为天生可持久化、不阻塞，反而能撑起很长很复杂的会话。它的危险在另一头：状态一旦 dump 出去，第二天 resume 时人对当时的上下文已经忘干净了，做出的决策未必真的基于上下文——这也是一种 "skating close to the edge"，只不过 edge 跑到人这边来了。
+这档 tolerance 更“软”。它可持久化、不阻塞，所以能撑起长而复杂的会话；但风险也换了位置：状态 dump 出去后，第二天 resume 的人可能已经忘了当时的上下文，新的决策未必真的建立在原来的信息上。仍然是在 skating close to the edge，只是 edge 跑到了人这一边。
 
 ### 3.3 一张映射表
 
-强行把两边对齐：
+下面这张表不是严格等价，只是把两种模式放到同一张图里看：
 
 | 维度 | 结构工程（Fowler 类比） | AutoGen 模式一 | AutoGen 模式二 |
 |---|---|---|---|
-| **被保护的对象** | 桥梁、建筑 | 不可逆 / 高 stake 操作 | 长对话 / 流程任务 |
-| **tolerance 来源** | 材料余量 + 检查工序 | 人在 loop 里阻塞确认 | 周期性 handoff + 人审 |
-| **极限场景** | 地震、超载 | prompt injection / 恶意 SQL | LLM 跑偏 / 长期 hallucination 累积 |
-| **失败代价** | 桥塌 | 直接生产事故 | 用户体验崩坏 + 信任损失 |
-| **能否"裸跑"** | 可以，按理论值 | 可以（去掉 user_proxy） | 可以（让 max_turns 拉得很大） |
-| **裸跑后果** | 偶尔倒一座 | 大概率某天出事 | 慢慢失控但难察觉 |
+| 被保护的对象 | 桥梁、建筑 | 不可逆 / 高 stake 操作 | 长对话 / 流程任务 |
+| tolerance 来源 | 材料余量 + 检查工序 | 人在 loop 里阻塞确认 | 周期性 handoff + 人审 |
+| 极限场景 | 地震、超载 | prompt injection / 恶意 SQL | LLM 跑偏 / 长期 hallucination 累积 |
+| 失败代价 | 桥塌 | 直接生产事故 | 用户体验崩坏 + 信任损失 |
+| 能否“裸跑” | 可以，按理论值 | 可以（去掉 user_proxy） | 可以（让 max_turns 拉得很大） |
+| 裸跑后果 | 偶尔倒一座 | 大概率某天出事 | 慢慢失控但难察觉 |
 
-Fowler 这套类比里我觉得最该记住的，是"裸跑后果"的不可见性才是真正的危险。桥塌是一次性事件，所有人都看到了，下一座设计会改。但 LLM agent 的失败往往是慢性的、统计的、被摊到无数次用户交互里——你可能两年都没意识到 production 每天在小幅犯错，直到哪天某个客户拿着一段 racist output 的截图挂上推特。
+这套类比里，我最想留下的是“裸跑后果”的不可见性。桥塌是一次性事件，所有人都看得到，下一座设计会改；LLM agent 的失败却可能慢慢摊进无数次用户交互。系统也许每天只错一点，直到某个客户拿着一段 racist output 的截图发到推特，团队才发现问题早就存在。
 
 ### 3.4 设计 HITL 时的几条原则（自己的总结）
 
-放在做 minimal-agent-harness 的语境里，我能想到几条经验性的原则：
+放在 minimal-agent-harness 的语境里，我现在会先找 cutpoint，而不是先问“要不要加 HITL”。写文件、调外部 API、做不可逆操作、生成会被直接执行的东西，都应该先列出来。风险点列清楚，介入位置才有依据。
 
-1. **HITL 不是"要不要加"，而是"加在哪几个 cutpoint"**——一开始就把整条 trajectory 的 risk 点列出来：写文件、调外部 API、做不可逆操作、生成会被直接执行的东西，这些天然就是 HITL cutpoint。
-2. **同步 HITL 只留给不可逆操作**——其余情况都走 async handoff。别图开发方便就到处插 blocking 的 `input_func`，那样系统会长得像个"半人工"的工单流，没有 agent 该有的样子。
-3. **HITL 之后的"恢复成本"得算进 tolerance 预算**——`HandoffTermination` 之后人 30 分钟才回来，这段时间的 context decay、用户上下文遗忘，都是被吃掉的余量。
-4. **HITL 的 fallback 也要设计**——人不回怎么办？timeout 之后默认 deny 还是默认 approve？这个默认值本身就是一个 tolerance 决定。
-5. **observability 永远是 HITL 的孪生兄弟**——人之所以能介入，前提是他看得见。看不见的 agent 行为，再好的 HITL 框架也接不进来。
+同步 HITL 我只会留给不可逆操作，其余情况尽量走 async handoff。为了开发方便，到处插 blocking 的 `input_func`，最后系统很容易长成“半人工”的工单流。
+
+恢复也不是免费的。`HandoffTermination` 之后人可能 30 分钟才回来，这段时间里的 context decay 和用户上下文遗忘，都应该算进 tolerance 预算。fallback 同样要提前定：人不回时，timeout 默认 deny 还是 approve？
+
+最后才是 observability。人能介入的前提，是先看得见 agent 在做什么；看不见的行为，再好的 HITL 框架也接不进来。
 
 ---
 
