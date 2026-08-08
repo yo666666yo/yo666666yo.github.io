@@ -281,25 +281,25 @@ HITL 不是“LLM 不够好所以加个人”的补救，而是把非确定性�
 
 ## 四、一点更宽的想法
 
-再往后退一步看，Fowler 的核心论点其实可以这么讲：软件工程师一直在跟不确定性打交道，只是过去我们成功地把它压到了 OS 层、协议层、硬件层底下，让 application 层白白享受了三十年的"伪确定性"假期。LLM 并没有创造新的不确定性，它只是把不确定性从底层抬到了 application 层、抬到了 prompt 这一层、抬到了 user-facing 行为这一层。
+再往后退一步看，Fowler 的核心论点可以这样理解：软件工程师一直在处理不确定性，只是过去我们把它压在 OS、协议和硬件这些更底层的位置，application 层因此享受了很久的“伪确定性”。LLM 没有凭空创造新的不确定性，它只是把原本藏在底层的波动推到了 application、prompt 和 user-facing 行为附近。
 
-抬上来之后，工程师反倒得去学结构工程师、医生、飞行员一直在用的 tolerance 思维。这事说远不远——手术室的 surgical timeout、航空的 checklist、CI 里的 review gate、金融的 4-eye principle，全是同一种思维的不同实例。HITL 在 LLM agent 里扮演的角色，和这些场景里的 review gate 没有本质区别。
+波动到了这一层，工程师反而得重新学习结构工程师、医生和飞行员一直在用的 tolerance 思维。手术室的 surgical timeout、航空 checklist、CI 里的 review gate、金融的 4-eye principle，看起来属于不同领域，处理的却是同一个问题：什么时候必须停下来，让另一双眼睛介入。HITL 在 LLM agent 里承担的也是这件事。
 
-唯一不太一样的是：LLM 给了我们一次重新挑 tolerance 等级的机会。过去 review gate 加在哪儿，是历史和制度定下来的；今天我们从零写一个 agent 系统，是自己在白纸上决定"哪几个 cutpoint 要 human"。从这个角度看，Fowler 那句 "we need to realize that we can't skate too close to the edge"，其实是在提醒我们：这一代工程师面对的是一个 design choice，而这个 choice 的代价，会写进未来十年的 production incident report 里。
+不同之处在于，LLM 给了我们重新选择 tolerance 等级的机会。过去 review gate 加在哪里，往往已经由历史和制度决定；现在从零写一个 agent 系统，我们得自己回答“哪几个 cutpoint 要 human”。Fowler 那句 "we need to realize that we can't skate too close to the edge"，说的其实就是这个 design choice：今天省下的那一道 gate，可能会在将来的 production incident report 里重新出现。
 
 ---
 
 ## 结语
 
-AutoGen 的两种 HITL 模式，从技术上看是 API 的两条路径，但放到 Fowler 的非确定性视角下，它们其实是 tolerance 工程化的两种方法论——一种把人当硬 gate（同步、阻塞、专供不可逆操作），一种把人当软审查（异步、可恢复、专供长会话）。
+AutoGen 的两种 HITL 模式，从技术上看是 API 的两条路径；放到 Fowler 的非确定性视角下，它们对应两种不同的 tolerance 设计：一种把人当硬 gate，适合同步阻塞的不可逆操作；另一种把人当软审查，适合异步、可恢复的长会话。
 
-把人塞回 loop 里，不是 LLM 应用的过渡形态，而是非确定性系统绕不开的一块。想清楚这件事，可能比记住任何一个具体 API 都有用。
+把人放回 loop 里，不是 LLM 应用的过渡形态，而是非确定性系统绕不开的一块。对我现在做的 agent 系统来说，这个区分比记住某一个 API 的参数更有用：先找风险 cutpoint，再决定人应该在哪个位置出现。
 
-如果你也在做 agent 系统相关的工程，希望这篇笔记里关于 tolerance 的几点观察能对你有用。
+这也是我读完文档和 Fowler 那期访谈后，最想留下的一条判断。
 
 ---
 
-**参考资料**
+## 参考资料
 
 - [Human-in-the-Loop — AutoGen AgentChat 官方文档](https://microsoft.github.io/autogen/stable/user-guide/agentchat-user-guide/tutorial/human-in-the-loop.html)
 - [agentchat.user_proxy_agent — AutoGen 0.2 文档](https://microsoft.github.io/autogen/0.2/docs/reference/agentchat/user_proxy_agent/)
