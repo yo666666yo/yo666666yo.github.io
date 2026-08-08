@@ -32,9 +32,9 @@
             
             <tag> CAD-GRPO </tag>
             
-            <tag> GiGPO </tag>
-            
             <tag> multi-agent </tag>
+            
+            <tag> GiGPO </tag>
             
             <tag> orchestration trace </tag>
             
@@ -65,19 +65,19 @@
             
             <tag> 周报 </tag>
             
-            <tag> CAD-GRPO </tag>
-            
-            <tag> DAPO </tag>
-            
             <tag> C3 </tag>
             
             <tag> CCPO </tag>
+            
+            <tag> CAD-GRPO </tag>
             
             <tag> credit-assignment </tag>
             
             <tag> multi-agent </tag>
             
             <tag> minimal-agent-harness </tag>
+            
+            <tag> DAPO </tag>
             
             <tag> NPO </tag>
             
@@ -549,9 +549,9 @@
     
     
     <entry>
-      <title>搜索</title>
-      <link href="/search/index.html"/>
-      <url>/search/index.html</url>
+      <title>标签</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -571,9 +571,9 @@
     
     
     <entry>
-      <title>标签</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
+      <title>搜索</title>
+      <link href="/search/index.html"/>
+      <url>/search/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
