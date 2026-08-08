@@ -8,14 +8,6 @@
 /* ============ Reset / base ============ */
 *, *::before, *::after { box-sizing: border-box; }
 
-:root {
-  /* Mirrored pairs: exit is the inverse of entry so reversals retrace their path. */
-  --ease-out: cubic-bezier(.2, 0, 0, 1);
-  --ease-in: cubic-bezier(1, 0, .8, 1);
-  --ease-spring: cubic-bezier(.34, 1.4, .64, 1);
-  --press-scale: .97;
-}
-
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
@@ -30,7 +22,6 @@ body {
   background-color: #fff;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  font-optical-sizing: auto;
 }
 
 img, svg { max-width: 100%; height: auto; display: block; }
@@ -47,66 +38,6 @@ a:hover { color: #00657b; }
 hr { border: 0; border-top: 1px solid rgba(0,0,0,.10); margin: 2rem 0; }
 hr.section-divider { margin: 0; border-top: 1px solid rgba(0,0,0,.08); }
 hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
-
-/* ============ Press feedback (§1: respond on pointer-down, not release) ============ */
-.post-preview > a,
-.site-search-button,
-.search-page-button,
-.pager .btn,
-.load-more-btn,
-.post-pager-item,
-.taxonomy-item a,
-.archive-post-title,
-.back-to-top,
-.toc-fab,
-.article-toc-collapse,
-.toc-drawer-close,
-.code-copy-button,
-.social-list-item a,
-.nav-link,
-.navbar-toggler,
-.article-toc-link,
-.site-search-result {
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-.site-search-button:active,
-.search-page-button:active,
-.pager .btn:active,
-.load-more-btn:not(:disabled):active,
-.article-toc-collapse:active,
-.toc-drawer-close:active,
-.code-copy-button:active,
-.navbar-toggler:active {
-  transform: scale(var(--press-scale));
-  transition: transform 100ms ease-out;
-}
-
-/* These lift on hover; keep the lift while compressing so press doesn't drop them. */
-.back-to-top:active,
-.toc-fab:active {
-  transform: translateY(-2px) scale(var(--press-scale));
-  transition: transform 100ms ease-out;
-}
-
-/* Large surfaces compress less — the same scale on a wide card reads as a lurch. */
-.post-preview > a:active,
-.post-pager-item:active,
-.taxonomy-item a:active {
-  transform: scale(.992);
-  transition: transform 100ms ease-out;
-}
-
-.nav-link:active,
-.article-toc-link:active,
-.site-search-result:active,
-.archive-post-title:active,
-.social-list-item a:active,
-.post-tag:active {
-  opacity: .62;
-  transition: opacity 80ms ease-out;
-}
 
 /* ============ Utility ============ */
 .container { width: 100%; max-width: 100%; padding-right: 1.5rem; padding-left: 1.5rem; margin: 0 auto; }
@@ -432,22 +363,8 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
   background-color: rgba(255,255,255,.78);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom-color: transparent;
-  box-shadow: none;
-}
-
-/* §12 — scroll edge effect: a soft fade where chrome overlaps content,
-   instead of a 1px rule that reads as a seam. */
-#mainNav.is-shrunk::after,
-#mainNav.nav-solid::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  right: 0;
-  left: 0;
-  height: 1.15rem;
-  pointer-events: none;
-  background: linear-gradient(to bottom, rgba(255,255,255,.72), rgba(255,255,255,0));
+  border-bottom-color: rgba(0,0,0,.08);
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
 }
 #mainNav.is-shrunk .navbar-brand,
 #mainNav.nav-solid .navbar-brand { color: #212529; }
@@ -517,14 +434,6 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
   justify-content: flex-end;
 }
 
-.navbar-collapse-inner {
-  display: flex;
-  flex-grow: 1;
-  align-items: center;
-  justify-content: flex-end;
-  width: 100%;
-}
-
 @media (max-width: 1199.98px) {
   .site-search { width: 12.75rem; }
   .nav-link { padding-right: .75rem; padding-left: .75rem; }
@@ -535,26 +444,13 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
   .navbar-toggler { display: inline-flex; }
   .navbar-collapse {
     flex-basis: 100%;
-    display: grid;
-    grid-template-rows: 0fr;
+    max-height: 0;
     overflow: hidden;
     align-items: stretch;
     justify-content: flex-start;
-    opacity: 0;
-    transition: grid-template-rows .34s var(--ease-out), opacity .2s var(--ease-in);
+    transition: max-height .28s ease;
   }
-  .navbar-collapse > * { min-height: 0; }
-  .navbar-collapse.is-open {
-    grid-template-rows: 1fr;
-    opacity: 1;
-    transition: grid-template-rows .34s var(--ease-out), opacity .24s var(--ease-out) .04s;
-  }
-  .navbar-collapse-inner {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    overflow: hidden;
-  }
+  .navbar-collapse.is-open { max-height: 42rem; }
   .site-search {
     width: 100%;
     margin: 1rem 0 .25rem;
@@ -601,11 +497,10 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
 .masthead .page-heading h1 {
   font-family: "Lora", Georgia, serif;
   font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -.022em;
+  line-height: 1.1;
+  letter-spacing: -.01em;
   margin: 0;
   color: #fff;
-  font-optical-sizing: auto;
 }
 
 .masthead .site-heading h1 { font-size: 3.25rem; }
@@ -694,6 +589,27 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
 .masthead .post-heading .meta a { color: inherit; text-decoration: underline; }
 .masthead .post-heading .meta a:hover { color: #fff; }
 
+/* Keep short CJK phrases and compact technical terms together while still
+   allowing a long Latin identifier to break when the viewport is narrow. */
+.title-word { white-space: nowrap; }
+.title-latin-term {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.title-date-group { display: inline-block; }
+.title-date,
+.title-separator { white-space: nowrap; }
+.masthead .title-latin-term {
+  display: inline;
+  max-width: none;
+  overflow-wrap: break-word;
+}
+@media screen and (max-width: 576px) {
+  .masthead .title-date-group { display: inline; }
+  .masthead .title-separator { white-space: normal; }
+}
+
 .masthead-post { padding: 12rem 0 6rem; }
 
 @media (min-width: 768px) {
@@ -777,11 +693,10 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
   font-family: "Lora", Georgia, serif;
   font-size: 2rem;
   font-weight: 700;
-  line-height: 1.18;
-  letter-spacing: -.021em;
+  line-height: 1.25;
+  letter-spacing: -.01em;
   color: #212529;
   transition: color .2s ease;
-  font-optical-sizing: auto;
 }
 
 .post-subtitle {
@@ -824,15 +739,15 @@ hr.post-divider { border-top: 1px solid rgba(0,0,0,.12); margin: 2.5rem 0; }
 .post-body h1, .post-body h2, .post-body h3, .post-body h4, .post-body h5, .post-body h6 {
   font-family: "Lora", Georgia, serif;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.3;
+  letter-spacing: -.01em;
   color: #212529;
   margin: 2.2rem 0 1rem;
-  font-optical-sizing: auto;
 }
-.post-body h1 { font-size: 2rem; line-height: 1.18; letter-spacing: -.021em; }
-.post-body h2 { font-size: 1.7rem; line-height: 1.22; letter-spacing: -.017em; }
-.post-body h3 { font-size: 1.4rem; line-height: 1.3; letter-spacing: -.012em; }
-.post-body h4 { font-size: 1.2rem; line-height: 1.35; letter-spacing: -.008em; }
+.post-body h1 { font-size: 2rem; }
+.post-body h2 { font-size: 1.7rem; }
+.post-body h3 { font-size: 1.4rem; }
+.post-body h4 { font-size: 1.2rem; }
 .post-body h5 { font-size: 1.05rem; text-transform: uppercase; letter-spacing: .06em; }
 .post-body h6 { font-size: .95rem; text-transform: uppercase; letter-spacing: .08em; color: #6c757d; }
 
@@ -1645,10 +1560,6 @@ figure.highlight figcaption a { color: inherit; text-decoration: underline; }
   transform: rotate(180deg);
 }
 
-.article-layout.toc-is-collapsed .article-toc-collapse:active {
-  transform: rotate(180deg) scale(var(--press-scale));
-}
-
 .article-layout.toc-is-collapsed .article-toc-scroll {
   display: none;
 }
@@ -1720,14 +1631,14 @@ figure.highlight figcaption a { color: inherit; text-decoration: underline; }
   justify-content: center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity .25s var(--ease-in);
+  transition: opacity .25s cubic-bezier(0.4, 0, 1, 1);
 }
 
 .toc-drawer.is-open {
   opacity: 1;
   pointer-events: auto;
   transition-duration: .3s;
-  transition-timing-function: var(--ease-out);
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .toc-drawer-backdrop {
@@ -1750,39 +1661,13 @@ figure.highlight figcaption a { color: inherit; text-decoration: underline; }
   box-shadow: 0 16px 48px rgba(0,0,0,.16);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  transform: translate3d(0, var(--toc-drawer-y, 100%), 0);
-  will-change: transform;
+  transform: translate3d(0, 1.5rem, 0);
+  transition: transform .3s cubic-bezier(0.2, 0, 0, 1);
 }
 
-/* Position is driven frame-by-frame by the JS spring, so no CSS transition
-   here — one would lag behind the pointer and defeat mid-flight grabs. */
-
-.toc-drawer.is-dragging .toc-drawer-panel {
-  transition: none;
+.toc-drawer.is-open .toc-drawer-panel {
+  transform: translate3d(0, 0, 0);
 }
-
-.toc-drawer-grabber {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 1.35rem;
-  margin: -.5rem -1rem .1rem;
-  cursor: grab;
-  touch-action: none;
-}
-
-.toc-drawer-grabber::before {
-  content: "";
-  width: 2.4rem;
-  height: .25rem;
-  background: rgba(33,37,41,.22);
-  border-radius: 999px;
-  transition: background-color .2s ease;
-}
-
-.toc-drawer.is-dragging .toc-drawer-grabber { cursor: grabbing; }
-.toc-drawer.is-dragging .toc-drawer-grabber::before,
-.toc-drawer-grabber:active::before { background: rgba(33,37,41,.38); }
 
 .toc-drawer-header {
   display: flex;
@@ -1965,88 +1850,4 @@ body.toc-drawer-open {
   .masthead::before {
     transform: none;
   }
-
-  /* Reduced motion means a gentler equivalent, not the absence of feedback:
-     the drawer cross-fades via .toc-drawer's opacity, and the spring snaps. */
-
-  .navbar-collapse {
-    transition: opacity .2s ease !important;
-  }
-
-  /* Keep press feedback, drop the movement. */
-  .site-search-button:active,
-  .search-page-button:active,
-  .pager .btn:active,
-  .load-more-btn:not(:disabled):active,
-  .back-to-top:active,
-  .toc-fab:active,
-  .article-toc-collapse:active,
-  .toc-drawer-close:active,
-  .code-copy-button:active,
-  .navbar-toggler:active,
-  .post-preview > a:active,
-  .post-pager-item:active,
-  .taxonomy-item a:active {
-    transform: none;
-    opacity: .7;
-  }
-}
-
-/* §14 — raise opacity toward solid and drop the blur. */
-@media (prefers-reduced-transparency: reduce) {
-  #mainNav.is-shrunk,
-  #mainNav.nav-solid {
-    background-color: #fff;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border-bottom-color: rgba(0,0,0,.12);
-  }
-
-  #mainNav.is-shrunk::after,
-  #mainNav.nav-solid::after { display: none; }
-
-  .site-search-results,
-  .article-toc,
-  .toc-fab,
-  .toc-drawer-panel {
-    background: #fff;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-
-  .toc-drawer-backdrop {
-    background: rgba(33,37,41,.55);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-
-  .post-reading-stats {
-    background: rgba(17,20,24,.72);
-    backdrop-filter: none;
-  }
-}
-
-/* §14 — near-solid backgrounds with a defined contrasting border. */
-@media (prefers-contrast: more) {
-  #mainNav.is-shrunk,
-  #mainNav.nav-solid {
-    background-color: #fff;
-    border-bottom-color: rgba(0,0,0,.45);
-  }
-
-  .site-search-results,
-  .article-toc,
-  .toc-drawer-panel,
-  .toc-fab {
-    background: #fff;
-    border-color: rgba(0,0,0,.45);
-  }
-
-  .post-body blockquote { border-left-color: #00566a; }
-  .post-subtitle,
-  .post-meta,
-  .site-search-excerpt,
-  .archive-post-date { color: #495057; }
-  .article-toc-link { color: #212529; }
-  .article-toc-link[data-toc-level="3"] { color: #343a40; }
 }

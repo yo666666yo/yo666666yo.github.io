@@ -16,92 +16,6 @@
     return reducedMotionQuery.matches;
   }
 
-  /*
-   * Critically-damped-by-default spring. Parameterised the way the Apple
-   * "Designing Fluid Interfaces" talk frames it: damping ratio (overshoot) and
-   * response (seconds to target), rather than mass/stiffness/damping.
-   * Always animates from the live presentation value, so it can be grabbed and
-   * re-targeted mid-flight without a jump.
-   */
-  function createSpring(options) {
-    const onUpdate = options.onUpdate;
-    const damping = options.damping == null ? 1 : options.damping;
-    const response = options.response == null ? 0.4 : options.response;
-    const omega = (2 * Math.PI) / response;
-
-    let value = options.from || 0;
-    let velocity = 0;
-    let target = value;
-    let frame = 0;
-    let lastTime = 0;
-    let onRest = null;
-
-    function stop() {
-      if (frame) window.cancelAnimationFrame(frame);
-      frame = 0;
-    }
-
-    function tick(now) {
-      const dt = Math.min((now - lastTime) / 1000, 1 / 30);
-      lastTime = now;
-
-      // Semi-implicit Euler; stable at the step sizes rAF gives us.
-      const accel = -omega * omega * (value - target) - 2 * damping * omega * velocity;
-      velocity += accel * dt;
-      value += velocity * dt;
-
-      if (Math.abs(value - target) < 0.1 && Math.abs(velocity) < 0.1) {
-        value = target;
-        velocity = 0;
-        onUpdate(value);
-        frame = 0;
-        const done = onRest;
-        onRest = null;
-        if (done) done();
-        return;
-      }
-
-      onUpdate(value);
-      frame = window.requestAnimationFrame(tick);
-    }
-
-    return {
-      get value() { return value; },
-      setValue: function (next) {
-        stop();
-        value = next;
-        onUpdate(value);
-      },
-      // Velocity is blended, not hard-cut, so a reversal has no brick wall.
-      to: function (next, initialVelocity, done) {
-        target = next;
-        if (typeof initialVelocity === 'number') velocity = initialVelocity;
-        onRest = done || null;
-
-        if (prefersReducedMotion()) {
-          stop();
-          value = next;
-          velocity = 0;
-          onUpdate(value);
-          if (done) done();
-          return;
-        }
-
-        if (!frame) {
-          lastTime = window.performance.now();
-          frame = window.requestAnimationFrame(tick);
-        }
-      },
-      stop: stop
-    };
-  }
-
-  // §9 — progressive resistance past a boundary instead of a hard stop.
-  function rubberband(overshoot, dimension, constant) {
-    const c = constant || 0.55;
-    return (overshoot * dimension * c) / (dimension + c * Math.abs(overshoot));
-  }
-
   // --- navbar shrink on scroll ---
   function updateNavState() {
     if (!nav) return;
@@ -269,16 +183,6 @@
 
     let lastFocusedElement = null;
 
-    // Drawer position as a percentage of panel height: 0 = open, 100 = dismissed.
-    const drawerSpring = tocPanel ? createSpring({
-      from: 100,
-      damping: 0.8,
-      response: 0.3,
-      onUpdate: function (v) {
-        tocPanel.style.setProperty('--toc-drawer-y', v.toFixed(3) + '%');
-      }
-    }) : null;
-
     function openTocDrawer() {
       if (!tocDrawer || !tocPanel) return;
       lastFocusedElement = document.activeElement;
@@ -288,7 +192,6 @@
 
       window.requestAnimationFrame(function () {
         tocDrawer.classList.add('is-open');
-        if (drawerSpring) drawerSpring.to(0);
         const closeButton = tocDrawer.querySelector('.toc-drawer-close');
         (closeButton || tocPanel).focus();
       });
@@ -296,112 +199,23 @@
 
     function closeTocDrawer(options) {
       if (!tocDrawer || tocDrawer.hidden) return;
-      const opts = options || {};
-      const shouldRestoreFocus = opts.restoreFocus !== false;
+      const shouldRestoreFocus = !options || options.restoreFocus !== false;
 
-      tocDrawer.classList.remove('is-open', 'is-dragging');
+      tocDrawer.classList.remove('is-open');
       tocDrawer.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('toc-drawer-open');
 
       const finishClose = function () {
         tocDrawer.hidden = true;
-        if (drawerSpring) drawerSpring.setValue(100);
       };
 
-      if (drawerSpring && !prefersReducedMotion()) {
-        // Carry the release velocity into the exit so the flick continues.
-        drawerSpring.to(100, opts.velocity, finishClose);
-      } else {
-        if (drawerSpring) drawerSpring.stop();
-        finishClose();
-      }
+      if (prefersReducedMotion()) finishClose();
+      else window.setTimeout(finishClose, 250);
 
       if (shouldRestoreFocus && lastFocusedElement && document.contains(lastFocusedElement)) {
         lastFocusedElement.focus();
       }
     }
-
-    // --- drag to dismiss (§3 interruptibility, §5 velocity handoff) ---
-    (function initDrawerDrag() {
-      const grabber = tocDrawer ? tocDrawer.querySelector('[data-toc-grabber]') : null;
-      if (!grabber || !tocPanel || !drawerSpring || !window.PointerEvent) return;
-
-      const DRAG_THRESHOLD = 10;
-      let pointerId = null;
-      let startY = 0;
-      let startValue = 0;
-      let panelHeight = 1;
-      let locked = false;
-      // Short history so release velocity reflects the last moments, not the whole drag.
-      let samples = [];
-
-      function velocityFromSamples() {
-        if (samples.length < 2) return 0;
-        const last = samples[samples.length - 1];
-        let first = samples[0];
-        for (let i = samples.length - 1; i >= 0; i--) {
-          if (last.t - samples[i].t > 100) break;
-          first = samples[i];
-        }
-        const dt = last.t - first.t;
-        if (dt <= 0) return 0;
-        return ((last.y - first.y) / dt) * 1000; // px/s
-      }
-
-      grabber.addEventListener('pointerdown', function (event) {
-        if (pointerId !== null || event.button !== 0) return;
-        pointerId = event.pointerId;
-        startY = event.clientY;
-        panelHeight = tocPanel.offsetHeight || 1;
-        startValue = drawerSpring.value; // presentation value — grabbing mid-flight is fine
-        locked = false;
-        samples = [{ y: event.clientY, t: event.timeStamp }];
-        drawerSpring.stop();
-        grabber.setPointerCapture(pointerId);
-      });
-
-      grabber.addEventListener('pointermove', function (event) {
-        if (event.pointerId !== pointerId) return;
-        const dy = event.clientY - startY;
-
-        if (!locked) {
-          if (Math.abs(dy) < DRAG_THRESHOLD) return;
-          locked = true;
-          tocDrawer.classList.add('is-dragging');
-        }
-
-        samples.push({ y: event.clientY, t: event.timeStamp });
-        if (samples.length > 8) samples.shift();
-
-        // Downward tracks 1:1; upward past the open position rubber-bands.
-        const raw = startValue + (dy / panelHeight) * 100;
-        const next = raw < 0 ? rubberband(raw, 100) : Math.min(raw, 100);
-        drawerSpring.setValue(next);
-      });
-
-      function endDrag(event) {
-        if (event.pointerId !== pointerId) return;
-        const wasLocked = locked;
-        pointerId = null;
-        locked = false;
-        tocDrawer.classList.remove('is-dragging');
-
-        if (!wasLocked) return;
-
-        const pxPerSec = velocityFromSamples();
-        const pctPerSec = (pxPerSec / panelHeight) * 100;
-
-        // Project where momentum would carry it, then decide against that point.
-        const decel = 0.998;
-        const projected = drawerSpring.value + (pctPerSec / 1000) * (decel / (1 - decel));
-
-        if (projected > 45) closeTocDrawer({ velocity: pctPerSec });
-        else drawerSpring.to(0, pctPerSec);
-      }
-
-      grabber.addEventListener('pointerup', endDrag);
-      grabber.addEventListener('pointercancel', endDrag);
-    })();
 
     function scrollToHeading(id, closeDrawer) {
       const heading = document.getElementById(id);
