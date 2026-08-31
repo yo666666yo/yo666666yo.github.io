@@ -4,6 +4,41 @@
   
     
     <entry>
+      <title>研究周报 · 2026.08.22-08.28 · C3 基线筛选与复现边界</title>
+      <link href="/posts/8e597c04/"/>
+      <url>/posts/8e597c04/</url>
+      
+        <content type="html"><![CDATA[<blockquote><p>本周完成 agent-level credit assignment 候选基线的初步筛选，并尝试复现 C3。<br>复现检查显示，当前公开仓库尚缺少关键脚本且训练配置与论文不完全对应，因此先明确其可复现边界，再调整下一阶段的问题选择。</p></blockquote><h2 id="本周清单">本周清单</h2><ol><li>初步完成 baseline 选取：C3</li><li>启动 C3 复现与仓库核验</li><li>精读 C3，比较不同粒度的 counterfactual credit assignment</li><li>寻找衡量计算开销的 metric</li></ol><span id="more"></span><hr><h2 id="一、初步完成-baseline-选取：C3">一、初步完成 baseline 选取：C3</h2><p>这一阶段的一个 motivation 是寻找更好的 cost-performance trade-off。当前 agent-level credit assignment 方法大多带有显式介入：例如 SHARP 用 Shapley value 估计单个 agent 的边际贡献。</p><p><img src="/img/weekly/image-20260827164535403.png" alt="SHARP 的 agent 边际贡献估计示意"></p><p>CCPO 和 C3 都利用 counterfactual，但介入粒度不同。CCPO 的做法是 mask 掉一个 agent 后重新进行 rollout，相当于直接考察移除该 agent 后的团队表现；原文讨论的重点似乎是 dual-agent 场景，例如 thinker 与 solver 的有无组合。</p><p>C3 则固定当前上下文，在 step level 替换某一条 message 来构造 counterfactual。相较于 whole-agent removal，它更接近对已完成轨迹中特定通信事件的局部归因。</p><p><img src="/img/weekly/image-20260827194824299.png" alt="CCPO 与 C3 的 counterfactual 粒度对比记录"></p><p><img src="/img/weekly/image-20260827194936368.png" alt="C3 的 step-level message 替换记录"></p><h2 id="二、C3-复现与当前边界">二、C3 复现与当前边界</h2><p>和盛天师哥讨论后，我先尝试复现 C3 的公开代码仓库，目标是核验它在 MATH500、GSM8K 等 benchmark 上的分数和运行链路。</p><p>检查发现，当前仓库缺少 <code>scripts/data/</code> 与 <code>scripts/models/</code>；README 提到的 <code>scripts/models/download_models.sh</code> 也不存在。同时，现有训练脚本与论文中的配置并不完全一致，因此暂时无法从公开 checkout 建立一条可与论文结果严格对应的训练路径。</p><p>我已向作者邮件询问。作者回复称近期会对仓库进行较大规模维护，包括补充缺失文件、整理训练脚本与配置；但公开更新的具体时间尚不明确。基于这一状态，C3 仍可作为方法与估计粒度的研究参照，却不适合作为当前阶段可直接复现、并用于 cost-performance 对比的主基线。</p><p>因此，先不把这一问题绑定在 C3 的复现进度上，转而继续寻找更可验证的研究 gap。</p><h2 id="三、下一步">三、下一步</h2><ol><li>重新聚焦 motivation 与可执行 baseline：考察 agent 广播、通信媒介与通信方式；例如在 latent space 直接传递 hidden state、为不同 policy 保留差异化上下文，以及动态内存与显存分配。</li><li>研究对应 method，明确通信上下文保留、异构 agent 与 agent 数量变化带来的建模约束。</li><li>将 Dr.MAS 纳入 baseline 候选，并与新的研究问题共同评估。</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 周报 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> credit assignment </tag>
+            
+            <tag> 周报 </tag>
+            
+            <tag> C3 </tag>
+            
+            <tag> multi-agent </tag>
+            
+            <tag> counterfactual </tag>
+            
+            <tag> cost-performance </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>研究周报 · 2026.08.08-08.14 · Agent-Level Credit Assignment Baseline 筛选</title>
       <link href="/posts/4afa2dfa/"/>
       <url>/posts/4afa2dfa/</url>
@@ -28,13 +63,13 @@
             
             <tag> multi-agent </tag>
             
+            <tag> counterfactual </tag>
+            
             <tag> COSAC </tag>
             
             <tag> DAE </tag>
             
             <tag> COMA </tag>
-            
-            <tag> counterfactual </tag>
             
         </tags>
       
@@ -73,9 +108,9 @@
             
             <tag> GiGPO </tag>
             
-            <tag> orchestration trace </tag>
-            
             <tag> multi-agent </tag>
+            
+            <tag> orchestration trace </tag>
             
         </tags>
       
@@ -108,19 +143,19 @@
             
             <tag> DAPO </tag>
             
-            <tag> multi-agent </tag>
-            
-            <tag> counterfactual </tag>
-            
             <tag> C3 </tag>
             
             <tag> CCPO </tag>
             
             <tag> credit-assignment </tag>
             
+            <tag> multi-agent </tag>
+            
             <tag> minimal-agent-harness </tag>
             
             <tag> NPO </tag>
+            
+            <tag> counterfactual </tag>
             
         </tags>
       
@@ -145,13 +180,13 @@
       
         <tags>
             
+            <tag> 随笔 </tag>
+            
             <tag> 红楼梦 </tag>
             
             <tag> 晴雯 </tag>
             
             <tag> 文学 </tag>
-            
-            <tag> 随笔 </tag>
             
         </tags>
       
@@ -577,11 +612,11 @@
     
     
     <entry>
-      <title>分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<h2 id="你好-👋">你好 👋</h2><p>我是 <strong>Yoyo_Lee</strong>。</p><p>这是我的个人角落，通常会写以下两方面：</p><ul><li>🧪 <strong>研究 / 笔记</strong>：机器学习、深度学习、多智能体、LLM 训练</li><li>🌿 <strong>生活 / 随笔</strong>：日常分享</li></ul><h2 id="联系">联系</h2><ul><li>GitHub: <a href="https://github.com/yo666666yo">Yoyo_Lee</a></li><li>RSS: <a href="/atom.xml">/atom.xml</a></li></ul><h2 id="关于这个博客">关于这个博客</h2><ul><li>框架：<a href="https://hexo.io/">Hexo</a> 8</li><li>主题：本地定制的 Clean Blog（移植自 <a href="https://startbootstrap.com/theme/clean-blog">Start Bootstrap Clean Blog</a>）</li><li>部署：GitHub Pages + GitHub Actions</li><li>评论：Giscus（基于 GitHub Discussions）</li><li>源码：<a href="https://github.com/yo666666yo/yo666666yo.github.io">GitHub Pages 仓库</a></li></ul><p>如果某篇文章对你有帮助，欢迎在评论区留言；有错请不吝指出。</p>]]></content>
       
     </entry>
     
@@ -599,11 +634,11 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
+      <title>分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
       
-        <content type="html"><![CDATA[<h2 id="你好-👋">你好 👋</h2><p>我是 <strong>Yoyo_Lee</strong>。</p><p>这是我的个人角落，通常会写以下两方面：</p><ul><li>🧪 <strong>研究 / 笔记</strong>：机器学习、深度学习、多智能体、LLM 训练</li><li>🌿 <strong>生活 / 随笔</strong>：日常分享</li></ul><h2 id="联系">联系</h2><ul><li>GitHub: <a href="https://github.com/yo666666yo">Yoyo_Lee</a></li><li>RSS: <a href="/atom.xml">/atom.xml</a></li></ul><h2 id="关于这个博客">关于这个博客</h2><ul><li>框架：<a href="https://hexo.io/">Hexo</a> 8</li><li>主题：本地定制的 Clean Blog（移植自 <a href="https://startbootstrap.com/theme/clean-blog">Start Bootstrap Clean Blog</a>）</li><li>部署：GitHub Pages + GitHub Actions</li><li>评论：Giscus（基于 GitHub Discussions）</li><li>源码：<a href="https://github.com/yo666666yo/yo666666yo.github.io">GitHub Pages 仓库</a></li></ul><p>如果某篇文章对你有帮助，欢迎在评论区留言；有错请不吝指出。</p>]]></content>
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     

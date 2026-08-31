@@ -1,0 +1,321 @@
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<title>研究周报 · 2026.08.22-08.28 · C3 基线筛选与复现边界 · Yoyo_Lee 的博客</title>
+<meta name="description" content="选定 C3 作为 agent-level credit assignment 的候选基线并启动复现； 记录其公开仓库缺失脚本、配置与论文不一致带来的复现边界，以及下一步研究方向调整。" />
+<meta name="keywords" content="AI,LLM,机器学习,深度学习,论文阅读,生活随笔,blog,Yoyo_Lee" />
+<meta name="author" content="Yoyo_Lee" />
+<link rel="canonical" href="https://yoyo-lee.com/posts/8e597c04/" />
+
+<!-- Open Graph / Twitter -->
+<meta property="og:site_name" content="Yoyo_Lee 的博客" />
+<meta property="og:title" content="研究周报 · 2026.08.22-08.28 · C3 基线筛选与复现边界" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://yoyo-lee.com/posts/8e597c04/" />
+<meta property="og:description" content="选定 C3 作为 agent-level credit assignment 的候选基线并启动复现； 记录其公开仓库缺失脚本、配置与论文不一致带来的复现边界，以及下一步研究方向调整。" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
+
+<link rel="alternate" type="application/atom+xml" title="Yoyo_Lee 的博客" href="/atom.xml" />
+
+
+<!-- Google Fonts (Lora for body, system font stack for UI) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,700;1,400;1,700&display=swap" />
+
+
+
+<link rel="stylesheet" href="/css/clean-blog.css?v=20260427-2" />
+
+
+
+
+
+</head>
+<body id="page-top" class="is-post">
+  
+<nav id="mainNav" class="navbar navbar-light" aria-label="主菜单">
+  <div class="navbar-container">
+    <a class="navbar-brand" href="/">Yoyo_Lee 的博客</a>
+    <button class="navbar-toggler" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="菜单">
+      菜单
+      <span class="navbar-toggler-icon" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+    </button>
+    <div class="navbar-collapse" id="navbarResponsive">
+      <form class="site-search" role="search" action="/search/" method="get" data-search-url="/search.xml" data-search-page-url="/search/" data-loading="正在搜索..." data-no-results="没有找到匹配文章" data-error="搜索索引暂时不可用">
+        <label class="sr-only" for="site-search-input">搜索文章</label>
+        <input id="site-search-input" class="site-search-input" type="search" name="q" placeholder="搜索文章..." autocomplete="off" spellcheck="false" aria-controls="site-search-results" aria-expanded="false" />
+        <button class="site-search-button" type="submit" aria-label="搜索">
+          <svg class="site-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10.8 5.2a5.6 5.6 0 1 0 0 11.2 5.6 5.6 0 0 0 0-11.2Zm-7.1 5.6a7.1 7.1 0 1 1 12.6 4.5l3.7 3.7-1.1 1.1-3.7-3.7A7.1 7.1 0 0 1 3.7 10.8Z" />
+          </svg>
+        </button>
+        <div id="site-search-results" class="site-search-results" role="listbox" hidden></div>
+      </form>
+      <ul class="navbar-nav">
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/research/">研究</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/life/">生活</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/weekly/">周报</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+<img src="/img/masthead/post.jpg" alt="" style="display:none" aria-hidden="true">
+<header class="masthead masthead-post" style="background-image: url('/img/masthead/post.jpg')">
+  <div class="masthead-overlay" aria-hidden="true"></div>
+  <div class="masthead-container">
+    <div class="masthead-inner">
+      
+        <div class="post-heading">
+          <div class="post-title-line">
+            <h1><span class="title-word">研究周报</span> · <span class="title-date-group"><span class="title-date">2026.08.22-08.28</span><span class="title-separator"> ·</span></span> C3 <span class="title-word">基线筛选与</span><span class="title-word">复现边界</span></h1>
+            
+              <span class="post-reading-stats" aria-label="文章字数和预计阅读时间">
+                <span>字数 685</span>
+                <span>预计阅读 2 分钟</span>
+              </span>
+            
+          </div>
+          <h2 class="subheading"><span class="title-word">选定</span> C3 <span class="title-word">作为</span> <span class="title-latin-term">agent‑level</span> credit assignment <span class="title-word">的候选基线并</span><span class="title-word">启动复现</span>； <span class="title-word">记录其公开</span><span class="title-word">仓库缺失脚本</span>、<span class="title-word">配置与论文</span><span class="title-word">不一致带来的</span><span class="title-word">复现边界</span>，<span class="title-word">以及下一步</span><span class="title-word">研究方向调整</span>。</h2>
+          <span class="meta">
+            作者
+            <a href="/about/">Yoyo_Lee</a>
+            发表于
+            <time datetime="2026-08-28T15:00:00.000Z">2026-08-28</time>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+</header>
+
+
+  <main id="main-content">
+    <article class="article article-post mb-4">
+  <div class="container article-container">
+    <div class="article-layout" data-article-layout>
+      <aside class="article-toc-sidebar" data-toc-sidebar hidden>
+        <nav class="article-toc" aria-label="Table of contents">
+          <div class="article-toc-header">
+            <span class="article-toc-title">Contents</span>
+            <button class="article-toc-collapse" type="button" data-toc-collapse aria-label="Collapse table of contents" aria-expanded="true">
+              <span aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="article-toc-scroll" data-toc-scroll>
+            <ol class="article-toc-list" data-toc-list></ol>
+          </div>
+        </nav>
+      </aside>
+
+      <div class="article-content-col">
+        <div class="post-body"><blockquote>
+<p>本周完成 agent-level credit assignment 候选基线的初步筛选，并尝试复现 C3。<br>
+复现检查显示，当前公开仓库尚缺少关键脚本且训练配置与论文不完全对应，因此先明确其可复现边界，再调整下一阶段的问题选择。</p>
+</blockquote>
+<h2 id="本周清单">本周清单</h2>
+<ol>
+<li>初步完成 baseline 选取：C3</li>
+<li>启动 C3 复现与仓库核验</li>
+<li>精读 C3，比较不同粒度的 counterfactual credit assignment</li>
+<li>寻找衡量计算开销的 metric</li>
+</ol>
+<span id="more"></span>
+<hr>
+<h2 id="一、初步完成-baseline-选取：C3">一、初步完成 baseline 选取：C3</h2>
+<p>这一阶段的一个 motivation 是寻找更好的 cost-performance trade-off。当前 agent-level credit assignment 方法大多带有显式介入：例如 SHARP 用 Shapley value 估计单个 agent 的边际贡献。</p>
+<p><img src="/img/weekly/image-20260827164535403.png" alt="SHARP 的 agent 边际贡献估计示意"></p>
+<p>CCPO 和 C3 都利用 counterfactual，但介入粒度不同。CCPO 的做法是 mask 掉一个 agent 后重新进行 rollout，相当于直接考察移除该 agent 后的团队表现；原文讨论的重点似乎是 dual-agent 场景，例如 thinker 与 solver 的有无组合。</p>
+<p>C3 则固定当前上下文，在 step level 替换某一条 message 来构造 counterfactual。相较于 whole-agent removal，它更接近对已完成轨迹中特定通信事件的局部归因。</p>
+<p><img src="/img/weekly/image-20260827194824299.png" alt="CCPO 与 C3 的 counterfactual 粒度对比记录"></p>
+<p><img src="/img/weekly/image-20260827194936368.png" alt="C3 的 step-level message 替换记录"></p>
+<h2 id="二、C3-复现与当前边界">二、C3 复现与当前边界</h2>
+<p>和盛天师哥讨论后，我先尝试复现 C3 的公开代码仓库，目标是核验它在 MATH500、GSM8K 等 benchmark 上的分数和运行链路。</p>
+<p>检查发现，当前仓库缺少 <code>scripts/data/</code> 与 <code>scripts/models/</code>；README 提到的 <code>scripts/models/download_models.sh</code> 也不存在。同时，现有训练脚本与论文中的配置并不完全一致，因此暂时无法从公开 checkout 建立一条可与论文结果严格对应的训练路径。</p>
+<p>我已向作者邮件询问。作者回复称近期会对仓库进行较大规模维护，包括补充缺失文件、整理训练脚本与配置；但公开更新的具体时间尚不明确。基于这一状态，C3 仍可作为方法与估计粒度的研究参照，却不适合作为当前阶段可直接复现、并用于 cost-performance 对比的主基线。</p>
+<p>因此，先不把这一问题绑定在 C3 的复现进度上，转而继续寻找更可验证的研究 gap。</p>
+<h2 id="三、下一步">三、下一步</h2>
+<ol>
+<li>重新聚焦 motivation 与可执行 baseline：考察 agent 广播、通信媒介与通信方式；例如在 latent space 直接传递 hidden state、为不同 policy 保留差异化上下文，以及动态内存与显存分配。</li>
+<li>研究对应 method，明确通信上下文保留、异构 agent 与 agent 数量变化带来的建模约束。</li>
+<li>将 Dr.MAS 纳入 baseline 候选，并与新的研究问题共同评估。</li>
+</ol>
+</div>
+
+        
+        <div class="post-tags">
+          <span class="post-tags-label">标签:</span>
+          
+            <a class="post-tag" href="/tags/credit-assignment/">#credit assignment</a>
+          
+            <a class="post-tag" href="/tags/%E5%91%A8%E6%8A%A5/">#周报</a>
+          
+            <a class="post-tag" href="/tags/C3/">#C3</a>
+          
+            <a class="post-tag" href="/tags/multi-agent/">#multi-agent</a>
+          
+            <a class="post-tag" href="/tags/counterfactual/">#counterfactual</a>
+          
+            <a class="post-tag" href="/tags/cost-performance/">#cost-performance</a>
+          
+        </div>
+        
+
+        <nav class="post-pager" aria-label="post navigation">
+          
+            <span></span>
+          
+          
+            <a class="post-pager-item post-pager-next" href="/posts/4afa2dfa/">
+              <span class="post-pager-label">下一篇</span>
+              <span class="post-pager-title">研究周报 · 2026.08.08-08.14 · Agent-Level Credit Assignment Baseline 筛选</span>
+            </a>
+          
+        </nav>
+
+        
+
+<section class="post-comments">
+  <script src="https://giscus.app/client.js"
+    data-repo="yo666666yo/yo666666yo.github.io"
+    data-repo-id="R_kgDOSLiRUQ"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOSLiRUc4C7m3u"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="zh-CN"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async></script>
+</section>
+
+
+      </div>
+    </div>
+  </div>
+
+  <button class="toc-fab" type="button" data-toc-open aria-label="Open table of contents" aria-controls="article-toc-drawer" hidden>
+    <span class="toc-fab-icon" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+  </button>
+
+  <div class="toc-drawer" id="article-toc-drawer" data-toc-drawer aria-hidden="true" hidden>
+    <div class="toc-drawer-backdrop" data-toc-close></div>
+    <section class="toc-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="toc-drawer-title" tabindex="-1">
+      <div class="toc-drawer-header">
+        <h2 id="toc-drawer-title">Contents</h2>
+        <button class="toc-drawer-close" type="button" data-toc-close aria-label="Close table of contents">
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="toc-drawer-scroll">
+        <ol class="article-toc-list toc-drawer-list" data-toc-mobile-list></ol>
+      </div>
+    </section>
+  </div>
+</article>
+
+  </main>
+
+  <hr class="section-divider" />
+
+  
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    
+    <ul class="social-list">
+      
+        
+        <li class="social-list-item">
+          <a href="https://github.com/yo666666yo" rel="noopener me external nofollow noreferrer" target="_blank" aria-label="Yoyo_Lee GitHub">
+            <span class="social-circle">
+              <span class="social-label">github</span>
+            </span>
+          </a>
+        </li>
+      
+      
+      <li class="social-list-item">
+        <a href="/atom.xml" rel="alternate" aria-label="rss">
+          <span class="social-circle"><span class="social-label">RSS</span></span>
+        </a>
+      </li>
+      
+    </ul>
+    
+
+    <div class="site-footer-copy">
+      
+        <span>Copyright &copy; Yoyo_Lee 2026</span>
+      
+      
+        <span class="site-footer-dot">·</span>
+        <span><a href="https://hexo.io/" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> · <a href="https://startbootstrap.com/theme/clean-blog" rel="noopener external nofollow noreferrer" target="_blank">Clean Blog</a></span>
+      
+    </div>
+  </div>
+</footer>
+
+  <script defer src="/js/clean-blog.js?v=20260427-2"></script>
+
+
+</body>
+</html>
