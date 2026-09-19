@@ -6,18 +6,18 @@
 <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-<title>研究周报 · 2026.08.22-08.28 · C3 基线筛选与复现边界 · Yoyo_Lee 的博客</title>
-<meta name="description" content="选定 C3 作为 agent-level credit assignment 的候选基线并启动复现； 记录其公开仓库缺失脚本、配置与论文不一致带来的复现边界，以及下一步研究方向调整。" />
+<title>研究周报 · 2026.08.29-09.13 · Dr.MAS 训练进展与 PPU 平台实践 · Yoyo_Lee 的博客</title>
+<meta name="description" content="记录 Dr.MAS Qwen3-4B 的训练集指标、PPU 环境与存储排查，以及 9 月 16 日 PAI 作业提交补记。测试集结果在原稿撰写时尚未完成。" />
 <meta name="keywords" content="AI,LLM,机器学习,深度学习,论文阅读,生活随笔,blog,Yoyo_Lee" />
 <meta name="author" content="Yoyo_Lee" />
-<link rel="canonical" href="https://yoyo-lee.com/posts/8e597c04/" />
+<link rel="canonical" href="https://yoyo-lee.com/posts/c4e57cae/" />
 
 <!-- Open Graph / Twitter -->
 <meta property="og:site_name" content="Yoyo_Lee 的博客" />
-<meta property="og:title" content="研究周报 · 2026.08.22-08.28 · C3 基线筛选与复现边界" />
+<meta property="og:title" content="研究周报 · 2026.08.29-09.13 · Dr.MAS 训练进展与 PPU 平台实践" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://yoyo-lee.com/posts/8e597c04/" />
-<meta property="og:description" content="选定 C3 作为 agent-level credit assignment 的候选基线并启动复现； 记录其公开仓库缺失脚本、配置与论文不一致带来的复现边界，以及下一步研究方向调整。" />
+<meta property="og:url" content="https://yoyo-lee.com/posts/c4e57cae/" />
+<meta property="og:description" content="记录 Dr.MAS Qwen3-4B 的训练集指标、PPU 环境与存储排查，以及 9 月 16 日 PAI 作业提交补记。测试集结果在原稿撰写时尚未完成。" />
 <meta name="twitter:card" content="summary_large_image" />
 
 <link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
@@ -119,20 +119,20 @@
       
         <div class="post-heading">
           <div class="post-title-line">
-            <h1><span class="title-word">研究周报</span> · <span class="title-date-group"><span class="title-date">2026.08.22-08.28</span><span class="title-separator"> ·</span></span> C3 <span class="title-word">基线筛选与</span><span class="title-word">复现边界</span></h1>
+            <h1><span class="title-word">研究周报</span> · <span class="title-date-group"><span class="title-date">2026.08.29-09.13</span><span class="title-separator"> ·</span></span> Dr.MAS <span class="title-word">训练进展与</span> PPU <span class="title-word">平台实践</span></h1>
             
               <span class="post-reading-stats" aria-label="文章字数和预计阅读时间">
-                <span>字数 685</span>
-                <span>预计阅读 2 分钟</span>
+                <span>字数 1,582</span>
+                <span>预计阅读 4 分钟</span>
               </span>
             
           </div>
-          <h2 class="subheading"><span class="title-word">选定</span> C3 <span class="title-word">作为</span> <span class="title-latin-term">agent‑level</span> credit assignment <span class="title-word">的候选基线并</span><span class="title-word">启动复现</span>； <span class="title-word">记录其公开</span><span class="title-word">仓库缺失脚本</span>、<span class="title-word">配置与论文</span><span class="title-word">不一致带来的</span><span class="title-word">复现边界</span>，<span class="title-word">以及下一步</span><span class="title-word">研究方向调整</span>。</h2>
+          <h2 class="subheading"><span class="title-word">记录</span> Dr.MAS <span class="title-latin-term">Qwen3‑4B</span> <span class="title-word">的训练集指标</span>、PPU <span class="title-word">环境与存储排</span><span class="title-word">查</span>，<span class="title-word">以及</span> 9 <span class="title-word">月</span> 16 <span class="title-word">日</span> PAI <span class="title-word">作业提交补记</span>。<span class="title-word">测试集结果在</span><span class="title-word">原稿撰写时尚</span><span class="title-word">未完成</span>。</h2>
           <span class="meta">
             作者
             <a href="/about/">Yoyo_Lee</a>
             发表于
-            <time datetime="2026-08-28T15:00:00.000Z">2026-08-28</time>
+            <time datetime="2026-09-13T15:00:00.000Z">2026-09-13</time>
           </span>
         </div>
       
@@ -161,35 +161,60 @@
 
       <div class="article-content-col">
         <div class="post-body"><blockquote>
-<p>本周完成 agent-level credit assignment 候选基线的初步筛选，并尝试复现 C3。<br>
-复现检查显示，当前公开仓库尚缺少关键脚本且训练配置与论文不完全对应，因此先明确其可复现边界，再调整下一阶段的问题选择。</p>
+<p>本篇记录 8 月 29 日至 9 月 13 日的研究进展，包含 9 月 16 日补记。文中作业状态与待办以原稿记录时间为准；训练集指标不代表测试集 benchmark 成绩。</p>
 </blockquote>
-<h2 id="本周清单">本周清单</h2>
-<ol>
-<li>初步完成 baseline 选取：C3</li>
-<li>启动 C3 复现与仓库核验</li>
-<li>精读 C3，比较不同粒度的 counterfactual credit assignment</li>
-<li>寻找衡量计算开销的 metric</li>
-</ol>
 <span id="more"></span>
-<hr>
-<h2 id="一、初步完成-baseline-选取：C3">一、初步完成 baseline 选取：C3</h2>
-<p>这一阶段的一个 motivation 是寻找更好的 cost-performance trade-off。当前 agent-level credit assignment 方法大多带有显式介入：例如 SHARP 用 Shapley value 估计单个 agent 的边际贡献。</p>
-<p><img src="/img/weekly/image-20260827164535403.png" alt="SHARP 的 agent 边际贡献估计示意"></p>
-<p>CCPO 和 C3 都利用 counterfactual，但介入粒度不同。CCPO 的做法是 mask 掉一个 agent 后重新进行 rollout，相当于直接考察移除该 agent 后的团队表现；原文讨论的重点似乎是 dual-agent 场景，例如 thinker 与 solver 的有无组合。</p>
-<p>C3 则固定当前上下文，在 step level 替换某一条 message 来构造 counterfactual。相较于 whole-agent removal，它更接近对已完成轨迹中特定通信事件的局部归因。</p>
-<p><img src="/img/weekly/image-20260827194824299.png" alt="CCPO 与 C3 的 counterfactual 粒度对比记录"></p>
-<p><img src="/img/weekly/image-20260827194936368.png" alt="C3 的 step-level message 替换记录"></p>
-<h2 id="二、C3-复现与当前边界">二、C3 复现与当前边界</h2>
-<p>和盛天师哥讨论后，我先尝试复现 C3 的公开代码仓库，目标是核验它在 MATH500、GSM8K 等 benchmark 上的分数和运行链路。</p>
-<p>检查发现，当前仓库缺少 <code>scripts/data/</code> 与 <code>scripts/models/</code>；README 提到的 <code>scripts/models/download_models.sh</code> 也不存在。同时，现有训练脚本与论文中的配置并不完全一致，因此暂时无法从公开 checkout 建立一条可与论文结果严格对应的训练路径。</p>
-<p>我已向作者邮件询问。作者回复称近期会对仓库进行较大规模维护，包括补充缺失文件、整理训练脚本与配置；但公开更新的具体时间尚不明确。基于这一状态，C3 仍可作为方法与估计粒度的研究参照，却不适合作为当前阶段可直接复现、并用于 cost-performance 对比的主基线。</p>
-<p>因此，先不把这一问题绑定在 C3 的复现进度上，转而继续寻找更可验证的研究 gap。</p>
-<h2 id="三、下一步">三、下一步</h2>
+<p>list:</p>
 <ol>
-<li>重新聚焦 motivation 与可执行 baseline：考察 agent 广播、通信媒介与通信方式；例如在 latent space 直接传递 hidden state、为不同 policy 保留差异化上下文，以及动态内存与显存分配。</li>
-<li>研究对应 method，明确通信上下文保留、异构 agent 与 agent 数量变化带来的建模约束。</li>
-<li>将 Dr.MAS 纳入 baseline 候选，并与新的研究问题共同评估。</li>
+<li>
+<p>复现Dr.MAS Qwen3-4B Math实验</p>
+</li>
+<li>
+<p>to-do</p>
+</li>
+</ol>
+<h2 id="一、复现-Dr-MAS">一、复现 Dr.MAS</h2>
+<p><img src="/img/weekly/image-20260913154214952.png" alt="image-20260913154214952"></p>
+<p>历经磨难后终于在大数据平台中用Dr.MAS优化器训了Qwen3-4B模型，结果显示avg@8（平均正确率）从step1的0.402涨到step814的0.785，而pass@8（至少对一次的题目占比）从0.781提升到0.875，虽然做对的新题没有多很多，但是稳定性提升了（已经会的题的平均正确率几乎翻倍），符合RL finetuning的特征，把概率质量集中到了正确解上。</p>
+<p>然后目前只有训练集的stdout，测试集还没有出结果，我在平台上提交了eval作业预计明天才能出结果，这个数据才能直接拿来和论文中跑出来的bench数据进行对比。</p>
+<ul>
+<li>
+<p>在跑的过程中，还注意到了episode/avg@8 和 episode/reward/mean 两个端点数值一模一样，之后我让Claude抽查了其中6个步骤，发现数值确实完全相等。</p>
+<p>keystep 1    reward/mean=0.402  avg@8=0.402<br>
+step 300  reward/mean=0.582  avg@8=0.582<br>
+step 450  reward/mean=0.793  avg@8=0.793<br>
+step 750  reward/mean=0.707  avg@8=0.707</p>
+<p>猜测是由于格式合规率valid_action_ratio 一直在 0.987~0.998，无效动作惩罚（coef=0.1）几乎不触发，所以平均 reward 就等于平均正确率</p>
+<ul>
+<li>用于格式惩罚，对每个格式不合规的动作，在回复最后一个 token 上扣 0.1 的 reward。目的是防止模型输出没法解析的东西。</li>
+</ul>
+<p>实测值step 1 是 0.998，step 814 是 0.987。也就是全程 98.7%~99.8% 的输出都合规。</p>
+<p>惩罚项的实际量级 = (1 − 0.99) × 0.1 ≈ 0.001，小到在三位小数上都显示不出来。所以 reward/mean和avg@8才会逐步完全相等</p>
+<ul>
+<li>valid_action_ratio从0.998到0.987，轻微下降了 1.1 个百分点。batch 里 32×8 个 rollout，大概多了两三个不合规，猜测模型为了优化正确率，有时会轻微牺牲格式一致性。</li>
+</ul>
+</li>
+<li>
+<p>同时，这个avg@8 平均正确率曲线不单调，在step 450 到了 0.793，中间掉到 0.676，最后 0.785。说明由于batch 只有 32 题导致单步噪声很大。</p>
+</li>
+<li>
+<p>训练集上 pass@8 起点就有 0.781，上升空间较小，因此涨幅小有一部分原因可能是天花板效应导致的。</p>
+</li>
+</ul>
+<p>4B non-sharing的配置还在大数据平台上跑，8B的两个作业还在排队。search的5个训练还没有提交，等最近研究玩平头哥的卡的使用方法后把作业放到上面。</p>
+<p>这个阿里云的配额使用起来也有点难度，首先卡不是NVIDIA的，之前按大数据平台那套H100环境准备的自定义镜像（nvidia/cuda:12.4.1 + torch 2.6.0+cu124 + flash-attn 2.7.4.post1）没法直接用。</p>
+<p><img src="/img/weekly/image-20260914032628243.png" alt="image-20260914032628243"></p>
+<p>但环境本身其实是能用的，我提交了两个探针作业实测，官方镜像ppu-training:2.0.0-pytorch2.6.0ray2.55.1sglang0.4.6post1已经带齐了torch 2.6.0、sglang 0.4.6.post1、ray 2.55.1、flash-attn 2.5.6，关键是torch.cuda这套API透明可用（PPU走的是CUDA兼容层，nvidia-smi被shim成PPU-SMI），bf16 matmul跑通，flash_attn_func能import，所以use_remove_padding=True不用关。单卡显存95.6 GiB，比H100-80G还宽裕。缺的只有tensordict，pip装了4秒。公网也通，ModelScope实测40~48 MB/s（3.96 GB的权重分片154秒下完），GitHub clone 3秒。也就是说只要存储解决了，训练环境是现成的。</p>
+<p>但是现在有一个报错是告诉我OSS权限不够。我的RAM用户能建Bucket，但往里写对象会报AccessDenied，在DLC建任务的表单里连挂载都配不了，选中Bucket直接报&quot;无效的Bucket&quot;，提示要主账号授权，换成其他bucket也一样。工作空间的默认存储又是空的，没有能退而求其次的路径。</p>
+<p>然后试了工作空间里唯一的CPFS数据集，结果卡死两小时。那个数据集挂CPFS的/seu/到容器的/mnt/data/，我提交了个探索作业只跑ls、df、touch三条命令，结果pod在01:44:11创建、03:44:12被删除，两个小时卡在环境准备。对照之前不挂任何数据集的探针作业20秒就起来了，所以故障点应该是CPFS挂载。后来查到这个数据集是isVpcMount=false，走的是VSC挂载而不是VPC挂载，猜测是我的作业没拿到VSC授权。</p>
+<p>卡住的是应该就是账号权限和存储配置，或许需要管理员给单个Bucket加一个对象读写权限，现在没地方存checkpoint。</p>
+<h2 id="9-月-16-日补记">9 月 16 日补记</h2>
+<p><img src="/img/weekly/image-20260917162825180.png" alt="image-20260917162825180"></p>
+<p>搞明白了PAI平台提交作业的SOP，先把启动脚本（entry point）提交到对应项目的目录下，然后直接在启动命令中用bash启动即可。之前卡在了在自定义数据集的时候需要导入oss配置，然后在选择oss目录的时候总是提示bucket无效。事实上，应该直接用系统提供的智算CPFS来存储数据。</p>
+<h2 id="二、to-do">二、to-do</h2>
+<ol>
+<li>继续复现Dr.MAS，使用平头哥芯片把作业跑通，然后就可以部署我剩余的所有作业了（工欲善其事必先利其器 lol）</li>
+<li>特别抱歉师哥最近事情比较多，一直在搞我学校另外一个为了满足毕业要求修的课题的中期检查工作，还要冲一下9.16截稿的ICASSP会议。同时暑校的课因为是小组共同完成的实训任务所以还不太好摸鱼，需要每天去沙盘实验室出勤，不然还会被老师点名点到，还要浪费一些精力。这两天每天要干的工作实在太多了，进度有点慢实在抱歉，我这两天忙完以后一定会恶补一下落下的进度。</li>
 </ol>
 </div>
 
@@ -197,32 +222,29 @@
         <div class="post-tags">
           <span class="post-tags-label">标签:</span>
           
-            <a class="post-tag" href="/tags/credit-assignment/">#credit assignment</a>
-          
             <a class="post-tag" href="/tags/%E5%91%A8%E6%8A%A5/">#周报</a>
-          
-            <a class="post-tag" href="/tags/C3/">#C3</a>
           
             <a class="post-tag" href="/tags/multi-agent/">#multi-agent</a>
           
-            <a class="post-tag" href="/tags/counterfactual/">#counterfactual</a>
+            <a class="post-tag" href="/tags/Dr-MAS/">#Dr.MAS</a>
           
-            <a class="post-tag" href="/tags/cost-performance/">#cost-performance</a>
+            <a class="post-tag" href="/tags/Qwen3/">#Qwen3</a>
+          
+            <a class="post-tag" href="/tags/PPU/">#PPU</a>
+          
+            <a class="post-tag" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/">#强化学习</a>
           
         </div>
         
 
         <nav class="post-pager" aria-label="post navigation">
           
-            <a class="post-pager-item post-pager-prev" href="/posts/c4e57cae/">
-              <span class="post-pager-label">上一篇</span>
-              <span class="post-pager-title">研究周报 · 2026.08.29-09.13 · Dr.MAS 训练进展与 PPU 平台实践</span>
-            </a>
+            <span></span>
           
           
-            <a class="post-pager-item post-pager-next" href="/posts/4afa2dfa/">
+            <a class="post-pager-item post-pager-next" href="/posts/8e597c04/">
               <span class="post-pager-label">下一篇</span>
-              <span class="post-pager-title">研究周报 · 2026.08.08-08.14 · Agent-Level Credit Assignment Baseline 筛选</span>
+              <span class="post-pager-title">研究周报 · 2026.08.22-08.28 · C3 基线筛选与复现边界</span>
             </a>
           
         </nav>
