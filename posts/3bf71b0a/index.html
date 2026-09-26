@@ -1,0 +1,495 @@
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<title>研究周报 · 2026.09.14-09.20 · Dr.MAS 与 C3 复现分析 · Yoyo_Lee 的博客</title>
+<meta name="description" content="对齐 Dr.MAS Qwen3-4B 的 avg@16/pass@16 评测口径并与论文对照，分析 AIME&#39;24 小样本波动、Verifier 梯度和训练曲线；同时记录 C3 数据问题及后续诊断计划。" />
+<meta name="keywords" content="AI,LLM,机器学习,深度学习,论文阅读,生活随笔,blog,Yoyo_Lee" />
+<meta name="author" content="Yoyo_Lee" />
+<link rel="canonical" href="https://yoyo-lee.com/posts/3bf71b0a/" />
+
+<!-- Open Graph / Twitter -->
+<meta property="og:site_name" content="Yoyo_Lee 的博客" />
+<meta property="og:title" content="研究周报 · 2026.09.14-09.20 · Dr.MAS 与 C3 复现分析" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://yoyo-lee.com/posts/3bf71b0a/" />
+<meta property="og:description" content="对齐 Dr.MAS Qwen3-4B 的 avg@16/pass@16 评测口径并与论文对照，分析 AIME&#39;24 小样本波动、Verifier 梯度和训练曲线；同时记录 C3 数据问题及后续诊断计划。" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
+
+<link rel="alternate" type="application/atom+xml" title="Yoyo_Lee 的博客" href="/atom.xml" />
+
+
+<!-- Google Fonts (Lora for body, system font stack for UI) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,700;1,400;1,700&display=swap" />
+
+
+
+<link rel="stylesheet" href="/css/clean-blog.css?v=20260427-2" />
+
+
+
+
+
+</head>
+<body id="page-top" class="is-post">
+  
+<nav id="mainNav" class="navbar navbar-light" aria-label="主菜单">
+  <div class="navbar-container">
+    <a class="navbar-brand" href="/">Yoyo_Lee 的博客</a>
+    <button class="navbar-toggler" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="菜单">
+      菜单
+      <span class="navbar-toggler-icon" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+    </button>
+    <div class="navbar-collapse" id="navbarResponsive">
+      <form class="site-search" role="search" action="/search/" method="get" data-search-url="/search.xml" data-search-page-url="/search/" data-loading="正在搜索..." data-no-results="没有找到匹配文章" data-error="搜索索引暂时不可用">
+        <label class="sr-only" for="site-search-input">搜索文章</label>
+        <input id="site-search-input" class="site-search-input" type="search" name="q" placeholder="搜索文章..." autocomplete="off" spellcheck="false" aria-controls="site-search-results" aria-expanded="false" />
+        <button class="site-search-button" type="submit" aria-label="搜索">
+          <svg class="site-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10.8 5.2a5.6 5.6 0 1 0 0 11.2 5.6 5.6 0 0 0 0-11.2Zm-7.1 5.6a7.1 7.1 0 1 1 12.6 4.5l3.7 3.7-1.1 1.1-3.7-3.7A7.1 7.1 0 0 1 3.7 10.8Z" />
+          </svg>
+        </button>
+        <div id="site-search-results" class="site-search-results" role="listbox" hidden></div>
+      </form>
+      <ul class="navbar-nav">
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/research/">研究</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/life/">生活</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/weekly/">周报</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+<img src="/img/masthead/post.jpg" alt="" style="display:none" aria-hidden="true">
+<header class="masthead masthead-post" style="background-image: url('/img/masthead/post.jpg')">
+  <div class="masthead-overlay" aria-hidden="true"></div>
+  <div class="masthead-container">
+    <div class="masthead-inner">
+      
+        <div class="post-heading">
+          <div class="post-title-line">
+            <h1><span class="title-word">研究周报</span> · <span class="title-date-group"><span class="title-date">2026.09.14-09.20</span><span class="title-separator"> ·</span></span> Dr.MAS <span class="title-word">与</span> C3 <span class="title-word">复现分析</span></h1>
+            
+              <span class="post-reading-stats" aria-label="文章字数和预计阅读时间">
+                <span>字数 2,268</span>
+                <span>预计阅读 6 分钟</span>
+              </span>
+            
+          </div>
+          <h2 class="subheading"><span class="title-word">对齐</span> Dr.MAS <span class="title-latin-term">Qwen3‑4B</span> <span class="title-word">的</span> avg@16/pass@16 <span class="title-word">评测口径并与</span><span class="title-word">论文对照</span>，<span class="title-word">分析</span> AIME&#39;24 <span class="title-word">小样本波动</span>、Verifier <span class="title-word">梯度和训练</span><span class="title-word">曲线</span>；<span class="title-word">同时记录</span> C3 <span class="title-word">数据问题及后</span><span class="title-word">续诊断计划</span>。</h2>
+          <span class="meta">
+            作者
+            <a href="/about/">Yoyo_Lee</a>
+            发表于
+            <time datetime="2026-09-20T15:00:00.000Z">2026-09-20</time>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+</header>
+
+
+  <main id="main-content">
+    <article class="article article-post mb-4">
+  <div class="container article-container">
+    <div class="article-layout" data-article-layout>
+      <aside class="article-toc-sidebar" data-toc-sidebar hidden>
+        <nav class="article-toc" aria-label="Table of contents">
+          <div class="article-toc-header">
+            <span class="article-toc-title">Contents</span>
+            <button class="article-toc-collapse" type="button" data-toc-collapse aria-label="Collapse table of contents" aria-expanded="true">
+              <span aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="article-toc-scroll" data-toc-scroll>
+            <ol class="article-toc-list" data-toc-list></ol>
+          </div>
+        </nav>
+      </aside>
+
+      <div class="article-content-col">
+        <div class="post-body"><blockquote>
+<p>本周完成 Dr.MAS Qwen3-4B sharing 与 non-sharing 两组结果的论文口径评估。non-sharing 的总体指标接近论文结果；sharing 的总体提升主要由 AIME’24 小样本结果拉动，需要继续用重复评测确认。训练日志还暴露出 Verifier 梯度偏小和缺少实际精化轮数指标的问题。</p>
+</blockquote>
+<h2 id="本周清单">本周清单</h2>
+<ol>
+<li>复现 Dr.MAS 和 C3 实验</li>
+<li>分析评测口径、训练曲线和 agent 级梯度</li>
+<li>to-do</li>
+</ol>
+<span id="more"></span>
+<hr>
+<h2 id="一、复现-Dr-MAS-和-C3-实验">一、复现 Dr.MAS 和 C3 实验</h2>
+<h3 id="1-1-C3-数据检查">1.1 C3 数据检查</h3>
+<p>C3 环境中缺少 MBPP+ 数据。项目读取数据时使用了不匹配的字段，导致每行除 <code>task_id</code> 和 <code>source</code> 外，其余字段都是 <code>null</code>，题目和代码等内容实际为空。另外，仓库只检查文件 SHA256 是否与 manifest 一致；如果错误文件本身的哈希也写进了 manifest，这项检查仍然会通过，因此不能验证数据语义正确。</p>
+<p>我还发现，作者提供的 MATH 训练集和测试集中有一道完全相同的题，可能造成数据泄漏，使测试结果不可靠。我已向作者反馈并收到回复。后续需要等数据和字段问题澄清后，再判断这套结果是否适合作为比较基线。</p>
+<h3 id="1-2-Dr-MAS-Qwen3-4B-评测结果">1.2 Dr.MAS Qwen3-4B 评测结果</h3>
+<p>4B sharing 和 non-sharing 两个训练作业都完成了 814 step（<code>total_epochs=2</code>）。sharing 训练耗时 60.6 小时，non-sharing 耗时 71.4 小时。对应的 eval 作业也已完成，因此本周可以把 <code>avg@16</code> 和 <code>pass@16</code> 与论文表格对照。</p>
+<h4 id="1-2-1-先统一-test-score-的统计口径">1.2.1 先统一 test_score 的统计口径</h4>
+<p>最初看到 eval 输出的 <code>test_score</code> 时，我去检查了 <code>verl/trainer/ppo/ray_trainer.py:884</code>，发现 <code>test_score = np.mean(rewards)</code> 是按 agent 行求平均的。一条轨迹里 Solver 和 Verifier 各占一行；Solver 被 reject 后还可能多一行，因此 AIME’24 上分母约为 30 道题乘以每题 2 到 3 行。这个数不能直接当作题目级准确率，需要用 <code>compute_pass_at_k_and_avg_at_k</code> 计算 <code>avg@k/pass@k</code>。</p>
+<h4 id="1-2-2-与论文结果对照">1.2.2 与论文结果对照</h4>
+<p>下面是 Qwen3-4B、Dr.MAS 的结果。差值单位为百分点。</p>
+<p><strong>LLM Sharing</strong></p>
+<table>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th style="text-align:right">论文 avg@16</th>
+<th style="text-align:right">我的 avg@16</th>
+<th style="text-align:right">Δ</th>
+<th style="text-align:right">论文 pass@16</th>
+<th style="text-align:right">我的 pass@16</th>
+<th style="text-align:right">Δ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AIME’24</td>
+<td style="text-align:right">39.3</td>
+<td style="text-align:right">51.5</td>
+<td style="text-align:right">+12.2</td>
+<td style="text-align:right">63.3</td>
+<td style="text-align:right">80.0</td>
+<td style="text-align:right">+16.7</td>
+</tr>
+<tr>
+<td>AIME’25</td>
+<td style="text-align:right">38.1</td>
+<td style="text-align:right">38.3</td>
+<td style="text-align:right">+0.2</td>
+<td style="text-align:right">63.3</td>
+<td style="text-align:right">70.0</td>
+<td style="text-align:right">+6.7</td>
+</tr>
+<tr>
+<td>AMC’23</td>
+<td style="text-align:right">87.3</td>
+<td style="text-align:right">88.4</td>
+<td style="text-align:right">+1.1</td>
+<td style="text-align:right">95.0</td>
+<td style="text-align:right">95.0</td>
+<td style="text-align:right">0.0</td>
+</tr>
+<tr>
+<td>MATH500</td>
+<td style="text-align:right">90.5</td>
+<td style="text-align:right">90.7</td>
+<td style="text-align:right">+0.2</td>
+<td style="text-align:right">96.0</td>
+<td style="text-align:right">96.8</td>
+<td style="text-align:right">+0.8</td>
+</tr>
+<tr>
+<td>Minerva</td>
+<td style="text-align:right">40.9</td>
+<td style="text-align:right">38.9</td>
+<td style="text-align:right">-2.0</td>
+<td style="text-align:right">53.3</td>
+<td style="text-align:right">52.9</td>
+<td style="text-align:right">-0.4</td>
+</tr>
+<tr>
+<td>Olympiad</td>
+<td style="text-align:right">58.2</td>
+<td style="text-align:right">58.1</td>
+<td style="text-align:right">-0.1</td>
+<td style="text-align:right">68.6</td>
+<td style="text-align:right">70.5</td>
+<td style="text-align:right">+1.9</td>
+</tr>
+<tr>
+<td>平均</td>
+<td style="text-align:right">59.0</td>
+<td style="text-align:right">61.0</td>
+<td style="text-align:right">+2.0</td>
+<td style="text-align:right">73.2</td>
+<td style="text-align:right">77.5</td>
+<td style="text-align:right">+4.3</td>
+</tr>
+</tbody>
+</table>
+<p><strong>LLM Non-Sharing</strong></p>
+<table>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th style="text-align:right">论文 avg@16</th>
+<th style="text-align:right">我的 avg@16</th>
+<th style="text-align:right">Δ</th>
+<th style="text-align:right">论文 pass@16</th>
+<th style="text-align:right">我的 pass@16</th>
+<th style="text-align:right">Δ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AIME’24</td>
+<td style="text-align:right">46.9</td>
+<td style="text-align:right">50.0</td>
+<td style="text-align:right">+3.1</td>
+<td style="text-align:right">80.0</td>
+<td style="text-align:right">80.0</td>
+<td style="text-align:right">0.0</td>
+</tr>
+<tr>
+<td>AIME’25</td>
+<td style="text-align:right">38.1</td>
+<td style="text-align:right">40.0</td>
+<td style="text-align:right">+1.9</td>
+<td style="text-align:right">66.7</td>
+<td style="text-align:right">56.7</td>
+<td style="text-align:right">-10.0</td>
+</tr>
+<tr>
+<td>AMC’23</td>
+<td style="text-align:right">89.5</td>
+<td style="text-align:right">90.9</td>
+<td style="text-align:right">+1.4</td>
+<td style="text-align:right">97.5</td>
+<td style="text-align:right">97.5</td>
+<td style="text-align:right">0.0</td>
+</tr>
+<tr>
+<td>MATH500</td>
+<td style="text-align:right">92.4</td>
+<td style="text-align:right">91.9</td>
+<td style="text-align:right">-0.5</td>
+<td style="text-align:right">97.0</td>
+<td style="text-align:right">96.6</td>
+<td style="text-align:right">-0.4</td>
+</tr>
+<tr>
+<td>Minerva</td>
+<td style="text-align:right">39.0</td>
+<td style="text-align:right">39.9</td>
+<td style="text-align:right">+0.9</td>
+<td style="text-align:right">51.5</td>
+<td style="text-align:right">52.6</td>
+<td style="text-align:right">+1.1</td>
+</tr>
+<tr>
+<td>Olympiad</td>
+<td style="text-align:right">60.9</td>
+<td style="text-align:right">58.4</td>
+<td style="text-align:right">-2.5</td>
+<td style="text-align:right">73.6</td>
+<td style="text-align:right">71.1</td>
+<td style="text-align:right">-2.5</td>
+</tr>
+<tr>
+<td>平均</td>
+<td style="text-align:right">61.1</td>
+<td style="text-align:right">61.9</td>
+<td style="text-align:right">+0.8</td>
+<td style="text-align:right">77.7</td>
+<td style="text-align:right">75.8</td>
+<td style="text-align:right">-1.9</td>
+</tr>
+</tbody>
+</table>
+<p>non-sharing 的 <code>avg@16</code> 为 61.9，对照论文 61.1；<code>pass@16</code> 为 75.8，对照论文 77.7。逐项看既有高于论文的项目，也有低于论文的项目，整体上与论文结果接近。sharing 总体高出 +2.0/+4.3 个百分点，但增量主要来自 AIME’24；其余五项差值都在约 ±2 个百分点内。因此，现阶段不宜把 sharing 的平均提升直接解释成稳定的整体优势。</p>
+<h3 id="1-3-AIME’24-的波动与结果差异">1.3 AIME’24 的波动与结果差异</h3>
+<p>我最开始怀疑论文是否没有使用完整的 814 步结果。论文没有明确报告训练步数，但官方脚本 <code>src/examples/drmas_trainer/run_math.sh</code> 将 <code>total_epochs=2</code> 写死，也没有设置 <code>total_training_steps</code> 上限。按该脚本执行得到 814 step，因此目前没有证据支持“论文只训到较早步骤”这个解释。</p>
+<p>更可能的差异来源是 AIME’24 只有 30 道题，估计方差较大。训练期间 step≥500 的 33 次验证中，同一模型在 AIME’24 上的 <code>avg@1</code> 均值为 47.7、标准差为 6.2、范围为 36.7–60.0；overall <code>avg@1</code> 的均值为 62.9、标准差为 2.2。只考虑采样波动，AIME’24 的结果就能跨越 23 个百分点。sharing 的 +12.2 大约是 1.5–2 个标准差，仍可能来自小样本与采样随机性，需要再评测确认。</p>
+<p>我也觉得只用 30 道题的 AIME’24 作为主要指标说服力有限，论文中几个百分点的差异可能受到明显噪声影响。下一步准备对保留的 step 775 checkpoint 或额外 seed 重跑 eval。</p>
+<h3 id="1-4-episode-length-恒为-1-的原因">1.4 <code>episode/length</code> 恒为 1 的原因</h3>
+<p><img src="/img/weekly/image-20260922021854716.png" alt="Math 环境训练曲线中的 episode/length"></p>
+<p>训练曲线里的 <code>episode/length</code> 最小值、最大值和均值在 814 步内都保持为 1。起初我以为 Solver↔Verifier 的精化循环没有进入第二轮，因为配置中的 <code>max_loop_num=2</code>。检查代码后发现，<code>agent_system/environments/env_package/math/envs.py:23</code> 的 <code>step()</code> 会直接设置 <code>done = True</code>；而 <code>agent_system/multi_turn_rollout/rollout_loop.py:444</code> 中的 <code>episode_lengths</code> 只统计外层环境 step。</p>
+<p>Solver↔Verifier 的整个循环实际在一次 <code>multiagent_orchestra.run()</code> 调用内部执行。外层 Math 环境第一步就结束，所以 <code>episode/length=1</code> 是预期行为，不能据此推断精化循环只跑了一轮。<code>max_loop_num=2</code> 下，loop 0 先由 Solver 生成并由 Verifier 审核；loop 1 只处理未获 approve 的样本，之后退出。Verifier 至少会执行一次。</p>
+<p>目前日志没有记录真实精化轮数和 approve 率。我准备在 <code>run()</code> 中增加 <code>approved_vector.mean()</code> 和实际执行 loop 数的 metrics，再用短作业检查 Verifier 是否退化为总是 approve。</p>
+<h3 id="1-5-Verifier-的梯度明显较小">1.5 Verifier 的梯度明显较小</h3>
+<p>non-sharing 配置把 Solver 和 Verifier 的指标分开记录。Solver 的 entropy 从约 0.22 降到 step 310–400 附近的 0.071，之后回升到 0.13；<code>pg_loss</code> 量级约为 <code>6e-2</code>，<code>grad_norm</code> 从 0.16 增至 0.35。Verifier 的 entropy 全程约为 0.20–0.26，<code>pg_loss</code> 约为 <code>5e-4</code>，比 Solver 小两个数量级；<code>grad_norm</code> 从 0.41 降至 0.11。</p>
+<p>这说明 Verifier 对应 token 的更新幅度较小，但具体原因还需要验证。一个可能解释是当前实现使用 trajectory-level reward：同一轨迹中 Solver 与 Verifier 行共享 reward。Verifier 只输出 approve/reject，其动作与最终答案对错的关联可能弱于 Solver 的解题过程；再按 <code>agent_id</code> 分组归一化后，Verifier 的 advantage 变化可能较小，从而产生较弱梯度。</p>
+<p>这与我关心的 credit assignment 问题有关：Dr.MAS 对不同 agent 的信号做了归一化，但没有进一步分解团队结果。如果后续确认 Verifier 的信号确实长期接近零，这组现象可以作为 CAD-GRPO 动机的候选证据。不过 Verifier 更新较少也不一定是坏事；如果它初始策略已经足够稳定，变化小可能有利于训练。更需要排查的是它是否退化为永远 approve，导致 Solver 无法进入后续精化轮。</p>
+<h3 id="1-6-训练曲线与-checkpoint-保留">1.6 训练曲线与 checkpoint 保留</h3>
+<p><img src="/img/weekly/image-20260922023157473.png" alt="训练过程中的 entropy 曲线"></p>
+<p>训练中的 <code>entropy_loss</code> 从 0.286 降到 step 510 的 0.091，随后回升到 0.33–0.40 并趋于稳定。该 run 的 <code>entropy_coeff=0</code>、<code>use_kl_loss=False</code>、<code>use_kl_in_reward=False</code>，因此这次回升不是 entropy bonus 或 KL 项直接拉回来的。可能原因包括回答长度从约 1690 增至 1881 token、per-token entropy 受长尾 token 不确定性影响；也可能是 reward 达到 0.75 以上后，group 内 8 个 rollout 更常出现全对样本，使 GRPO advantage 为零、有效梯度样本减少。现在这些仍是待验证的解释。</p>
+<p>我原先把 step 690 后 val 曲线回落看成轻微过拟合；复查 step≥500 的 33 个点后，均值为 62.9、标准差为 2.2，最后一个点 62.7 正好接近均值。67.3 更像这 33 次带噪评估中的一次高点。当前证据更支持 step 500 后进入平台期、训练 reward 仍缓慢上涨但收益递减，而不足以断言过拟合。</p>
+<p>另一个实验管理上的坑是，受内存限制，entrypoint 设置了 <code>DRMAS_MAX_ACTOR_CKPT_TO_KEEP=2</code>。814 步训练结束后只剩 step 775 和 800 checkpoint，无法回取更多中间点做 best-checkpoint selection。之后要做 checkpoint 选择，需要预先提高保留数量或另行保存候选点。</p>
+<h2 id="二、to-do">二、to-do</h2>
+<ol>
+<li>在 <code>math_orchestra.run()</code> 增加 approve 率和实际 loop 数 metrics，跑短作业确认 Verifier 是否退化为总是 approve。</li>
+<li>用保留的 step 775 checkpoint 或增加 1–2 个 seed 重跑 AIME’24 eval，检查 +12.2 是否落在重复评测的均值与方差范围内。</li>
+<li>跟进 8B 的两个排队作业，并提交 search 的五个训练作业。</li>
+<li>将 Verifier 梯度曲线及其待验证解释整理进 <code>IDEA_REPORT_CAD_GRPO.md</code>，作为动机证据候选。</li>
+</ol>
+</div>
+
+        
+        <div class="post-tags">
+          <span class="post-tags-label">标签:</span>
+          
+            <a class="post-tag" href="/tags/GRPO/">#GRPO</a>
+          
+            <a class="post-tag" href="/tags/%E5%91%A8%E6%8A%A5/">#周报</a>
+          
+            <a class="post-tag" href="/tags/CAD-GRPO/">#CAD-GRPO</a>
+          
+            <a class="post-tag" href="/tags/Dr-MAS/">#Dr.MAS</a>
+          
+            <a class="post-tag" href="/tags/C3/">#C3</a>
+          
+            <a class="post-tag" href="/tags/Qwen3/">#Qwen3</a>
+          
+        </div>
+        
+
+        <nav class="post-pager" aria-label="post navigation">
+          
+            <span></span>
+          
+          
+            <a class="post-pager-item post-pager-next" href="/posts/c4e57cae/">
+              <span class="post-pager-label">下一篇</span>
+              <span class="post-pager-title">研究周报 · 2026.08.29-09.13 · Dr.MAS 训练进展与 PPU 平台实践</span>
+            </a>
+          
+        </nav>
+
+        
+
+<section class="post-comments">
+  <script src="https://giscus.app/client.js"
+    data-repo="yo666666yo/yo666666yo.github.io"
+    data-repo-id="R_kgDOSLiRUQ"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOSLiRUc4C7m3u"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="zh-CN"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async></script>
+</section>
+
+
+      </div>
+    </div>
+  </div>
+
+  <button class="toc-fab" type="button" data-toc-open aria-label="Open table of contents" aria-controls="article-toc-drawer" hidden>
+    <span class="toc-fab-icon" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+  </button>
+
+  <div class="toc-drawer" id="article-toc-drawer" data-toc-drawer aria-hidden="true" hidden>
+    <div class="toc-drawer-backdrop" data-toc-close></div>
+    <section class="toc-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="toc-drawer-title" tabindex="-1">
+      <div class="toc-drawer-header">
+        <h2 id="toc-drawer-title">Contents</h2>
+        <button class="toc-drawer-close" type="button" data-toc-close aria-label="Close table of contents">
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="toc-drawer-scroll">
+        <ol class="article-toc-list toc-drawer-list" data-toc-mobile-list></ol>
+      </div>
+    </section>
+  </div>
+</article>
+
+  </main>
+
+  <hr class="section-divider" />
+
+  
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    
+    <ul class="social-list">
+      
+        
+        <li class="social-list-item">
+          <a href="https://github.com/yo666666yo" rel="noopener me external nofollow noreferrer" target="_blank" aria-label="Yoyo_Lee GitHub">
+            <span class="social-circle">
+              <span class="social-label">github</span>
+            </span>
+          </a>
+        </li>
+      
+      
+      <li class="social-list-item">
+        <a href="/atom.xml" rel="alternate" aria-label="rss">
+          <span class="social-circle"><span class="social-label">RSS</span></span>
+        </a>
+      </li>
+      
+    </ul>
+    
+
+    <div class="site-footer-copy">
+      
+        <span>Copyright &copy; Yoyo_Lee 2026</span>
+      
+      
+        <span class="site-footer-dot">·</span>
+        <span><a href="https://hexo.io/" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> · <a href="https://startbootstrap.com/theme/clean-blog" rel="noopener external nofollow noreferrer" target="_blank">Clean Blog</a></span>
+      
+    </div>
+  </div>
+</footer>
+
+  <script defer src="/js/clean-blog.js?v=20260427-2"></script>
+
+
+</body>
+</html>
