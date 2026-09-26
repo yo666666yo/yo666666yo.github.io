@@ -122,7 +122,7 @@
             <h1><span class="title-word">研究周报</span> · <span class="title-date-group"><span class="title-date">2026.08.22-08.28</span><span class="title-separator"> ·</span></span> C3 <span class="title-word">基线筛选与</span><span class="title-word">复现边界</span></h1>
             
               <span class="post-reading-stats" aria-label="文章字数和预计阅读时间">
-                <span>字数 685</span>
+                <span>字数 627</span>
                 <span>预计阅读 2 分钟</span>
               </span>
             
@@ -160,37 +160,24 @@
       </aside>
 
       <div class="article-content-col">
-        <div class="post-body"><blockquote>
-<p>本周完成 agent-level credit assignment 候选基线的初步筛选，并尝试复现 C3。<br>
-复现检查显示，当前公开仓库尚缺少关键脚本且训练配置与论文不完全对应，因此先明确其可复现边界，再调整下一阶段的问题选择。</p>
-</blockquote>
-<h2 id="本周清单">本周清单</h2>
-<ol>
-<li>初步完成 baseline 选取：C3</li>
-<li>启动 C3 复现与仓库核验</li>
-<li>精读 C3，比较不同粒度的 counterfactual credit assignment</li>
-<li>寻找衡量计算开销的 metric</li>
-</ol>
-<span id="more"></span>
-<hr>
-<h2 id="一、初步完成-baseline-选取：C3">一、初步完成 baseline 选取：C3</h2>
-<p>这一阶段的一个 motivation 是寻找更好的 cost-performance trade-off。当前 agent-level credit assignment 方法大多带有显式介入：例如 SHARP 用 Shapley value 估计单个 agent 的边际贡献。</p>
-<p><img src="/img/weekly/image-20260827164535403.png" alt="SHARP 的 agent 边际贡献估计示意"></p>
-<p>CCPO 和 C3 都利用 counterfactual，但介入粒度不同。CCPO 的做法是 mask 掉一个 agent 后重新进行 rollout，相当于直接考察移除该 agent 后的团队表现；原文讨论的重点似乎是 dual-agent 场景，例如 thinker 与 solver 的有无组合。</p>
-<p>C3 则固定当前上下文，在 step level 替换某一条 message 来构造 counterfactual。相较于 whole-agent removal，它更接近对已完成轨迹中特定通信事件的局部归因。</p>
-<p><img src="/img/weekly/image-20260827194824299.png" alt="CCPO 与 C3 的 counterfactual 粒度对比记录"></p>
-<p><img src="/img/weekly/image-20260827194936368.png" alt="C3 的 step-level message 替换记录"></p>
-<h2 id="二、C3-复现与当前边界">二、C3 复现与当前边界</h2>
-<p>和盛天师哥讨论后，我先尝试复现 C3 的公开代码仓库，目标是核验它在 MATH500、GSM8K 等 benchmark 上的分数和运行链路。</p>
-<p>检查发现，当前仓库缺少 <code>scripts/data/</code> 与 <code>scripts/models/</code>；README 提到的 <code>scripts/models/download_models.sh</code> 也不存在。同时，现有训练脚本与论文中的配置并不完全一致，因此暂时无法从公开 checkout 建立一条可与论文结果严格对应的训练路径。</p>
-<p>我已向作者邮件询问。作者回复称近期会对仓库进行较大规模维护，包括补充缺失文件、整理训练脚本与配置；但公开更新的具体时间尚不明确。基于这一状态，C3 仍可作为方法与估计粒度的研究参照，却不适合作为当前阶段可直接复现、并用于 cost-performance 对比的主基线。</p>
-<p>因此，先不把这一问题绑定在 C3 的复现进度上，转而继续寻找更可验证的研究 gap。</p>
-<h2 id="三、下一步">三、下一步</h2>
-<ol>
-<li>重新聚焦 motivation 与可执行 baseline：考察 agent 广播、通信媒介与通信方式；例如在 latent space 直接传递 hidden state、为不同 policy 保留差异化上下文，以及动态内存与显存分配。</li>
-<li>研究对应 method，明确通信上下文保留、异构 agent 与 agent 数量变化带来的建模约束。</li>
-<li>将 Dr.MAS 纳入 baseline 候选，并与新的研究问题共同评估。</li>
-</ol>
+        <div class="post-body"><h2 id="8-27-组会outline">8.27 组会outline</h2>
+<h5 id="1-初步完成了baseline选取——C3">1.初步完成了baseline选取——C3</h5>
+<h5 id="2-进行C3的复现">2.进行C3的复现</h5>
+<h5 id="3-精读C3">3.精读C3</h5>
+<h5 id="4-寻找衡量计算开销的Metric">4.寻找衡量计算开销的Metric</h5>
+<h3 id="1-初步完成了baseline选取——C3-2">1.初步完成了baseline选取——C3</h3>
+<p>经过前一段时间的调研，在几篇paper中选定了C3作为baseline。因为我的motivation之一是寻找一个比较好的 cost-performance tradeoff ，而针对当前背景下的agent level CA多以介入性方法为主——例如SHARP中是用Shapley值去估每个agent个体的边际贡献</p>
+<p><img src="/img/weekly/image-20260827164535403.png" alt="image-20260827164535403"></p>
+<p>——CCPO和C3都是不同粒度的counterfactual，CCPO直接mask掉一个agent，重新跑一个rollout，相当于直接删除某个 agent 的贡献，只不过作者好像只讨论了dual agent的场景，也就是一个thinker一个solver，对比有/无thinker组别的分数。C3是在冻结（文中用了这个词，其实就是固定住当前上下文）当前上下文以后，替换某个 message，是step level的CA。</p>
+<p><img src="/img/weekly/image-20260827194824299.png" alt="image-20260827194824299"></p>
+<p><img src="/img/weekly/image-20260827194936368.png" alt="image-20260827194936368"></p>
+<h3 id="2-复现C3">2.复现C3</h3>
+<p>和盛天师哥交流了一下然后师哥让我先去复现一下C3的代码仓库，看看能不能先把它在MATH500、GSM8K等bench上的分数<img src="/img/weekly/image-20260827201215880.png" alt="image-20260827201215880"></p>
+<p>然后我去复现的时候发现作者目前的代码仓库中缺少 <code>scripts/data/</code> 和 <code>scripts/models/</code>，而且训练脚本与论文配置存在差异。README中提到的scripts/models/download_models.sh也并不存在，之后我给作者发邮件以后作者回复我说&quot;近期会对代码库进行一次较大规模的维护和更新，包括补充缺失文件、整理训练脚本及配置等。&quot;由于这个作者可能是在打太极，实际什么时候更新代码仓库也不知道，也可能就给不出能复现论文中数据的配置，所以盛天师哥建议我可以换一个方向，暂时不研究这个cost-performance tradeoff问题，寻找其他gap。</p>
+<h3 id="To-do">To do</h3>
+<p>1.寻找新的motivation（现在agent广播。通讯媒介、通信方式：latent space跳过解码文本直接利用hidden state/通信上下文，保留n个agent的上下文，可能导致注意力缺失的drift,保留哪些信息？异构agent,针对不同policy去记住不同内容/agent数量很难做、动态内存/显存分配是难点，agent若作为sub-agent天生具有自动编排能力，快手 web-SWARM/dynamic）及对应baseline（当前C3质量低，且不易于复现）</p>
+<p>2.研究method</p>
+<p>3.Dr.MAS作为baseline</p>
 </div>
 
         
@@ -201,9 +188,9 @@
           
             <a class="post-tag" href="/tags/%E5%91%A8%E6%8A%A5/">#周报</a>
           
-            <a class="post-tag" href="/tags/multi-agent/">#multi-agent</a>
-          
             <a class="post-tag" href="/tags/C3/">#C3</a>
+          
+            <a class="post-tag" href="/tags/multi-agent/">#multi-agent</a>
           
             <a class="post-tag" href="/tags/counterfactual/">#counterfactual</a>
           

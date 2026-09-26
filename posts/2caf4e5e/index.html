@@ -124,8 +124,8 @@
             <h1><span class="title-word">研究周报</span> · <span class="title-date-group"><span class="title-date">2026.03.22–03.28</span><span class="title-separator"> ·</span></span> PSR <span class="title-word">实验</span> <span class="title-latin-term">Block1‑3</span> <span class="title-word">与方向复盘</span></h1>
             
               <span class="post-reading-stats" aria-label="文章字数和预计阅读时间">
-                <span>字数 1,051</span>
-                <span>预计阅读 3 分钟</span>
+                <span>字数 4,038</span>
+                <span>预计阅读 11 分钟</span>
               </span>
             
           </div>
@@ -162,17 +162,20 @@
       </aside>
 
       <div class="article-content-col">
-        <div class="post-body"><blockquote>
-<p>本周主线：<strong>PSR</strong> 实验验证 + 方向复盘。<br>
-跑通了 ProbeCommitEnv 上 8 种方法（PSR / AE / MaskedAE / MaskMA / TIMAR / NextStep / CPC / Scratch）的横向对比，以及与学长的 idea sharing meeting。</p>
-</blockquote>
+        <div class="post-body"><h1>[冯磊组实习] 李晟昊 20260322–20260328</h1>
+<p>List</p>
+<p>1.How PSR came about (详见idea <a target="_blank" rel="noopener external nofollow noreferrer" href="http://sharing.md">sharing.md</a>)</p>
+<p>2.Paper reading (详见idea <a target="_blank" rel="noopener external nofollow noreferrer" href="http://sharing.md">sharing.md</a>)</p>
+<p>3.meeting with Kaibing_Yang</p>
+<p>4.To-do list</p>
+<p>5.idea <a target="_blank" rel="noopener external nofollow noreferrer" href="http://sharing.md">sharing.md</a></p>
+<hr>
 <h2 id="一、概览">一、概览</h2>
 <ol>
 <li><strong>PSR 实验验证</strong>：在 ProbeCommitEnv 上完成 Block 1–3 全部实验（Kill Test、Sample Efficiency、Adaptation Ablation、Nuisance Robustness、Theorem Validation），跑通了 light 版（本地 RTX 4060）和 full 版（服务器 RTX 3090），系统梳理了正面结果与负面结果</li>
-<li><strong>与学长讨论</strong>：组织了一轮 PSR idea sharing meeting，明确了后续研究方向应当与 LLM 场景结合（MARL + LLM Agent），因为师哥师姐在 LLM 研究方向上造诣较深，可获得更多指导</li>
+<li><strong>与杨凯冰学长讨论</strong>：组织了一轮 PSR idea sharing meeting，明确了后续研究方向应当与 LLM 场景结合（MARL + LLM Agent），因为师哥师姐在 LLM 研究方向上造诣较深，可获得更多指导</li>
 <li><strong>方向复盘与规划</strong>：整理了 PSR 当前存在的核心问题、后续投稿策略，以及下一步行动计划</li>
 </ol>
-<span id="more"></span>
 <hr>
 <h2 id="二、experiment">二、experiment</h2>
 <h3 id="2-1-实验框架">2.1 实验框架</h3>
@@ -209,7 +212,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="2-3-negative-result">2.3 negative result</h3>
+<h3 id="2-negative-result">2. negative result</h3>
 <table>
 <thead>
 <tr>
@@ -249,11 +252,9 @@
 <li>研究动机、方法设计、实验结果与存在问题</li>
 <li>学长确认 PSR 方向的基本思路可行，但需要完善内容很多：</li>
 </ul>
-<blockquote>
-<p>Introduction 和 Related Work 需要打磨得非常精细，这是论文最重要的部分。<br>
-打通 user story（研究为什么重要、解决什么问题），因为当前 method 部分在 LLM 时代不算特别新颖，关键看方向是否有意义且新颖。<br>
-冯导对 intro 和 related work 的逻辑严谨性要求很高。</p>
-</blockquote>
+<p>​				Introduction 和 Related Work 需要打磨得非常精细，这是论文最重要的部分</p>
+<p>​				打通 user story（研究为什么重要、解决什么问题），因为当前 method 部分在 LLM 时代不算特别新颖，关键看方向是否有意义且新颖</p>
+<p>​				冯导对 intro 和 related work 的逻辑严谨性要求很高</p>
 <hr>
 <h2 id="四、后续若要推进必须完善的点">四、后续若要推进必须完善的点</h2>
 <h3 id="4-1-motivation">4.1 motivation</h3>
@@ -290,7 +291,7 @@
 <tbody>
 <tr>
 <td><strong>是否已有类似工作？</strong></td>
-<td>需要系统调研：是没人做过？有人做过但失败了？还是前人已经证明成功了？必须自己亲自做这项调研，不能盲目依赖 LLM</td>
+<td>需要系统调研：是没人做过？有人做过但失败了？还是前人已经证明成功了？必须自己亲自做这项调研，不能盲目依赖cc</td>
 </tr>
 <tr>
 <td><strong>在 LLM 场景下的独特性</strong></td>
@@ -325,34 +326,276 @@
 <h2 id="五、To-Do-List">五、To-Do List</h2>
 <h3 id="5-1-未来若要投稿论文">5.1 未来若要投稿论文</h3>
 <ul>
-<li>[ ] 关注三大顶会投稿 DDL：<strong>ICLR</strong>（一般 9–10 月截稿）、<strong>ICML</strong>（一般 1–2 月截稿）、<strong>NeurIPS</strong>（一般 5–6 月截稿）</li>
-<li>[ ] 重点打磨 <strong>Introduction</strong> 和 <strong>Related Work</strong></li>
-<li>[ ] 打通 user story：为什么这个方向重要？解决了什么核心痛点？</li>
-<li>[ ] 方法部分注重与 LLM 时代的结合点</li>
-<li>[ ] 自己做文献调研：系统检索 partner-sufficient / nuisance-robust representation 在 MARL 中是否已有类似工作</li>
-<li>[ ] 论证 MARL 的前景优势（为什么选 multi-agent 而不是 single agent）</li>
-<li>[ ] 明确 nuisance 在不同场景下的形式化定义</li>
-<li>[ ] 论证 partner-sufficient 信息为什么能改善协作（理论 + 直觉）</li>
+<li>
+<p>[ ] 关注三大顶会投稿 DDL：<strong>ICLR</strong>（一般9–10月截稿）、<strong>ICML</strong>（一般1–2月截稿）、<strong>NeurIPS</strong>（一般5–6月截稿）</p>
+</li>
+<li>
+<p>[ ] 重点打磨 <strong>Introduction</strong> 和 <strong>Related Work</strong></p>
+</li>
+<li>
+<p>[ ] 打通 user story：为什么这个方向重要？解决了什么核心痛点？</p>
+</li>
+<li>
+<p>[ ] 方法部分注重与 LLM 时代的结合点</p>
+</li>
+<li>
+<p>[ ] 自己做文献调研：系统检索 partner-sufficient / nuisance-robust representation 在 MARL 中是否已有类似工作</p>
+</li>
+<li>
+<p>[ ] 论证 MARL 的前景优势（为什么选 multi-agent 而不是 single agent）</p>
+</li>
+<li>
+<p>[ ] 明确 nuisance 在不同场景下的形式化定义</p>
+</li>
+<li>
+<p>[ ] 论证 partner-sufficient 信息为什么能改善协作（理论 + 直觉）</p>
+</li>
 </ul>
-<h3 id="5-2-学校方面">5.2 学校方面</h3>
+<h3 id="5-3-学校方面">5.3 学校方面</h3>
 <ul>
 <li>[ ] 填写学校<strong>新人工智能开放实验室</strong>开放课题申请书</li>
 <li>[ ] 找冯导确认研究方向的可行性</li>
-<li>[ ] 与组内师兄分工合作，推进科研基金补助申请</li>
+<li>[ ] 与<strong>晋博</strong>分工合作，推进科研基金补助申请</li>
 <li>[ ] 逐步熟悉智算中心的 <strong>A100 GPU 集群</strong>使用方法，为后续部署 veRL 框架和跑实验做准备</li>
 </ul>
-<h3 id="5-3-技术层面">5.3 技术层面</h3>
+<h3 id="5-4-技术层面">5.4 技术层面</h3>
 <ul>
-<li>[ ] 将 PSR 方向与 LLM Agent 场景结合，思考具体的问题建模方式</li>
-<li>[ ] 解决 adversarial 训练退化问题（考虑 early stopping / 梯度裁剪 / 渐进式 adversarial weight）</li>
-<li>[ ] 重做 estimator</li>
-<li>[ ] 定义真实环境里的 nuisance</li>
-<li>[ ] 准备真实 benchmark pilot（优先 Overcooked，后续 Hanabi）</li>
+<li>
+<p>[ ] 将 PSR 方向与 LLM Agent 场景结合，思考具体的问题建模方式</p>
+</li>
+<li>
+<p>[ ] 解决 adversarial 训练退化问题（考虑 early stopping / 梯度裁剪 / 渐进式 adversarial weight）</p>
+</li>
+<li>
+<p>[ ] 重做 estimator</p>
+</li>
+<li>
+<p>[ ] 定义真实环境里的 nuisance</p>
+</li>
+<li>
+<p>[ ] 准备真实 benchmark pilot（优先 Overcooked，后续 Hanabi）</p>
+</li>
 </ul>
 <hr>
-<blockquote>
-<p>📄 <strong>本周附表（meeting report 详细讨论笔记）不在博客公开</strong>，仅保留以上技术讨论的概览与行动项。</p>
-</blockquote>
+<h1>附表：meeting report</h1>
+<p><strong>Outline</strong></p>
+<ol>
+<li>最近看了哪些东西</li>
+<li>PSR 这个想法是怎么一步步收束出来的</li>
+<li>现在手上的结果</li>
+<li>to-do list</li>
+</ol>
+<hr>
+<h2 id="1-最近的整体工作">1. 最近的整体工作</h2>
+<p>这段时间看了很多 cooperative MARL / MARL pretraining，发现了一个值得研究的方向，就是协作型的MARL智能体往往难以实现迁移。因为大多数预训练保留的都是general observations或者environment dynamic，而非决定队友如何对智能体自身行动作出反应的历史信息。然后大多数论文采取的方法都是把所有信息在transfer的时候都表示出来比如重建 observation、预测 full transition、或者干脆直接 end-to-end 训 policy。然后我和Opus交流之后进行了数轮的/idea-discovery，产出了一个我认为比较有意思的idea。就是可以采取一种 partner-sufficient reward-free pretraining method, 我把它叫做PSR，也就是一种自监督学习目标，仅保留在去中心化执行下预测队友响应结构所需的信息，从无标签的多智能体轨迹中进行学习。</p>
+<p>Opus提出这个idea的思考过程也很直观，简单来说，就是思考：</p>
+<pre class="line-numbers language-none"><code class="language-none">在 cooperative MARL 里，什么信息对于后续和新搭档协作是够用的？<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>如果 observation 里有很多高熵但没用的 nuisance，重建类目标会天然被这些东西吸引，有限容量下很容易把真正和 partner coordination 相关的信息挤掉。</p>
+<p>直觉上：</p>
+<ul>
+<li>cooperative transfer 需要的不是 full-state representation</li>
+<li>更像是一种 partner-centric representation</li>
+<li>它应该保留“我做一个动作之后，队友会怎么接”这一类结构</li>
+<li>不该为了把所有细节都记住而浪费容量</li>
+</ul>
+<p>这个其实就是 PSR 最开始的出发点。</p>
+<hr>
+<h2 id="2-一些碎碎念">2. 一些碎碎念</h2>
+<p>这里主要记我看完上面提到的文章之后，自己的一些感悟。</p>
+<h3 id="2-1-VDN-cooperative-MARL-老工作">2.1 VDN / cooperative MARL 老工作</h3>
+<p><code>Value-Decomposition Networks (VDN, 2017)</code></p>
+<p>Google 的Notebook LM总结这篇文章的核心内容就是<code>针对具有单一联合奖励的合作型MARL问题，传统的完全中心化和完全去中心化方法容易面临严重的“伪奖励”和由于部分可观测性导致的“懒惰智能体（lazy agent）”问题（即某个智能体为了不拖累表现好的队友而放弃学习）</code></p>
+<p>就是说，哪怕 reward 是共享的，也不代表表示会自动学到“队友怎么想/怎么动”。</p>
+<h3 id="2-2-MAPPO-那篇">2.2 MAPPO 那篇</h3>
+<p><code>The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games (MAPPO, 2022)</code></p>
+<p>启示：<br>
+很多时候，一个调得比较对的简单 baseline 就已经很强了。</p>
+<p>我目前最直观的感受就是跑出来的实验结果上来看，scratch baseline的表现似乎比PSR更好…</p>
+<p><img src="/img/weekly/image-20260326205055357.png" alt="image-20260326205055357"></p>
+<p>PSR 的下游性能反而下降更多！ 在 z=16/32 时，AE 的 %Optimal 反而比 PSR 高 6-8pp</p>
+<p>意味着过度抑制 nuisance 可能也丢失了有用信息，或者 adversarial 训练在 200k steps 下导致 encoder 质量退化</p>
+<p>只有在 z=8（低容量）时 PSR 才略赢 AE，说明 PSR 在容量受限时的信息选择优势更明显</p>
+<ul>
+<li>后面如果上真实 benchmark，scratch baseline 一定要很强</li>
+<li>不能只和弱的 reconstruction baseline 比</li>
+<li>如果 PSR 想成立，最好是能解释“为什么它在低数据下更有用”</li>
+</ul>
+<p>不然 reviewer 很容易一句话打回来：那我直接 scratch 训不就行了。</p>
+<h3 id="2-3-Decentralized-Transformer-World-Models">2.3 Decentralized Transformer World Models</h3>
+<p><code>Decentralized Transformers with Centralized Aggregation are Sample-Efficient Multi-Agent World Models (TMLR 2025)</code> 让我重新想了一下“要不要把 cooperative transfer 问题写成 world model 问题”。</p>
+<p>问题就是：</p>
+<ul>
+<li>full joint/world dynamics 很贵</li>
+<li>MARL 里建模所有 agent 的完整动态，本身就是一个很重的目标</li>
+<li>如果我的目标只是 transfer / coordination，没必要先把整个世界都建好</li>
+</ul>
+<p>所以这篇对我的启示是：</p>
+<pre class="line-numbers language-none"><code class="language-none">不需要完整 world model（引入WM研究起来太复杂），只需要保留 teammate-response structure。<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3 id="2-4-Privileged-PORL">2.4 Privileged PORL</h3>
+<p><code>Provable Partially Observable Reinforcement Learning with Privileged Information (2024/2025)</code> 让我了解了partial observability 这个概念。</p>
+<p>首先就是：</p>
+<ul>
+<li>在 POMDP 里，训练时如果有额外信息，确实可以帮助学到更好的东西</li>
+<li>但 deployment 的时候，agent 还是只能靠部分观测活</li>
+</ul>
+<p>这对我现在的启发是：</p>
+<ul>
+<li>cooperative MARL 里很多“对合作有用的信息”不是显式给出来的</li>
+<li>pretraining 能否通过轨迹结构、partner-response prediction、或者某种 auxiliary target 把这些信息抽出来，就比如设计一些辅助任务</li>
+<li>重点不是让 deployment 更复杂，而是让 pretraining 更对题</li>
+</ul>
+<h3 id="2-5-MetaDrive-ScenarioNet">2.5 MetaDrive / ScenarioNet</h3>
+<p>更像是 benchmark 设计上的提醒。</p>
+<p>它们让我觉得，之后如果真要把 PSR 往真实环境推，不能随便搞几个 task 就说 transfer 了。<br>
+partner variation 和 scenario diversity 最好是系统化设计出来的，不然很容易变成“只在某几个特例里有效”。</p>
+<p>codex给出的建议是：</p>
+<ul>
+<li>partner family / convention cluster 要不要显式设计</li>
+<li>正例 transfer 和负例 transfer 要不要都做</li>
+<li>真实 benchmark 里能不能把“同 response structure / 不同 response structure”区分开</li>
+</ul>
+<h3 id="2-6-Social-Robot-Navigation">2.6 Social Robot Navigation</h3>
+<p>然后我还读了一篇<code>Multi-Agent Dynamic Relational Reasoning for Social Robot Navigation (2024)</code>的论文。就是他也是研究的多智能体问题里关键点往往不是 raw observation 本身，而是 interaction structure / relation structure。  和我现在想抓的 teammate-response structure 其实是一个意思。说明这个思路还是挺靠谱的hhh，毕竟有应用先例了。</p>
+<h3 id="2-7-CAMEL-MetaGPT-Chain-of-Agents-这些">2.7 CAMEL / MetaGPT / Chain-of-Agents 这些</h3>
+<p>这几篇就不属于 cooperative MARL baseline了，他们主要讲的工作流编排（Workflow Orchestration）与角色分配（Role Assignment）。但我觉得这几篇文章主要让我确信了**“多智能体协作”这件事在 agent/LLM 场景里越来越重要**.</p>
+<hr>
+<h2 id="3-为什么想出来PSR这个idea">3. 为什么想出来PSR这个idea</h2>
+<h3 id="3-1-对于reconstruction-必要性的质疑">3.1 对于reconstruction 必要性的质疑</h3>
+<p>如果 observation 里同时有：</p>
+<ul>
+<li>真正决定 partner 行为的东西</li>
+<li>很多无关但高熵、很好重建的 nuisance</li>
+</ul>
+<p>那 AE / masked AE 这类目标很容易优先学后者。<br>
+从优化角度看这甚至很正常，因为 nuisance 往往量大、稳定、loss 好降。</p>
+<p>但 cooperative transfer 真的不需要这些。</p>
+<h3 id="3-2-不想把目标写成full-transition-prediction">3.2 不想把目标写成full transition prediction</h3>
+<p>next-step / dynamics 预测当然比纯重建更好一点，但它还是偏 environment-centric。</p>
+<p>如果后续的 reward / task 变化主要发生在 coordination 逻辑这一侧，那么 full dynamics 也可能学得很努力，但完全学偏了…</p>
+<h3 id="3-3-所以回到最开始的问题：最小充分信息是什么">3.3 所以回到最开始的问题：最小充分信息是什么?</h3>
+<p>Opus大佬认为：</p>
+<pre class="line-numbers language-none"><code class="language-none">对 cooperative downstream 来说，只要我知道“在当前 history 下，我采取某个动作后，队友会如何响应”，很多决策就已经够做了。<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>出于对截至2026.3.26  21:10 pm.最强agent的信任。PSR 的idea就产生了：</p>
+<ul>
+<li>不是去重建所有 observation</li>
+<li>不是去拟合整个环境</li>
+<li>而是去保留 partner-response kernel 相关的信息</li>
+<li>同时主动压掉 nuisance</li>
+</ul>
+<h3 id="3-4-方法雏形（待验证）">3.4 方法雏形（待验证）</h3>
+<p>codex：</p>
+<ol>
+<li>用 reward-free 的轨迹做 pretraining</li>
+<li>encoder 看 ego observation / history</li>
+<li>latent 需要预测 teammate action / teammate response 相关结构</li>
+<li>同时做 next-latent prediction，保证不是只记一个静态标签</li>
+<li>再加 nuisance suppression，让表示别被无关信息占满</li>
+<li>downstream 先用 frozen 适配，看这个 latent 到底有没有 transfer 价值</li>
+</ol>
+<hr>
+<h2 id="4-Experiment-part-和现有方法进行横向对比">4. Experiment part (和现有方法进行横向对比)</h2>
+<p>经过和Opus聊天，我得知了很多现有方法（待验证AI幻觉）：</p>
+<ul>
+<li>vs AE / masked AE：谁保留的信息更对题</li>
+<li>vs next-step / world model：谁更会建模 teammate-response structure</li>
+<li>vs scratch policy learning：什么 pretraining 在 partner transfer 场景下真的有价值</li>
+</ul>
+<hr>
+<h2 id="5-目前手上已经有的结果">5. 目前手上已经有的结果</h2>
+<h4 id="1-PSR-的表示确实更“干净”">(1) PSR 的表示确实更“干净”</h4>
+<p>这个是我目前最有信心的一点。</p>
+<p>在现在的 synthetic Probe-Commit 环境里：</p>
+<ul>
+<li>easy 设定下，PSR 的 <code>u_probe</code> 基本在 <code>0.9997~1.0</code></li>
+<li>对 nuisance 的泄漏 <code>n_R2</code> 只有 <code>0.014~0.026</code></li>
+<li>hard 设定下，<code>u_probe</code> 还是 <code>0.999+</code></li>
+<li><code>n_R2</code> 甚至能压到 <code>0.003~0.008</code></li>
+</ul>
+<p>对比 AE 那边，<code>n_R2</code> 很容易大很多，Block 2 里最高能到 <code>0.998</code>。<br>
+这说明 reconstruction 确实会被 nuisance 吸过去，而 PSR 至少在这个 controlled setup 里，真的学到了“保留 u、压掉 n”。</p>
+<h4 id="2-在-pretrained-methods-里面，PSR-目前是最稳的">(2) 在 pretrained methods 里面，PSR 目前是最稳的</h4>
+<p>标准设置里：</p>
+<ul>
+<li>PSR 最终大概 <code>75.1%</code> optimal</li>
+<li>AE 大概 <code>71.9%</code></li>
+<li>MaskedAE / MaskMA 大概 <code>74.4~74.6%</code></li>
+<li>TIMAR / NextStep / CPC 更低</li>
+</ul>
+<p>更难的设置里：</p>
+<ul>
+<li>PSR 大概 <code>60.6%</code></li>
+<li>AE 大概 <code>53.1%</code></li>
+<li>MaskMA 大概 <code>50.3%</code></li>
+<li>TIMAR 大概 <code>32.6%</code></li>
+</ul>
+<pre class="line-numbers language-none"><code class="language-none">PSR 是目前这些 pretrained baselines 里最靠谱的。<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h4 id="3-nuisance-story-是成立的">(3) nuisance story 是成立的</h4>
+<p>Block 2 的结果我觉得挺关键，因为它不是单纯“谁最后分高一点”，而是更像机制验证：</p>
+<ul>
+<li>nuisance 增大时，AE 的 <code>n_R2</code> 会一路上升，说明它在记无关信息</li>
+<li>PSR 的 <code>n_R2</code> 基本稳定在 <code>0.01~0.05</code></li>
+<li>说明 PSR 的 inductive bias 确实更偏“只抓合作相关结构”</li>
+</ul>
+<p>这个故事目前是通的。</p>
+<h3 id="5-2-目前的negative-result">5.2 目前的negative result</h3>
+<h4 id="1-kill-test-其实没有-kill-成">(1) kill test 其实没有 kill 成</h4>
+<p>标准设置里虽然 PSR 是第一，但：</p>
+<ul>
+<li><code>75.1%</code> vs 最好 baseline <code>74.6%</code></li>
+<li>gap 只有 <code>0.5</code> 个点左右</li>
+</ul>
+<p>hard 设置里虽然比 AE 高 <code>7.5</code> 个点，但远远达不到那种“把其它方法直接杀掉”的程度。</p>
+<p>所以如果继续叫 kill test，会有点 overstated。</p>
+<h4 id="2-scratch-还是很强">(2) scratch 还是很强</h4>
+<p>这个也是现在最现实的问题。</p>
+<p>在 hard main setting 里：</p>
+<ul>
+<li>PSR 大概 <code>60.6%</code></li>
+<li>Scratch 大概 <code>71.3%</code></li>
+</ul>
+<p>也就是说，目前证明不了它在整体实用性上全面超过 scratch。</p>
+<h4 id="3-theorem-那条线现在是负结果">(3) theorem 那条线现在是负结果</h4>
+<p>目前empirical <code>epsilon-hat</code> 预测不了 transfer gap<br>
+所以如果继续把 theorem validation 当 central selling point，会很危险。</p>
+<p>所以之后肯定要重做这个epsilon estimator的。</p>
+<hr>
+<h2 id="6-接下来的安排（Opus评价）">6. 接下来的安排（Opus评价）</h2>
+<h3 id="6-1-先做一个最小可用的真实-benchmark-pilot">6.1 先做一个最小可用的真实 benchmark pilot</h3>
+<p>我倾向先上 Overcooked pilot，而不是一口气同时做 Overcooked + Hanabi。</p>
+<p>原因很简单：</p>
+<ul>
+<li>Overcooked 更适合看 coordination / convention / cross-play</li>
+<li>训练和 debug 成本应该比 Hanabi 更可控</li>
+<li>如果 Overcooked pilot 都没有信号，就没必要太早扑到 Hanabi</li>
+</ul>
+<h3 id="6-2-评价指标不要只看-final-score">6.2 评价指标不要只看 final score</h3>
+<p>如果只看最后分数，scratch 很容易吃掉很多优势。<br>
+我觉得更该看的可能是：</p>
+<ul>
+<li>low-data adaptation AUC</li>
+<li>cross-play with unseen partners</li>
+<li>convergence speed</li>
+<li>partner robustness</li>
+<li>same-family vs cross-family transfer</li>
+</ul>
+<p>这样才更容易对齐 PSR 本来的问题意识。</p>
+<hr>
+<h2 id="7-to-do-list">7. to-do list</h2>
+<ol>
+<li>
+<p>重做 estimator</p>
+</li>
+<li>
+<p>motivation讲清楚</p>
+</li>
+<li>
+<p>定义真实环境里的 nuisance</p>
+<hr>
+<p>做 Overcooked pilot，先验证有没有 partner transfer 信号</p>
+</li>
+</ol>
+<p>给真实环境补强 baseline，strong scratch / PPO （经典算法）, GRPO类 baseline etc.（baseline 和motivation匹配，<strong>时效性</strong>）</p>
+<p>把 frozen / finetune / low-data 这三种 adaptation protocol 分开讲，不要混在一起</p>
 </div>
 
         
