@@ -4,6 +4,41 @@
   
     
     <entry>
+      <title>研究周报 · 2026.10.08-10.14 · Dr.MAS Verifier 行为诊断与 AIME&#39;24 重复评测</title>
+      <link href="/posts/c7f5af4b/"/>
+      <url>/posts/c7f5af4b/</url>
+      
+        <content type="html"><![CDATA[<h2 id="2026-10-8-2026-10-14-weekly-report-by-李晟昊">2026.10.8-2026.10.14 weekly report by 李晟昊</h2><p>list:</p><ol><li>Dr.MAS Verifier行为诊断（approve率和实际loop数）</li><li>AIME’24重复eval（+12.2是不是噪声）</li><li>to-do</li></ol><h3 id="1-Dr-MAS-Verifier行为诊断">1. Dr.MAS Verifier行为诊断</h3><p>上周to-do的第一条，让Claude给math_orchestra.run()加了approve率和实际loop数的metrics，然后在大数据平台上跑了个短作业，看Verifier有没有degenerate成永远approve。结论是没有，反而更容易拒绝了，non-sharing的Verifier训完之后差不多变成了永远reject。</p><h4 id="1-1-加的指标">1.1 加的指标</h4><p>读代码的时候先发现了一个坑，agent_system/agent/agents/math/verifier_agent.py:81里，Verifier的输出里既没有approve也没有reject的时候（被截断或者大小写不对），是直接按approve处理的。所以如果只看approved_vector.mean()，被截断的Verifier也会被算成approve，于是我把判决拆成了三类单独记。</p><ul><li>run()里记每道题实际跑了几轮Solver（loop数）和Verifier每次的判决（显式approve / 显式reject / 无判决），挂到每个agent的batch上，在ray_trainer的_validate()里按traj_uid去重后汇总成val/orchestra/<em>，fit()里也加了train/orchestra/</em>（这一路还没真正跑过）</li><li><strong>approve_rate_on_wrong</strong>：最终答案错的轨迹里被Verifier放行的比例，永远approve的Verifier这里是1</li><li><strong>approve_rate_on_correct</strong>：最终答案对的轨迹里被放行的比例</li></ul><h4 id="1-2-结果">1.2 结果</h4><p>用的是训练时的test_sampled（MATH500前50题 + AIME’24 30题 + AIME’25 30题，共110题），val_n=8，每组880条轨迹，temperature 0.6。除了两个step 814的checkpoint，还加了一组没训过的Qwen3-4B跑同一套orchestra当base，不然说不了&quot;退化&quot;。</p><table><thead><tr><th></th><th>base</th><th>sharing@814</th><th>non-sharing@814</th></tr></thead><tbody><tr><td>avg@8</td><td>48.5</td><td>63.7</td><td>66.9</td></tr><tr><td>approve率</td><td>74.0</td><td>58.8</td><td>21.8</td></tr><tr><td>reject率</td><td>26.0</td><td>41.2</td><td>78.2</td></tr><tr><td>无判决</td><td>0</td><td>0.9</td><td>0</td></tr><tr><td>实际loop数均值</td><td>1.26</td><td>1.41</td><td>1.78</td></tr><tr><td>错误答案被放行</td><td>50.3</td><td>17.6</td><td>5.8</td></tr><tr><td>正确答案被放行</td><td>99.1</td><td>82.2</td><td>29.7</td></tr><tr><td>放行后正确率</td><td>65.0</td><td>89.2</td><td>91.1</td></tr><tr><td>被拒重试后正确率</td><td>1.7</td><td>27.5</td><td>60.2</td></tr></tbody></table><p>发现了以下几点：</p><ul><li>base的Verifier很松，错的答案一半都放过去了（50.3%），对的几乎全放（99.1%），被拒之后的重试也基本救不回来（1.7%）</li><li>sharing训完之后Verifier更有区分度了，错的只放过17.6%，对的还放82.2%，算是往好的方向走</li><li>但是non-sharing的reject率78.2%，对的答案也只放过29.7%，基本每题都reject。MATH500前50题上最终正确率91.2%，它还是拒了66.0%，而被拒的题重试后92.8%是对的，比整体还高，拒掉的应该大多是本来就能做对的题</li><li>无判决的比例几乎是0（sharing最高也只有0.9%），所以不是截断的问题，Verifier是明确输出了reject</li></ul><p>所以上周担心的&quot;degenerate成永远approve，Solver进不了第二轮&quot;没有发生，non-sharing反而有78%的题都进了第二轮。</p><p>base在1卡和4卡上各跑了一次，approve率72.5 vs 74.0，avg@8 48.2 vs 48.5，结果是稳定的。</p><p>同时，sharing@814在AIME’24上这次avg@8是47.5，跟上周算的训练中val的均值47.7几乎一样，论文的39.3比这个均值还是低了1.3σ左右。</p><h4 id="1-3-用test-score反推reject率">1.3 用test_score反推reject率</h4><p>max_loop_num=2时approve的轨迹是2行（Solver、Verifier），reject的是3行（多一行Solver重试），每行都记整条轨迹的0/1 reward，设N为轨迹数、C为答对数、R为被reject的数、B为被reject里最后答对的数，那么</p><p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>test_score</mtext><mo>=</mo><mfrac><mrow><mn>2</mn><mi>C</mi><mo>+</mo><mi>B</mi></mrow><mrow><mn>2</mn><mi>N</mi><mo>+</mo><mi>R</mi></mrow></mfrac><mo separator="true">,</mo><mspace width="2em"/><mtext>avg@k</mtext><mo>=</mo><mfrac><mi>C</mi><mi>N</mi></mfrac></mrow><annotation encoding="application/x-tex">\text{test\_score}=\frac{2C+B}{2N+R},\qquad \text{avg@k}=\frac{C}{N}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9251em;vertical-align:-0.31em;"></span><span class="mord text"><span class="mord">test_score</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.1297em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">avg@k</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p><p>np.mean对0/1求平均就是两个整数做一次除法。完整eval（1547题×16）反推和跟这次实测对照：</p><table><thead><tr><th>reject率</th><th>反推（完整测试集×16）</th><th>实测（110题×8）</th></tr></thead><tbody><tr><td>sharing AIME’24</td><td>65.0</td><td>61.7</td></tr><tr><td>sharing AIME’25</td><td>67.7</td><td>67.5</td></tr><tr><td>sharing MATH500</td><td>13.9</td><td>13.3（前50题）</td></tr><tr><td>non-sharing AIME’24</td><td>30.8或88.5（两个解）</td><td>88.3</td></tr><tr><td>non-sharing AIME’25</td><td>88.7</td><td>88.3</td></tr><tr><td>non-sharing MATH500</td><td>63.0</td><td>66.0（前50题）</td></tr></tbody></table><p>相当于日志里只记了 test_score和avg@k两个汇总数，没有直接记录 Verifier 的reject 率。但可以利用 “0/1 求平均的结果是两个整数相除”这一点，从这两个数把 reject 率 R/N 反推出来。然后另跑一次小规模实验，直接测出 reject 率来对照，确认反推是对的。</p><h4 id="1-4-Verifier">1.4 Verifier</h4><p>上周我根据non-sharing下Verifier的entropy全程0.20~0.26、pg_loss比Solver小两个数量级，说Verifier几乎没被训动，但这周直接测出来reject率从base的26.0%变成了78.2%，至少在行为上这个说法站不住。可能是entropy和pg_loss被前面一大段critique的token主导了，最后那个approve/reject的分布变了也看不出来(猜测)。</p><p>还有一个混淆没排除，base这组的Solver也是没训过的，Verifier看到的解答本身就不一样，reject率变高可能有一部分是Solver的输出变了，不完全是Verifier自己变了。non-sharing两个模型是分开存的，交叉组合一下（训过的Solver配没训的Verifier，再反过来一组）就能拆开，sharing共用一个模型拆不了。</p><h4 id="1-5-猜想">1.5 猜想</h4><p>max_loop_num=2的时候reject只会让Solver再改一遍，而且改完不再验证，重试的正确率又不低（non-sharing是60.2%），所以Verifier错拒一次几乎不会被团队的结果reward惩罚，它的判决跟最终reward之间的联系很弱(猜测)。这跟上周1.5里说的traj级reward、Verifier拿不到有效advantage应该是同一个原因。可以跟上周的梯度曲线一起放进作为motivation之一（猜测）。</p><p>还有一个小插曲是，我原本想把作业拆成1卡和2卡的小作业插空，结果带checkpoint的两组都在加载的时候FileNotFoundError，verl的FSDP checkpoint是按保存时的卡数分片的（model_world_size_4_rank_0~3.pt），换了卡数就找不到文件，只有不加载checkpoint的base跑成了，最后还是等4卡的作业跑完。以后resume这两个checkpoint只能用4卡，除非先合并成HF格式</p><p>代码在experiments/drmas_overlay/，结果在experiments/results/orchestra_diag_1126238.json。</p><h3 id="2-AIME’24重复eval">2. AIME’24重复eval</h3><p>上周to-do的第2条。上周1.3里我拿训练中val的avg@1标准差（6.2）当σ，说sharing在AIME’24上比论文高的+12.2大概1.5~2σ，在可接受的范围内。这周把sharing的checkpoint在AIME’24上重复eval了16次，结论是+12.2不在重复eval的波动范围里，上周这个判断是错的。</p><h4 id="2-1-做法">2.1 做法</h4><ul><li>上周想用的step 775其实已经没有权重了，global_step_775/actor/是空的，<a href="http://xn--data-k84fuit5y87c.pt">只剩一个data.pt</a>，是max_actor_ckpt_to_keep=2的轮转删掉的。完整留下来的是800和814（verl在最后一步也会存一次）</li><li>AIME’24的30题复制8份拼成一个parquet，每份的data_source改成aime24_r0~r7，val_n还是16，这样一次加载就能拿到8个独立的avg@16（data_source在这条路径上只是个标签，env打分用的是env_kwargs里的，没动）</li><li>launcher直接用1089597那次eval的，只改了验证文件、env.seed（0→1）、实验名和resume的step，814和800各跑一遍，作业1126291，排了21个多小时的队，4卡跑了1小时13分</li><li>作业最后自动汇总的summary没解析出来（Ray给日志每行前面加了(TaskRunner pid=…)，脚本只认行首的step:），下面的数是直接从两份日志里step:814和step:800那两行指标读的。日志里只有3位小数，但avg@16一定是k/480，换算回去是唯一的</li></ul><h4 id="2-2-结果">2.2 结果</h4><p>AIME’24 avg@16，每个checkpoint 8次：</p><table><thead><tr><th></th><th>8次avg@16</th><th>均值</th><th>标准差</th><th>范围</th></tr></thead><tbody><tr><td>step 814</td><td>46.0, 51.0, 49.4, 47.1, 48.5, 49.0, 49.0, 48.1</td><td>48.52</td><td>1.50</td><td>46.0~51.0</td></tr><tr><td>step 800</td><td>49.6, 49.2, 48.5, 47.3, 49.2, 47.3, 48.5, 50.0</td><td>48.70</td><td>0.99</td><td>47.3~50.0</td></tr></tbody></table><p>pass@16的均值是79.2（814）和77.9（800），标准差都在2.4左右。</p><ul><li>同一个checkpoint重复eval，avg@16的标准差只有1.0~1.5，814和800之间也基本没差（-0.18，se 0.64）</li><li>上周那次eval的51.5，这8次里一次都没到（最高51.0），比814的均值高2.9，大概+2σ，那次算是偏高的</li><li>论文的39.3比814的均值低9.2，大概-6σ，8次里最低的也有46.0</li><li>用重复eval的均值48.5代替单次的51.5，和论文的差距从+12.2变成+9.2，还是远在eval噪声之外</li></ul><h4 id="2-3-上周的σ用错了">2.3 上周的σ用错了</h4><p>上周拿来当σ的6.2是训练中avg@1的波动，每题只采1个样本，avg@16每题平均了16个样本，采样噪声差不多要除以√16=4。我还说30题的题目集方差压不掉，实则是因为拿avg@1的σ去衡量avg@16的差距，会把噪声高估好几倍。</p><p>30题×16个样本的时候avg@16的采样标准差其实有个上限，每道题正确率都刚好50%的时候取到</p><p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>σ</mi><mtext>avg@16</mtext></msub><mo>≤</mo><mfrac><mn>1</mn><mn>30</mn></mfrac><msqrt><mfrac><mrow><mn>30</mn><mo>×</mo><mn>0.25</mn></mrow><mn>16</mn></mfrac></msqrt><mo>≈</mo><mn>2.3</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">\sigma_{\text{avg@16}}\le\frac{1}{30}\sqrt{\frac{30\times 0.25}{16}}\approx 2.3\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9221em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">avg@16</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.44em;vertical-align:-0.7884em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">30</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6516em;"><span class="svg-align" style="top:-4.4em;"><span class="pstrut" style="height:4.4em;"></span><span class="mord" style="padding-left:1em;"><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">16</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">30</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">0.25</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:-3.6116em;"><span class="pstrut" style="height:4.4em;"></span><span class="hide-tail" style="min-width:1.02em;height:2.48em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="2.48em" viewBox="0 0 400000 2592" preserveAspectRatio="xMinYMin slice"><path d="M424,2478c-1.3,-0.7,-38.5,-172,-111.5,-514c-73,-342,-109.8,-513.3,-110.5,-514c0,-2,-10.7,14.3,-32,49c-4.7,7.3,-9.8,15.7,-15.5,25c-5.7,9.3,-9.8,16,-12.5,20s-5,7,-5,7c-4,-3.3,-8.3,-7.7,-13,-13s-13,-13,-13,-13s76,-122,76,-122s77,-121,77,-121s209,968,209,968c0,-2,84.7,-361.7,254,-1079c169.3,-717.3,254.7,-1077.7,256,-1081l0 -0c4,-6.7,10,-10,18,-10 H400000v40H1014.6s-87.3,378.7,-272.6,1166c-185.3,787.3,-279.3,1182.3,-282,1185c-2,6,-10,9,-24,9c-8,0,-12,-0.7,-12,-2z M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7884em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">2.3%</span></span></span></span></span></p><p>这次实测的1.0~1.5也在这个范围里。1.2最后那句&quot;论文的39.3比这个均值还是低了1.3σ左右&quot;用的也是6.2这个σ，同样不成立。</p><h3 id="3-to-do">3. to-do</h3><ol><li>交叉组合eval（训过的Solver+没训的Verifier，没训的Solver+训过的Verifier），把non-sharing reject率的变化拆成Solver和Verifier各自的贡献</li><li>AIME’24的+9.2 eval噪声解释不了，可以再训一个seed看训练本身的波动</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 周报 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 周报 </tag>
+            
+            <tag> multi-agent </tag>
+            
+            <tag> Dr.MAS </tag>
+            
+            <tag> 强化学习 </tag>
+            
+            <tag> Verifier </tag>
+            
+            <tag> AIME </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>研究周报 · 2026.09.14-09.20 · Dr.MAS 和 C3 实验</title>
       <link href="/posts/3bf71b0a/"/>
       <url>/posts/3bf71b0a/</url>
@@ -24,11 +59,11 @@
             
             <tag> 周报 </tag>
             
+            <tag> C3 </tag>
+            
             <tag> CAD-GRPO </tag>
             
             <tag> Dr.MAS </tag>
-            
-            <tag> C3 </tag>
             
             <tag> Qwen3 </tag>
             
@@ -57,9 +92,9 @@
             
             <tag> 周报 </tag>
             
-            <tag> Dr.MAS </tag>
-            
             <tag> multi-agent </tag>
+            
+            <tag> Dr.MAS </tag>
             
             <tag> Qwen3 </tag>
             
@@ -176,11 +211,11 @@
             
             <tag> CAD-GRPO </tag>
             
-            <tag> GiGPO </tag>
-            
             <tag> multi-agent </tag>
             
             <tag> orchestration trace </tag>
+            
+            <tag> GiGPO </tag>
             
         </tags>
       
@@ -209,19 +244,19 @@
             
             <tag> 周报 </tag>
             
-            <tag> CAD-GRPO </tag>
-            
-            <tag> DAPO </tag>
-            
             <tag> C3 </tag>
             
             <tag> CCPO </tag>
+            
+            <tag> CAD-GRPO </tag>
             
             <tag> credit-assignment </tag>
             
             <tag> multi-agent </tag>
             
             <tag> minimal-agent-harness </tag>
+            
+            <tag> DAPO </tag>
             
             <tag> NPO </tag>
             
@@ -693,11 +728,11 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
+      <title>搜索</title>
+      <link href="/search/index.html"/>
+      <url>/search/index.html</url>
       
-        <content type="html"><![CDATA[<h2 id="你好-👋">你好 👋</h2><p>我是 <strong>Yoyo_Lee</strong>。</p><p>这是我的个人角落，通常会写以下两方面：</p><ul><li>🧪 <strong>研究 / 笔记</strong>：机器学习、深度学习、多智能体、LLM 训练</li><li>🌿 <strong>生活 / 随笔</strong>：日常分享</li></ul><h2 id="联系">联系</h2><ul><li>GitHub: <a href="https://github.com/yo666666yo">Yoyo_Lee</a></li><li>RSS: <a href="/atom.xml">/atom.xml</a></li></ul><h2 id="关于这个博客">关于这个博客</h2><ul><li>框架：<a href="https://hexo.io/">Hexo</a> 8</li><li>主题：本地定制的 Clean Blog（移植自 <a href="https://startbootstrap.com/theme/clean-blog">Start Bootstrap Clean Blog</a>）</li><li>部署：GitHub Pages + GitHub Actions</li><li>评论：Giscus（基于 GitHub Discussions）</li><li>源码：<a href="https://github.com/yo666666yo/yo666666yo.github.io">GitHub Pages 仓库</a></li></ul><p>如果某篇文章对你有帮助，欢迎在评论区留言；有错请不吝指出。</p>]]></content>
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
@@ -715,11 +750,11 @@
     
     
     <entry>
-      <title>搜索</title>
-      <link href="/search/index.html"/>
-      <url>/search/index.html</url>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<h2 id="你好-👋">你好 👋</h2><p>我是 <strong>Yoyo_Lee</strong>。</p><p>这是我的个人角落，通常会写以下两方面：</p><ul><li>🧪 <strong>研究 / 笔记</strong>：机器学习、深度学习、多智能体、LLM 训练</li><li>🌿 <strong>生活 / 随笔</strong>：日常分享</li></ul><h2 id="联系">联系</h2><ul><li>GitHub: <a href="https://github.com/yo666666yo">Yoyo_Lee</a></li><li>RSS: <a href="/atom.xml">/atom.xml</a></li></ul><h2 id="关于这个博客">关于这个博客</h2><ul><li>框架：<a href="https://hexo.io/">Hexo</a> 8</li><li>主题：本地定制的 Clean Blog（移植自 <a href="https://startbootstrap.com/theme/clean-blog">Start Bootstrap Clean Blog</a>）</li><li>部署：GitHub Pages + GitHub Actions</li><li>评论：Giscus（基于 GitHub Discussions）</li><li>源码：<a href="https://github.com/yo666666yo/yo666666yo.github.io">GitHub Pages 仓库</a></li></ul><p>如果某篇文章对你有帮助，欢迎在评论区留言；有错请不吝指出。</p>]]></content>
       
     </entry>
     
